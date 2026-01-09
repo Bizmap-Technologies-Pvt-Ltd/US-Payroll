@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:insurance_provider",
+ "creation": "2025-12-27 01:47:34.200145",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "insurance_provider",
+  "accounts",
+  "section_break_e4im",
+  "provider_name",
+  "provider_code",
+  "default_contribution_",
+  "employee_share_",
+  "employer_share_",
+  "active"
+ ],
+ "fields": [
+  {
+   "fieldname": "insurance_provider",
+   "fieldtype": "Data",
+   "label": "Insurance Provider",
+   "unique": 1
+  },
+  {
+   "fieldname": "provider_name",
+   "fieldtype": "Data",
+   "label": "Provider Name"
+  },
+  {
+   "fieldname": "provider_code",
+   "fieldtype": "Data",
+   "label": "Provider Code"
+  },
+  {
+   "fieldname": "default_contribution_",
+   "fieldtype": "Percent",
+   "label": "Default Contribution %"
+  },
+  {
+   "fieldname": "employee_share_",
+   "fieldtype": "Percent",
+   "label": "Employee Share %"
+  },
+  {
+   "fieldname": "employer_share_",
+   "fieldtype": "Percent",
+   "label": "Employer Share %"
+  },
+  {
+   "default": "0",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active"
+  },
+  {
+   "fieldname": "accounts",
+   "fieldtype": "Table",
+   "label": "Accounts",
+   "options": "Salary Component Account"
+  },
+  {
+   "fieldname": "section_break_e4im",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-05 20:15:33.532708",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "Insurance Provider",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

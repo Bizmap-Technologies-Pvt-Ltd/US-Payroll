@@ -201,15 +201,12 @@ class OverrideSalarySlip(OverrideSalarySlip):
 
 
 	def set_net_total_in_words(self):
-		print("calllllllllllllllllllllllllllllllllllllllllllllll")
 		doc_currency = self.currency
 		company_currency = erpnext.get_company_currency(self.company)
 		total = self.net_pay if self.is_rounding_total_disabled() else self.rounded_total
 		base_total = self.base_net_pay if self.is_rounding_total_disabled() else self.base_rounded_total
 		self.total_in_words = money_in_words(total, doc_currency)
 		self.base_total_in_words = money_in_words(base_total, company_currency)
-
-		print(doc_currency, company_currency, total, base_total, "calllllllllllllllllllllllllllllllllllllllllllllll")
 
 	def on_update(self):
 		self.publish_update()
@@ -1220,7 +1217,7 @@ class OverrideSalarySlip(OverrideSalarySlip):
 					if sal_assignment_name:
 						sal_assignment_doc = frappe.get_doc("Salary Structure Assignment",sal_assignment_name)
 						for r in sal_assignment_doc.custom_employee_insurance_deduction:
-							if r.component== struct_row.salary_component:
+							if r.salary_component == struct_row.salary_component:
 								return r.amount
 
 					return 0.0

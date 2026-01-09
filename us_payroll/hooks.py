@@ -44,6 +44,10 @@ app_license = "mit"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+
+doctype_js = {"Salary Structure Assignment" : "custom_script/salary_structure_assignment.js"}
+
+
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -131,7 +135,8 @@ app_license = "mit"
 
 override_doctype_class = {
     # "ToDo": "custom_app.overrides.CustomToDo"
-    "Salary Slip":"us_payroll.override.salary_slip.OverrideSalarySlip"
+    "Salary Slip":"us_payroll.override.salary_slip.OverrideSalarySlip",
+    "Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry"
 }
 
 # Document Events

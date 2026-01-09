@@ -7,9 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "insurance_company",
-  "component",
-  "custom_aflacaccident_bt",
-  "category",
+  "salary_component",
   "amount",
   "tax_type",
   "is_active"
@@ -17,33 +15,11 @@
  "fields": [
   {
    "columns": 2,
-   "fieldname": "component",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Component",
-   "options": "Salary Component"
-  },
-  {
-   "columns": 1,
-   "fieldname": "custom_aflacaccident_bt",
-   "fieldtype": "Currency",
-   "label": "custom_aflacaccident_bt"
-  },
-  {
-   "columns": 2,
    "fieldname": "insurance_company",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Insurance Company",
-   "options": "Insurance Company"
-  },
-  {
-   "columns": 1,
-   "fieldname": "category",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Category",
-   "options": "\nAccident\nDental\nCancer\nHospital\nMedical\nVision"
+   "label": "Insurance Provider",
+   "options": "Insurance Provider"
   },
   {
    "columns": 1,
@@ -64,13 +40,20 @@
    "fieldname": "is_active",
    "fieldtype": "Check",
    "label": "Is Active"
+  },
+  {
+   "fieldname": "salary_component",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Salary Component"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-26 03:06:20.632435",
+ "modified": "2026-01-05 04:30:44.754803",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Employee Insurance Deduction",
