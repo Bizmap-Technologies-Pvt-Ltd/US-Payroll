@@ -45,7 +45,11 @@ app_license = "mit"
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 
-doctype_js = {"Salary Structure Assignment" : "custom_script/salary_structure_assignment.js"}
+doctype_js = {
+                "Salary Structure Assignment" : "custom_script/salary_structure_assignment.js",
+                "Salary Component" : "custom_script/salary_component.js",
+
+            }
 
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}

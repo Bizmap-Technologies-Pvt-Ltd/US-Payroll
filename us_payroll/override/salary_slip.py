@@ -1199,7 +1199,7 @@ class OverrideSalarySlip(OverrideSalarySlip):
 		return frappe.cache().get_value(SALARY_COMPONENT_VALUES, generator=_fetch_component_values)
 
 	def eval_condition_and_formula(self, struct_row, data):
-		print("22222222222222")
+		print("eval_condition_and_formula custom_formula 222222222")
 		try:
 			condition = sanitize_expression(struct_row.condition)
 			if condition:
@@ -1209,19 +1209,14 @@ class OverrideSalarySlip(OverrideSalarySlip):
 			if struct_row.amount_based_on_formula:
 				formula = sanitize_expression(struct_row.formula)
 				
-				if formula.startswith("custom_formula"):
-					
-					sal_assignment_name = frappe.db.get_value("Salary Structure Assignment",
-												{"employee":self.employee,"salary_structure":self.salary_structure},"name")
-
+				if formula.startswith("custom_formula"):					
+					sal_assignment_name = frappe.db.get_value("Salary Structure Assignment",												{"employee":self.employee,"salary_structure":self.salary_structure},"name")
 					if sal_assignment_name:
 						sal_assignment_doc = frappe.get_doc("Salary Structure Assignment",sal_assignment_name)
 						for r in sal_assignment_doc.custom_employee_insurance_deduction:
 							if r.salary_component == struct_row.salary_component:
 								return r.amount
-
 					return 0.0
-
 				if formula:
 					amount = flt(
 						_safe_eval(formula, self.whitelisted_globals, data), struct_row.precision("amount")

@@ -6,11 +6,9 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			return {
 					filters: {
 						type: "Deduction",
-                        custom_is_this_insurance_component: true
-					}
+                        custom_insurance_component:true					}
 			};
 		})
-
 	},
 
 });
