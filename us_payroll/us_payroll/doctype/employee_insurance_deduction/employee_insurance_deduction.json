@@ -15,6 +15,7 @@
   "do_not_include_in_total",
   "is_this_employees_insurance_component",
   "is_this_employers_insurance_component",
+  "insurance_component",
   "is_this_pre_tax_component",
   "is_this_income_tax_slab_component",
   "federal_income_tax_and_additional_withholdings"
@@ -26,21 +27,25 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Insurance Provider",
-   "options": "Insurance Provider"
+   "options": "Insurance Provider",
+   "width": "2"
   },
   {
    "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Amount"
+   "label": "Amount",
+   "width": "2"
   },
   {
    "columns": 1,
    "fieldname": "tax_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Tax Type",
-   "options": "\nBefore Tax\nAfter Tax"
+   "options": "\nBefore Tax\nAfter Tax",
+   "width": "2"
   },
   {
    "default": "0",
@@ -53,7 +58,8 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Category",
-   "options": "Salary Component"
+   "options": "Salary Component",
+   "width": "2"
   },
   {
    "default": "0",
@@ -96,13 +102,19 @@
    "fieldname": "federal_income_tax_and_additional_withholdings",
    "fieldtype": "Check",
    "label": "Federal Income Tax and Additional Withholdings"
+  },
+  {
+   "default": "0",
+   "fieldname": "insurance_component",
+   "fieldtype": "Check",
+   "label": "Insurance Component"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-04 05:57:43.282964",
+ "modified": "2026-02-04 19:13:11.303859",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Employee Insurance Deduction",
