@@ -6,10 +6,10 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			return {
 					filters: {
 						type: "Deduction",
-                        custom_insurance_component:true	
+                        custom_insurance_component: 1	
                     }
 			};
-		})
+		});
 
 		frm.set_query("salary_component", "custom_employee_earnings", function (doc, cdt, cdn) {
 			return {
@@ -17,7 +17,7 @@ frappe.ui.form.on('Salary Structure Assignment', {
 						type: "Earning"                    
                     }
 			};
-		})
+		});
 	},
 
 });
