@@ -4104,7 +4104,7 @@ class OverridePayrollEntry(Document):
 	):
 		provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
 		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-
+		filters = {"parent": salary_component, "custom_fund": fund}
 		for row in provider_doc.accounts:
 			if row.custom_fund != fund:
 				continue
@@ -4114,7 +4114,7 @@ class OverridePayrollEntry(Document):
 
 			if department and department == dept:
 				filters = {
-					"parent": salary_component,
+					"parent": "Insurance Provider",
 					"custom_fund": fund,
 					"custom_department_name": department,
 				}
@@ -4129,7 +4129,7 @@ class OverridePayrollEntry(Document):
 		
 		if fund:
 			# Fund-only case: pick first matching row from the child table
-			for row in comp_doc.accounts:
+			for row in provider_doc.accounts:
 				if row.get("custom_fund") == fund:
 					account = row.get("account")
 					break
@@ -4168,12 +4168,12 @@ class OverridePayrollEntry(Document):
 					dept_account = row.get("account")
 
 			if not fund_account:
-				frappe.throw(_("Please set Liability account in Salary Component {0}").format(
+				frappe.throw(_("Please set Liability account in Insurance Provider {0}").format(
 					get_link_to_form("Salary Component", salary_component)
 				))
 
 			if not dept_account:
-				frappe.throw(_("Please set Expense account in Salary Component {0}").format(
+				frappe.throw(_("Please set Expense account in Insurance Provider {0}").format(
 					get_link_to_form("Salary Component", salary_component)
 				))
 

@@ -155,6 +155,38 @@ override_doctype_class = {
 # 	}
 # }
 
+doc_events = {
+    #   "*": {
+    #       "on_update": "method",
+    #       "on_cancel": "method",
+    #       "on_trash": "method"
+    #   }
+
+    "Salary Slip":{
+                   "after_insert":"us_payroll.custom_script.salary_slip.after_insert",
+                   "validate":"us_payroll.custom_script.salary_slip.validate",
+                   "on_cancel":"us_payroll.custom_script.salary_slip.on_cancel",
+                   "before_save":"us_payroll.custom_script.salary_slip.before_save",
+                   "before_submit":"us_payroll.custom_script.salary_slip.before_submit",
+                },
+
+
+  # "Payroll Entry":{ 
+  #                   "validate":"overtonfa.custom_script.payroll_entry.validate",
+  #                   "before_submit": "overtonfa.custom_script.payroll_entry.before_submit"
+
+  #               },
+
+  # "Batch Payment Entry":{"validate":"overtonfa.custom_script.batch_payment_entry.validate"},
+
+  # "Leave Allocation" : {
+  #                       "validate":"overtonfa.custom_script.leave_allocation.validate",
+  #                       "before_insert":"overtonfa.custom_script.leave_allocation.before_insert",
+  #                       "after_insert":"overtonfa.custom_script.leave_allocation.after_insert"
+  #                       }
+}
+
+
 # Scheduled Tasks
 # ---------------
 
