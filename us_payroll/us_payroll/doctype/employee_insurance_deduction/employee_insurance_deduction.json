@@ -51,7 +51,8 @@
    "default": "0",
    "fieldname": "is_active",
    "fieldtype": "Check",
-   "label": "Is Active"
+   "label": "Is Active",
+   "read_only": 1
   },
   {
    "fieldname": "salary_component",
@@ -65,56 +66,64 @@
    "default": "0",
    "fieldname": "is_employer_component",
    "fieldtype": "Check",
-   "label": "Is Employer component?"
+   "label": "Is Employer component?",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "do_not_include_in_total",
    "fieldtype": "Check",
-   "label": "Do Not Include in Total"
+   "label": "Do Not Include in Total",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "is_this_employees_insurance_component",
    "fieldtype": "Check",
-   "label": "Is this Employee's insurance component?"
+   "label": "Is this Employee's insurance component?",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "is_this_employers_insurance_component",
    "fieldtype": "Check",
-   "label": " Is this Employer's insurance component?"
+   "label": " Is this Employer's insurance component?",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "is_this_pre_tax_component",
    "fieldtype": "Check",
-   "label": " Is this Pre-Tax component?"
+   "label": " Is this Pre-Tax component?",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "is_this_income_tax_slab_component",
    "fieldtype": "Check",
-   "label": "Is this Income Tax Slab component?"
+   "label": "Is this Income Tax Slab component?",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "federal_income_tax_and_additional_withholdings",
    "fieldtype": "Check",
-   "label": "Federal Income Tax and Additional Withholdings"
+   "label": "Federal Income Tax and Additional Withholdings",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "insurance_component",
    "fieldtype": "Check",
-   "label": "Insurance Component"
+   "label": "Insurance Component",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-04 19:13:11.303859",
+ "modified": "2026-02-23 02:18:34.233962",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Employee Insurance Deduction",

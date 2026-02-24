@@ -11,7 +11,7 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			};
 		});
 
-		// frm.set_query("salary_component", "custom_employee_earnings", function (doc, cdt, cdn) {
+		// frm.set_query("earning_component", "custom_employee_earnings", function (doc, cdt, cdn) {
 		// 	return {
 		// 			filters: {
 		// 				type: "Earning"                    
@@ -19,7 +19,6 @@ frappe.ui.form.on('Salary Structure Assignment', {
 		// 	};
 		// });
 	},
-
 });
 
 frappe.ui.form.on('Employee Insurance Deduction', {   // child doctype
@@ -67,7 +66,19 @@ frappe.ui.form.on('Employee Insurance Deduction', {   // child doctype
                 );
             });
         });
+    },
+
+    tax_type: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        
+        if (row.tax_type === "Before Tax") {
+            row.is_this_pre_tax_component = 1;   // check
+        } else if (row.tax_type === "After Tax") {
+            row.is_this_pre_tax_component = 0;   // uncheck
+        }
+        frm.refresh_field("custom_employee_insurance_deduction");
     }
+
 });
 
 

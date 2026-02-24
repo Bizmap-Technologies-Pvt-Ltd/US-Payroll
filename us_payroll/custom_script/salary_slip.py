@@ -4,7 +4,8 @@ from frappe.utils import get_url
 
 
 def after_insert(doc, method): 
-	calculate_leaves_taken(doc) 
+	calculate_leaves_taken(doc)
+	set_insurance_component_name(doc)
 
 	if doc.payroll_entry:		
 		payroll_entry = frappe.get_doc("Payroll Entry", doc.payroll_entry)
@@ -39,7 +40,7 @@ def validate(doc, method):
 	salary_calulations_for_fit(doc)
 	set_standard_deduction(doc)
 	# set_fit_add_flag(doc)
-	# tax_calulations_for_fit(doc)
+	# tax_calulations_for_fit(doc) 
 
 
 def set_fit_add_flag(doc):	
@@ -56,6 +57,32 @@ def before_save(doc, method):
 def before_submit(doc, method):
 	reflect_do_not_include(doc)
 	set_insurance_componence_amount_to_zero(doc)
+
+def set_insurance_component_name(doc):
+	print("call in set_insurance_component_name11111111111111")
+	sal_assignment_name = frappe.get_value(
+		"Salary Structure Assignment",
+		{"employee": doc.employee, "docstatus": 1},
+		"name")
+
+	if not sal_assignment_name:
+		return {}
+
+	sal_assignment_doc = frappe.get_doc("Salary Structure Assignment", sal_assignment_name)
+	for deduction_row in doc.deductions:
+		print("call in set_insurance_component_name 222222222222222")
+		for row in sal_assignment_doc.custom_employee_insurance_deduction:
+			if (row.salary_component == deduction_row.salary_component
+				and row.insurance_component  # <-- this is child table field
+			):
+				if row.tax_type == "Before Tax":
+					print("call in set_insurance_component_name before 33333333333333333")
+					deduction_row.component_name = f"{row.insurance_company}-{row.salary_component}-BT"
+
+
+				if row.tax_type == "After Tax":
+					print("call in set_insurance_component_name after 444444444444444444")
+					deduction_row.component_name = f"{row.insurance_company}-{row.salary_component}-AT"
 	
 
 def get_insurance_flags_from_assignment(employee, salary_component):
@@ -82,7 +109,7 @@ def get_insurance_flags_from_assignment(employee, salary_component):
 	for row in sal_assignment_doc.custom_employee_insurance_deduction:
 		if (
 			row.salary_component == salary_component
-			and row.insurance_component  # <-- this is child table field
+			and row.is_this_employees_insurance_component  # <-- this is child table field
 		):
 			return {
 				"is_pretax": row.is_this_pre_tax_component,
@@ -120,7 +147,7 @@ def set_insurance_componence_amount_to_zero(doc):
         for assign_row in sal_assignment_doc.custom_employee_insurance_deduction:
             if (
                 deduction_row.salary_component == assign_row.salary_component
-                and assign_row.insurance_component
+                and assign_row.is_this_employees_insurance_component
                 and assign_row.do_not_include_in_total
             ):
                 deduction_row.amount = 0
@@ -155,7 +182,7 @@ def reflect_do_not_include(doc):
 		for assign_row in sal_assignment_doc.custom_employee_insurance_deduction:
 			if (
 				deduction_row.salary_component == assign_row.salary_component
-				and assign_row.insurance_component
+				and assign_row.is_this_employees_insurance_component
 			):
 				deduction_row.do_not_include_in_total = assign_row.do_not_include_in_total
 

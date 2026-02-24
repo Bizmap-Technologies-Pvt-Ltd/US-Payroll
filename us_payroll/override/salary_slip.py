@@ -1218,7 +1218,7 @@ class OverrideSalarySlip(OverrideSalarySlip):
 								return r.amount
 
 						# for r in sal_assignment_doc.custom_employee_earnings:
-						# 	if r.salary_component == struct_row.salary_component:
+						# 	if r.earning_component == struct_row.salary_component:
 						# 		return r.amount
 								
 					return 0.0
