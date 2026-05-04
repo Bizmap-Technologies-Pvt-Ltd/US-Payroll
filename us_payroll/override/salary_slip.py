@@ -43,7 +43,7 @@ from hrms.payroll.doctype.employee_benefit_claim.employee_benefit_claim import (
 )
 # from hrms.payroll.doctype.payroll_entry.payroll_entry import get_start_end_dates
 # /home/suraj/frappe-bench/apps/overtonfa/overtonfa/override/payroll_entry.py
-from overtonfa.override.payroll_entry import get_start_end_dates
+from us_payroll.override.payroll_entry import get_start_end_dates
 from hrms.payroll.doctype.payroll_period.payroll_period import (
 	get_payroll_period,
 	get_period_factor,
