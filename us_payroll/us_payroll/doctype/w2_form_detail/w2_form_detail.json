@@ -1,0 +1,117 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-06 13:36:27.554577",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "control_number",
+  "social_security_number",
+  "address",
+  "wages_tips_other_compensation",
+  "federal_income_tax_withheld",
+  "social_security_tax_withheld",
+  "medicare_tax_withheld",
+  "tmrs",
+  "social_security_wages",
+  "medicare_wages_and_tips",
+  "retirement_plan",
+  "medical_insurance"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "control_number",
+   "fieldtype": "Data",
+   "label": "Control Number"
+  },
+  {
+   "fieldname": "social_security_number",
+   "fieldtype": "Data",
+   "label": "Social Security Number"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "wages_tips_other_compensation",
+   "fieldtype": "Currency",
+   "label": "FIT Wages"
+  },
+  {
+   "fieldname": "federal_income_tax_withheld",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "FIT"
+  },
+  {
+   "fieldname": "social_security_tax_withheld",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Social Security Tax"
+  },
+  {
+   "fieldname": "medicare_tax_withheld",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Medicare Tax"
+  },
+  {
+   "fieldname": "tmrs",
+   "fieldtype": "Currency",
+   "label": "TMRS"
+  },
+  {
+   "fieldname": "social_security_wages",
+   "fieldtype": "Currency",
+   "label": "Social security wages"
+  },
+  {
+   "fieldname": "medicare_wages_and_tips",
+   "fieldtype": "Currency",
+   "label": "Medicare wages and tips"
+  },
+  {
+   "default": "0",
+   "fieldname": "retirement_plan",
+   "fieldtype": "Check",
+   "label": " Retirement plan"
+  },
+  {
+   "fieldname": "medical_insurance",
+   "fieldtype": "Currency",
+   "label": "12a"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-05-06 13:36:27.554577",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "W2 Form Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

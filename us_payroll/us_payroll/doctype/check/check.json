@@ -1,0 +1,105 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:check_number",
+ "creation": "2026-05-06 10:40:57.591676",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "check_number",
+  "status",
+  "bank",
+  "bank_name",
+  "reference",
+  "column_break_xgya",
+  "reason",
+  "reason_for_cancellation",
+  "note"
+ ],
+ "fields": [
+  {
+   "fieldname": "check_number",
+   "fieldtype": "Data",
+   "label": "Check Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "\nAvailable\nIssued\nVoid/Cancelled\nNSF",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "label": "Bank",
+   "options": "Bank Account",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bank.account_name",
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Bank Name"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "label": "Reference",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_xgya",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Cancelled/Replacement Note",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reason_for_cancellation",
+   "fieldtype": "Small Text",
+   "label": "Reason for cancellation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Note"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-06 10:40:57.591676",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "Check",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

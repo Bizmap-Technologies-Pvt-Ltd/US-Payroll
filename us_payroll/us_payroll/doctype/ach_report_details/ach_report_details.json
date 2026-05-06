@@ -1,0 +1,234 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-05 11:33:12.862125",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company_id",
+  "company_name",
+  "bank_routing_no",
+  "bank_account_no",
+  "bank_name",
+  "column_break_sv3j",
+  "company_city_name",
+  "address",
+  "city",
+  "city_code",
+  "zipcode",
+  "contact",
+  "telephone_number",
+  "telephone_extension_box",
+  "state_unemployment_insurance_account_number",
+  "naics_code",
+  "reporting_period",
+  "no_workersno_wages",
+  "other_ein",
+  "section_break_0ldj",
+  "computer",
+  "internal_label",
+  "density",
+  "recording_code",
+  "number_of_tracks",
+  "blocking_factor",
+  "type_of_employment",
+  "establishment_number_or_coverage_grouppru",
+  "tax_type_code",
+  "state_control_number",
+  "taxing_entity_code",
+  "unit_number",
+  "foreign_indicator"
+ ],
+ "fields": [
+  {
+   "fieldname": "company_id",
+   "fieldtype": "Data",
+   "label": "company id"
+  },
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "company name"
+  },
+  {
+   "fieldname": "bank_routing_no",
+   "fieldtype": "Data",
+   "label": "bank routing no"
+  },
+  {
+   "fieldname": "bank_account_no",
+   "fieldtype": "Data",
+   "label": "bank account no"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "label": "bank name"
+  },
+  {
+   "fieldname": "column_break_sv3j",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "company_city_name",
+   "fieldtype": "Data",
+   "label": "company city name"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "label": "address"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "city"
+  },
+  {
+   "fieldname": "city_code",
+   "fieldtype": "Data",
+   "label": "city code"
+  },
+  {
+   "fieldname": "zipcode",
+   "fieldtype": "Data",
+   "label": "zipcode"
+  },
+  {
+   "fieldname": "contact",
+   "fieldtype": "Data",
+   "label": "contact"
+  },
+  {
+   "fieldname": "telephone_number",
+   "fieldtype": "Data",
+   "label": "Telephone Number"
+  },
+  {
+   "fieldname": "telephone_extension_box",
+   "fieldtype": "Data",
+   "label": "telephone_extension_box"
+  },
+  {
+   "fieldname": "state_unemployment_insurance_account_number",
+   "fieldtype": "Data",
+   "label": "State Unemployment Insurance Account Number"
+  },
+  {
+   "fieldname": "naics_code",
+   "fieldtype": "Data",
+   "label": "NAICS Code"
+  },
+  {
+   "fieldname": "reporting_period",
+   "fieldtype": "Data",
+   "label": "Reporting Period"
+  },
+  {
+   "fieldname": "no_workersno_wages",
+   "fieldtype": "Select",
+   "label": "No Workers/No Wages",
+   "options": "\n0\n1"
+  },
+  {
+   "fieldname": "other_ein",
+   "fieldtype": "Data",
+   "label": "Other EIN"
+  },
+  {
+   "fieldname": "section_break_0ldj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "computer",
+   "fieldtype": "Data",
+   "label": "Computer"
+  },
+  {
+   "fieldname": "internal_label",
+   "fieldtype": "Data",
+   "label": "Internal Label"
+  },
+  {
+   "fieldname": "density",
+   "fieldtype": "Data",
+   "label": "Density"
+  },
+  {
+   "fieldname": "recording_code",
+   "fieldtype": "Data",
+   "label": "Recording Code"
+  },
+  {
+   "fieldname": "number_of_tracks",
+   "fieldtype": "Data",
+   "label": "Number of Tracks"
+  },
+  {
+   "fieldname": "blocking_factor",
+   "fieldtype": "Data",
+   "label": "Blocking Factor "
+  },
+  {
+   "fieldname": "type_of_employment",
+   "fieldtype": "Data",
+   "label": "Type of Employment"
+  },
+  {
+   "fieldname": "establishment_number_or_coverage_grouppru",
+   "fieldtype": "Data",
+   "label": "Establishment Number or Coverage Group/PRU"
+  },
+  {
+   "fieldname": "tax_type_code",
+   "fieldtype": "Data",
+   "label": "Tax Type Code"
+  },
+  {
+   "fieldname": "state_control_number",
+   "fieldtype": "Data",
+   "label": "State Control Number"
+  },
+  {
+   "fieldname": "taxing_entity_code",
+   "fieldtype": "Data",
+   "label": "Taxing Entity Code"
+  },
+  {
+   "fieldname": "unit_number",
+   "fieldtype": "Data",
+   "label": "Unit Number"
+  },
+  {
+   "fieldname": "foreign_indicator",
+   "fieldtype": "Data",
+   "label": "Foreign Indicator"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-05 11:33:12.862125",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "ACH Report Details",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

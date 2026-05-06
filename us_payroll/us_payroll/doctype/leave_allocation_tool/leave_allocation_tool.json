@@ -1,0 +1,102 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-06 15:25:28.381787",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "department",
+  "leave_type",
+  "get_employees",
+  "column_break_u08u",
+  "from_date",
+  "to_date",
+  "section_break_rlzm",
+  "leave_allocation_details",
+  "generate_leave_allocation_records"
+ ],
+ "fields": [
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Department",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "leave_type",
+   "fieldtype": "Link",
+   "label": "Leave Type",
+   "options": "Leave Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "get_employees",
+   "fieldtype": "Button",
+   "label": "Get Employees"
+  },
+  {
+   "fieldname": "column_break_u08u",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "This is the start date of the fiscal year",
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "description": "This is the last date of the fiscal year",
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_rlzm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "leave_allocation_details",
+   "fieldtype": "Table",
+   "label": "Leave Allocation Details",
+   "options": "Leave Allocation Details"
+  },
+  {
+   "fieldname": "generate_leave_allocation_records",
+   "fieldtype": "Button",
+   "label": "Generate Leave Allocation Records"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-06 15:25:28.381787",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "Leave Allocation Tool",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -48,10 +48,15 @@ app_license = "mit"
 doctype_js = {
                 "Salary Structure Assignment" : "custom_script/salary_structure_assignment.js",
                 "Salary Component" : "custom_script/salary_component.js",
+                "Employee" : "custom_script/employee.js", 
+                "Journal Entry": "custom_script/journal_entry/journal_entry.js",
 
             }
 
 
+doctype_list_js = {
+    "W2 Form Details": "us_payroll/doctype/w2_form_details/w2_form_details_list.js"
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -169,6 +174,10 @@ doc_events = {
                    "before_save":"us_payroll.custom_script.salary_slip.before_save",
                    "before_submit":"us_payroll.custom_script.salary_slip.before_submit",
                 },
+
+    "Employee":{
+        "validate":"us_payroll.custom_script.employee.validate"
+  },
 
 
   # "Payroll Entry":{ 

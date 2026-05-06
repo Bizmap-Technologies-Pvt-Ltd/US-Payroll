@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-06 13:39:00.659663",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "year",
+  "year_start_date",
+  "year_end_date",
+  "get_employees",
+  "column_break_fhdc",
+  "employer_identification_number_ein",
+  "section_break_nsbt",
+  "w2_form_details",
+  "generate_w2_form_records"
+ ],
+ "fields": [
+  {
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Year",
+   "options": "Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "year_start_date",
+   "fieldtype": "Date",
+   "label": "Year Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "year_end_date",
+   "fieldtype": "Date",
+   "label": "Year End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "get_employees",
+   "fieldtype": "Button",
+   "label": "Get Employees"
+  },
+  {
+   "fieldname": "column_break_fhdc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employer_identification_number_ein",
+   "fieldtype": "Data",
+   "label": "Employer identification number (EIN)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_nsbt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "w2_form_details",
+   "fieldtype": "Table",
+   "label": "W2 Form Details",
+   "options": "W2 Form Detail"
+  },
+  {
+   "fieldname": "generate_w2_form_records",
+   "fieldtype": "Button",
+   "label": "Generate W2 Form Records"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-06 13:39:00.659663",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "W2 Form Tool",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
