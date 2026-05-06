@@ -293,3 +293,27 @@ doc_events = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+
+fixtures = [
+    {
+        "dt": "Custom Field",
+        "filters": [
+            ["module", "=", "US-Payroll"]
+        ]
+    },
+    {
+        "dt": "Property Setter",
+        "filters": [
+            ["module", "=", "US-Payroll"]
+        ]
+    },
+    {
+        "dt": "Workspace",
+        "filters": [
+            ["module", "=", "US-Payroll"]
+        ]
+    },
+    "Translation",
+    "Workspace"
+]
