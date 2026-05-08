@@ -24,5 +24,31 @@
   "name": "af6o6kkea1",
   "source_text": "Salary Slip",
   "translated_text": "Check Stubs"
+ },
+ {
+  "context": null,
+  "contributed": 0,
+  "contribution_docname": null,
+  "contribution_status": "",
+  "docstatus": 0,
+  "doctype": "Translation",
+  "language": "en-US",
+  "modified": "2026-05-06 20:16:38.821161",
+  "name": "iok9id4vg5",
+  "source_text": "Cost Center",
+  "translated_text": "Department Name"
+ },
+ {
+  "context": null,
+  "contributed": 0,
+  "contribution_docname": null,
+  "contribution_status": "",
+  "docstatus": 0,
+  "doctype": "Translation",
+  "language": "en",
+  "modified": "2026-05-06 20:17:03.848775",
+  "name": "j0e0d9qj5n",
+  "source_text": "Cost Center",
+  "translated_text": "Department Name"
  }
 ]

@@ -26,8 +26,9 @@
 # from erpnext.accounts.utils import get_fiscal_year
 # from frappe.utils import get_url
 # from collections import defaultdict
+# from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
 
-# class OverridePayrollEntry(Document):
+# class OverridePayrollEntry(PayrollEntry):
 # 	def onload(self):
 # 		if not self.docstatus == 1 or self.salary_slips_submitted:
 # 			return
@@ -152,6 +153,7 @@
 # 			self.queue_action("cancel", timeout=3000)
 # 		else:
 # 			self._cancel()
+
 
 # 	def delete_linked_salary_slips(self):
 # 		salary_slips = self.get_linked_salary_slips()
@@ -315,7 +317,7 @@
 # 						"end_date": self.end_date,
 # 						"company": self.company,
 # 						"posting_date": self.posting_date,
-# 						"deduct_tax_for_unclaimed_employee_benefits": self.deduct_tax_for_unclaimed_employee_benefits,
+# 						"deduct_tax_for_unclaimed_employee_benefits": 0,
 # 						"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
 # 						"payroll_entry": self.name,
 # 						"exchange_rate": self.exchange_rate,
@@ -391,10 +393,314 @@
 # 				ss.email_salary_slip()
 
 
-# # # ----------------------below is working in case of expense and  2 liability accounts-----------------
-# 	def get_salary_component_accounts(self, salary_component, fund, department=None):
-# 		print(salary_component, fund, department, "salary_component, fund, department =======")
-# 		comp_doc = frappe.get_doc("Salary Component", salary_component)
+# # # # ----------------------below is working in case of expense and  2 liability accounts-----------------
+# # 	def get_salary_component_accounts(self, salary_component, fund, department=None):
+# # 		print(salary_component, fund, department, "salary_component, fund, department =======")
+# # 		comp_doc = frappe.get_doc("Salary Component", salary_component)
+# # 		filters = {"parent": salary_component, "custom_fund": fund}  # default
+
+# # 		if comp_doc.type == "Earning":
+# # 			# Check for department match
+# # 			for row in comp_doc.accounts:
+# # 				acc_doc = frappe.get_doc("Account", row.get("account"))
+# # 				dept = acc_doc.custom_department_number
+
+# # 				if department and department == dept:
+# # 					filters = {
+# # 						"parent": salary_component,
+# # 						"custom_fund": fund,
+# # 						"custom_department_name": department,
+# # 					}
+# # 					break  # stop at first department match
+
+# # 			account = None
+
+# # 			if department:
+# # 				# Use existing logic if department is provided
+# # 				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+			
+# # 			else:
+# # 				# Fund-only case: pick first matching row from the child table
+# # 				for row in comp_doc.accounts:
+# # 					if row.get("custom_fund") == fund:
+# # 						account = row.get("account")
+# # 						break
+
+# # 		if comp_doc.type == "Deduction":
+# # 			# Check for department match
+# # 			for row in comp_doc.accounts:
+# # 				acc_doc = frappe.get_doc("Account", row.get("account"))
+# # 				dept = acc_doc.custom_department_number
+
+# # 				if department and department == dept:
+# # 					filters = {
+# # 						"parent": salary_component,
+# # 						"custom_fund": fund,
+# # 						"custom_department_name": department,
+# # 					}
+# # 					print(filters, "department match")
+# # 					break  # stop at first department match
+
+# # 			account = None
+
+# # 			if department:
+# # 				# Use existing logic if department is provided
+# # 				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+			
+# # 			if fund:
+# # 				# Fund-only case: pick first matching row from the child table
+# # 				for row in comp_doc.accounts:
+# # 					if row.get("custom_fund") == fund:
+# # 						account = row.get("account")
+# # 						break
+# # 		if not account:
+# # 			frappe.throw(
+# # 				_("Please set account in Salary Component {0}").format(
+# # 					get_link_to_form("Salary Component", salary_component)
+# # 				)
+# # 			)
+
+
+# # 		print(account, "account =======")
+
+# # 		return account
+
+
+# # # ----------------------below is working in case of expense and liability----------------
+# # 	def get_salary_component_account(self, salary_component, fund, department=None):
+# # 		print(salary_component, fund, department, "salary_component, fund, department 222222222=======")
+# # 		comp_doc = frappe.get_doc("Salary Component", salary_component)
+# # 		filters = {"parent": salary_component, "custom_fund": fund}
+# # 		account = None
+
+# # 		if comp_doc.type in ["Earning", "Deduction"]:
+# # 			for row in comp_doc.accounts:
+# # 				acc_doc = frappe.get_doc("Account", row.get("account"))
+# # 				dept = acc_doc.custom_department_number
+
+# # 				if department and department == dept:
+# # 					filters = {
+# # 						"parent": salary_component,
+# # 						"custom_fund": fund,
+# # 						"custom_department_name": department,
+# # 					}
+# # 					break
+
+# # 			if department:
+# # 				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+# # 			else:
+# # 				for row in comp_doc.accounts:
+# # 					if row.get("custom_fund") == fund:
+# # 						account = row.get("account")
+# # 						break
+
+# # 			if comp_doc.type == "Deduction" and comp_doc.do_not_include_in_total and comp_doc.custom_is_employer_component:
+# # 				fund_account = None
+# # 				dept_account = None
+# # 				for row in comp_doc.accounts:
+# # 					acc_doc = frappe.get_doc("Account", row.get("account"))
+# # 					dept = acc_doc.custom_department_number
+
+# # 					if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
+# # 						fund_account = row.get("account")
+
+# # 					elif acc_doc.root_type == "Expense" and department == dept:
+# # 						dept_account = row.get("account")
+
+# # 				if not fund_account:
+# # 					frappe.throw(_("Please set Liability account in Salary Component {0}").format(
+# # 						get_link_to_form("Salary Component", salary_component)
+# # 					))
+
+# # 				if not dept_account:
+# # 					frappe.throw(_("Please set Expense account in Salary Component {0}").format(
+# # 						get_link_to_form("Salary Component", salary_component)
+# # 					))
+
+# # 				return {"fund_account": fund_account, "dept_account": dept_account}
+# # 		if not account:
+# # 			frappe.throw(_("Please set account in Salary Component {0}").format(
+# # 				get_link_to_form("Salary Component", salary_component)
+# # 			))
+
+# # 		print(account, "account22222222222222 =======")
+
+# # 		return account
+
+
+# 	def get_insurance_details_from_ssa(self, employee, salary_component):
+# 		ssa = frappe.db.get_value(
+# 			"Salary Structure Assignment",
+# 			{
+# 				"employee": employee,
+# 				"docstatus": 1
+# 			},
+# 			"name"
+# 		)
+
+# 		if not ssa:
+# 			return None, None   # ✅ ALWAYS return tuple
+
+# 		print(employee,ssa,salary_component,"employee,ssa,salary_component 0000000000000" )
+
+# 		result = frappe.db.get_value(
+# 			"Employee Insurance Deduction",
+# 			{
+# 				"parent": ssa,
+# 				"salary_component": salary_component
+# 			},
+# 			["insurance_company", "category"]
+# 		)
+
+# 		if not result:
+# 			return None, None   # ✅ ALWAYS return tuple
+
+# 		print(result,"resultsssssssssssssssssssssssssssssssssssssssssssssssss" )
+
+# 		return result
+
+
+# 	# def get_insurance_provider_account(
+# 	# 	self,
+# 	# 	provider,
+# 	# 	salary_component,
+# 	# 	fund,
+# 	# 	department=None
+# 	# ):
+# 	# 	provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
+# 	# 	comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
+
+# 	# 	for row in provider_doc.accounts:
+# 	# 		if row.custom_fund != fund:
+# 	# 			continue
+
+# 	# 		acc_doc = frappe.get_cached_doc("Account", row.account)
+# 	# 		dept = acc_doc.custom_department_number
+
+# 	# 		# 🔹 Employee Insurance → Liability
+# 	# 		if comp_doc.custom_is_this_insurance_component:
+# 	# 			if acc_doc.root_type == "Liability":
+# 	# 				return row.account
+
+# 	# 		# 🔹 Employer Insurance → Expense
+# 	# 		if comp_doc.custom_is_this_employers_insurance_component:
+# 	# 			if acc_doc.root_type == "Expense":
+# 	# 				if department and department == dept:
+# 	# 					return row.account
+
+# 	# 	frappe.throw(
+# 	# 		_("Please set proper Insurance account in Insurance Provider {0}")
+# 	# 		.format(provider)
+# 	# 	)
+
+# 	def get_insurance_provider_account(
+# 		self,
+# 		provider,
+# 		salary_component,
+# 		fund,
+# 		department=None
+# 	):
+# 		provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
+# 		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
+# 		filters = {"parent": salary_component, "custom_fund": fund}
+# 		for row in provider_doc.accounts:
+# 			if row.custom_fund != fund:
+# 				continue
+
+# 			acc_doc = frappe.get_cached_doc("Account", row.account)
+# 			dept = acc_doc.custom_department_number
+
+# 			if department and department == dept:
+# 				filters = {
+# 					"parent": "Insurance Provider",
+# 					"custom_fund": fund,
+# 					"custom_department_name": department,
+# 				}
+# 				print(filters, "department match")
+# 				break  # stop at first department match
+
+# 		account = None
+
+# 		if department:
+# 			# Use existing logic if department is provided
+# 			account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+		
+# 		if fund:
+# 			# Fund-only case: pick first matching row from the child table
+# 			for row in provider_doc.accounts:
+# 				if row.get("custom_fund") == fund:
+# 					account = row.get("account")
+# 					break
+
+# 		if not account:		
+# 			frappe.throw(
+# 				_("Please set proper Insurance account in Insurance Provider {0}")
+# 				.format(provider)
+# 			)
+
+# 		return account
+
+
+
+# 	def get_er_insurance_account(
+# 		self,
+# 		provider,
+# 		salary_component,
+# 		fund,
+# 		department=None
+# 	):
+# 		provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
+# 		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
+
+# 		if comp_doc.do_not_include_in_total and comp_doc.custom_is_employer_component:
+# 			fund_account = None
+# 			dept_account = None
+# 			for row in provider_doc.accounts:
+# 				acc_doc = frappe.get_doc("Account", row.get("account"))
+# 				dept = acc_doc.custom_department_number
+
+# 				if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
+# 					fund_account = row.get("account")
+
+# 				elif acc_doc.root_type == "Expense" and department == dept:
+# 					dept_account = row.get("account")
+
+# 			if not fund_account:
+# 				frappe.throw(_("Please set Liability account in Insurance Provider {0}").format(
+# 					get_link_to_form("Salary Component", salary_component)
+# 				))
+
+# 			if not dept_account:
+# 				frappe.throw(_("Please set Expense account in Insurance Provider {0}").format(
+# 					get_link_to_form("Salary Component", salary_component)
+# 				))
+
+# 			return {"fund_account": fund_account, "dept_account": dept_account}
+
+
+
+# 	# # ----------------------below is working in case of expense and  2 liability accounts-----------------
+# 	def get_salary_component_accounts(self, salary_component, fund, department=None, employee=None):
+# 		print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None /////////////////")
+# 		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
+
+# 		# 🔹 INSURANCE OVERRIDE (Employee or Employer)
+# 		if comp_doc.type == "Deduction" and (
+# 			comp_doc.custom_is_this_insurance_component
+# 			or comp_doc.custom_is_this_employers_insurance_component
+# 		):
+# 			provider, category = self.get_insurance_details_from_ssa(
+# 				employee, salary_component
+# 			)
+
+# 			print(provider, category, "provider, category ==============")
+
+# 			if provider:
+# 				return self.get_insurance_provider_account(
+# 					provider, salary_component, fund, department
+# 				)
+
+# 		# 🔹 EXISTING LOGIC (UNCHANGED)
 # 		filters = {"parent": salary_component, "custom_fund": fund}  # default
 
 # 		if comp_doc.type == "Earning":
@@ -465,9 +771,27 @@
 
 
 # # ----------------------below is working in case of expense and liability----------------
-# 	def get_salary_component_account(self, salary_component, fund, department=None):
-# 		print(salary_component, fund, department, "salary_component, fund, department 222222222=======")
-# 		comp_doc = frappe.get_doc("Salary Component", salary_component)
+# 	def get_salary_component_account(self, salary_component, fund, department=None, employee=None):
+# 		print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None /////////////////")
+# 		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
+
+# 		# 🔹 INSURANCE OVERRIDE (Employee or Employer)
+# 		if comp_doc.type == "Deduction" and (
+# 			comp_doc.custom_is_this_insurance_component
+# 			or comp_doc.custom_is_this_employers_insurance_component
+# 		):
+# 			provider, category = self.get_insurance_details_from_ssa(
+# 				employee, salary_component
+# 			)
+
+# 			print(provider, category, "provider, category ==============")
+
+# 			if provider:
+# 				return self.get_er_insurance_account(
+# 					provider, salary_component, fund, department
+# 				)
+
+# 		# 🔹 EXISTING LOGIC (UNCHANGED)
 # 		filters = {"parent": salary_component, "custom_fund": fund}
 # 		account = None
 
@@ -526,248 +850,33 @@
 # 		return account
 
 
+# 	# def get_salary_component_account(self, salary_component, fund, department=None, employee=None):
+# 	# 	print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None /////////////////")
+# 	# 	comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
 
-# # # # ------------------------------------below is working code for employee tml-------------------
-# # 	def get_insurance_provider_account(
-# # 		self,
-# # 		salary_component,
-# # 		employee,
-# # 		fund,
-# # 		department=None,
-# # 	):
-# # 		"""
-# # 		Override account fetch for insurance deduction components.
-# # 		Account is fetched from Insurance Provider → accounts child table
-# # 		based on Salary Structure Assignment mapping.
-# # 		"""
-
-# # 		print(salary_component,employee,fund,department, "salary_component,employee,fund,department get_insurance_provider_accounttttttttttttttt")
-
-# # 		ssa_name = frappe.db.get_value(
-# # 			"Salary Structure Assignment",
-# # 			{"employee": employee, "docstatus": 1},
-# # 			"name",
-# # 		)
-
-# # 		if not ssa_name:
-# # 			frappe.throw(
-# # 				_("No Salary Structure Assignment found for employee {0}")
-# # 				.format(employee)
-# # 			)
-
-# # 		ssa = frappe.get_doc("Salary Structure Assignment", ssa_name)
-# # 		print(ssa,"ssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-# # 		account = None
-# # 		for row in ssa.custom_employee_insurance_deduction:
-# # 			print(row.insurance_company,"ssaaaarow.insurance_companyyyyyyyyyyyy")
-			
-# # 			# if row.salary_component != salary_component:
-# # 			# 	print(row.salary_component,salary_component, "ifffffffffffffff 111111")
-# # 			# 	continue
-
-# # 			if not row.insurance_company:
-# # 				print("ifffffffffff 2222222222222222")
-# # 				continue
-
-# # 			provider = frappe.get_doc("Insurance Provider", row.insurance_company)
-# # 			filters = {"parent": salary_component, "custom_fund": fund}
-# # 			for acc_row in provider.accounts:
-# # 				acc_doc = frappe.get_doc("Account", acc_row.get("account"))
-# # 				dept = acc_doc.custom_department_number
-# # 				if department and department == dept:
-# # 					filters = {
-# # 						"parent": row.insurance_company,
-# # 						"custom_fund": fund,
-# # 						"custom_department_name": department,
-# # 					}
-# # 					break
-
-# # 			if department:
-# # 				account = frappe.db.get_value(
-# # 					"Salary Component Account",
-# # 					filters,
-# # 					"account",
-# # 					cache=True,
-# # 				)
-# # 			else:
-# # 				if acc_row.get("custom_fund") == fund:
-# # 					account = acc_row.get("account")
-# # 					break
-
-# # 		print(account, "account insurance accou ts==")
-
-# # 		# return account
-
-# # 		if not account:
-# # 			frappe.throw(
-# # 				_("Please set account in Insurance Provider for Salary Component {0}")
-# # 				.format(get_link_to_form("Salary Component", salary_component))
-# # 			)
-
-# # 		print(account, "account =======insurance provider")
-# # 		return account
-
-
-# 	# def get_insurance_provider_account(
-# 	# 	self,
-# 	# 	salary_component,
-# 	# 	employee,
-# 	# 	fund,
-# 	# 	department=None,
-# 	# ):
-# 	# 	"""
-# 	# 	Override account fetch for insurance deduction components.
-# 	# 	Account is fetched from Insurance Provider → accounts child table
-# 	# 	based on Salary Structure Assignment mapping.
-# 	# 	"""
-
-# 	# 	print(salary_component,employee,fund,department, "salary_component,employee,fund,department get_insurance_provider_accounttttttttttttttt")
-
-# 	# 	ssa_name = frappe.db.get_value(
-# 	# 		"Salary Structure Assignment",
-# 	# 		{"employee": employee, "docstatus": 1},
-# 	# 		"name",
-# 	# 	)
-
-# 	# 	if not ssa_name:
-# 	# 		frappe.throw(
-# 	# 			_("No Salary Structure Assignment found for employee {0}")
-# 	# 			.format(employee)
-# 	# 		)
-
-# 	# 	ssa = frappe.get_doc("Salary Structure Assignment", ssa_name)
-# 	# 	print(ssa,"ssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-# 	# 	account = None
-# 	# 	for row in ssa.custom_employee_insurance_deduction:
-# 	# 		print(row.insurance_company,"ssaaaarow.insurance_companyyyyyyyyyyyy")
-# 	# 		if not row.insurance_company:
-# 	# 			print("ifffffffffff 2222222222222222")
-# 	# 			continue
-# 	# 		comp_doc = frappe.get_doc("Salary Component", salary_component)
-# 	# 		provider = frappe.get_doc("Insurance Provider", row.insurance_company)
-# 	# 		filters = {"parent": salary_component, "custom_fund": fund}
-			
-# 	# 		# if (comp_doc.type == "Deduction"and comp_doc.custom_is_this_insurance_component):
-# 	# 		# 	fund_account = None
-# 	# 		# 	dept_account = None
-# 	# 		# 	for acc_row in provider.accounts:
-# 	# 		# 		acc_doc = frappe.get_doc("Account", row.get("account"))
-# 	# 		# 		dept = acc_doc.custom_department_number
-
-# 	# 		# 		if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
-# 	# 		# 			fund_account = row.get("account")
-
-# 	# 		# 		elif acc_doc.root_type == "Expense" and department == dept:
-# 	# 		# 			dept_account = row.get("account")
-
-# 	# 		# 	if not fund_account:
-# 	# 		# 		frappe.throw(
-# 	# 		# 			_("Please set Liability account in Salary Component {0}")
-# 	# 		# 			.format(get_link_to_form("Salary Component", salary_component))
-# 	# 		# 		)
-
-# 	# 		# 	if not dept_account:
-# 	# 		# 		frappe.throw(
-# 	# 		# 			_("Please set Expense account in Salary Component {0}")
-# 	# 		# 			.format(get_link_to_form("Salary Component", salary_component))
-# 	# 		# 		)
-
-# 	# 		# 	return {
-# 	# 		# 		"fund_account": fund_account,
-# 	# 		# 		"dept_account": dept_account,
-# 	# 		# 	}
-# 	# 		# ---------------------
-# 	# 		if (comp_doc.type == "Deduction"):
-# 	# 			if(comp_doc.custom_is_this_insurance_component):
-# 	# 				for acc_row in provider.accounts:
-# 	# 					acc_doc = frappe.get_doc("Account", acc_row.get("account"))
-# 	# 			# 		dept = acc_doc.custom_department_number
-
-# 	# 			# 		if department and department == dept:
-# 	# 			# 			filters = {
-# 	# 			# 				"parent": salary_component,
-# 	# 			# 				"custom_fund": fund,
-# 	# 			# 				"custom_department_name": department,
-# 	# 			# 			}
-# 	# 			# 			break
-
-# 	# 			# 	account = None
-
-# 	# 			# 	if department:
-# 	# 			# 		account = frappe.db.get_value(
-# 	# 			# 			"Salary Component Account",
-# 	# 			# 			filters,
-# 	# 			# 			"account",
-# 	# 			# 			cache=True,
-# 	# 			# 		)
-
-# 	# 			# 	if fund:
-# 	# 			# 		for row in comp_doc.accounts:
-# 	# 			# 			if row.get("custom_fund") == fund:
-# 	# 			# 				account = row.get("account")
-# 	# 			# 				break
-# 	# 			# print(account, "account employee insurance acc=======")
-# 	# 		# ---------------------------------	
-# 	# 					dept = acc_doc.custom_department_number
-# 	# 					if department and department == dept:
-# 	# 						filters = {
-# 	# 							"parent": row.insurance_company,
-# 	# 							"custom_fund": fund,
-# 	# 							"custom_department_name": department,
-# 	# 						}
-# 	# 						break
-
-# 	# 				if department:
-# 	# 					account = frappe.db.get_value(
-# 	# 						"Salary Component Account",
-# 	# 						filters,
-# 	# 						"account",
-# 	# 						cache=True,
-# 	# 					)
-# 	# 				if fund:
-# 	# 					if acc_row.get("custom_fund") == fund:
-# 	# 						account = acc_row.get("account")
-# 	# 						break
-
-# 	# 	print(account, "account insurance accou ts==")
-
-# 	# 	# return account
-
-# 	# 	if not account:
-# 	# 		frappe.throw(
-# 	# 			_("Please set account in Insurance Provider for Salary Component {0}")
-# 	# 			.format(get_link_to_form("Salary Component", salary_component))
-# 	# 		)
-
-# 	# 	print(account, "account =======insurance provider")
-# 	# 	return account
-
-
-# 	# def get_salary_component_account(self, salary_component, fund, employee, department=None):
-# 	# 	print(salary_component, fund, department, employee, "salary_component, fund, department get_salary_component_account=======")
-
-# 	# 	comp_doc = frappe.get_doc("Salary Component", salary_component)
-
-# 	# 	# 🔥 INSURANCE OVERRIDE (NEW)
-# 	# 	if (
-# 	# 		comp_doc.type == "Deduction"
-# 	# 		and comp_doc.custom_is_this_insurance_component
+# 	# 	# 🔹 INSURANCE OVERRIDE (Employee or Employer)
+# 	# 	if comp_doc.type == "Deduction" and (
+# 	# 		comp_doc.custom_is_this_insurance_component
+# 	# 		or comp_doc.custom_is_this_employers_insurance_component
 # 	# 	):
-# 	# 		return self.get_insurance_provider_account(
-# 	# 			salary_component=salary_component,
-# 	# 			employee=employee,
-# 	# 			fund=fund,
-# 	# 			department=department,
+# 	# 		provider, category = self.get_insurance_details_from_ssa(
+# 	# 			employee, salary_component
 # 	# 		)
 
-# 	# 	# ---------------- EXISTING LOGIC (UNCHANGED) ----------------
+# 	# 		print(provider, category, "provider, category ==============")
 
+# 	# 		if provider:
+# 	# 			return self.get_insurance_provider_account(
+# 	# 				provider, salary_component, fund, department
+# 	# 			)
+
+# 	# 	# 🔹 EXISTING LOGIC (UNCHANGED)
 # 	# 	filters = {"parent": salary_component, "custom_fund": fund}
 # 	# 	account = None
 
 # 	# 	if comp_doc.type in ["Earning", "Deduction"]:
 # 	# 		for row in comp_doc.accounts:
-# 	# 			acc_doc = frappe.get_doc("Account", row.get("account"))
+# 	# 			acc_doc = frappe.get_cached_doc("Account", row.get("account"))
 # 	# 			dept = acc_doc.custom_department_number
 
 # 	# 			if department and department == dept:
@@ -780,10 +889,7 @@
 
 # 	# 		if department:
 # 	# 			account = frappe.db.get_value(
-# 	# 				"Salary Component Account",
-# 	# 				filters,
-# 	# 				"account",
-# 	# 				cache=True,
+# 	# 				"Salary Component Account", filters, "account", cache=True
 # 	# 			)
 # 	# 		else:
 # 	# 			for row in comp_doc.accounts:
@@ -791,6 +897,7 @@
 # 	# 					account = row.get("account")
 # 	# 					break
 
+# 	# 		# Employer contribution (ER Expense + Liability)
 # 	# 		if (
 # 	# 			comp_doc.type == "Deduction"
 # 	# 			and comp_doc.do_not_include_in_total
@@ -800,7 +907,7 @@
 # 	# 			dept_account = None
 
 # 	# 			for row in comp_doc.accounts:
-# 	# 				acc_doc = frappe.get_doc("Account", row.get("account"))
+# 	# 				acc_doc = frappe.get_cached_doc("Account", row.get("account"))
 # 	# 				dept = acc_doc.custom_department_number
 
 # 	# 				if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
@@ -809,21 +916,15 @@
 # 	# 				elif acc_doc.root_type == "Expense" and department == dept:
 # 	# 					dept_account = row.get("account")
 
-# 	# 			if not fund_account:
+# 	# 			if not fund_account or not dept_account:
 # 	# 				frappe.throw(
-# 	# 					_("Please set Liability account in Salary Component {0}")
-# 	# 					.format(get_link_to_form("Salary Component", salary_component))
-# 	# 				)
-
-# 	# 			if not dept_account:
-# 	# 				frappe.throw(
-# 	# 					_("Please set Expense account in Salary Component {0}")
+# 	# 					_("Please set Expense and Liability accounts in Salary Component {0}")
 # 	# 					.format(get_link_to_form("Salary Component", salary_component))
 # 	# 				)
 
 # 	# 			return {
 # 	# 				"fund_account": fund_account,
-# 	# 				"dept_account": dept_account,
+# 	# 				"dept_account": dept_account
 # 	# 			}
 
 # 	# 	if not account:
@@ -832,102 +933,60 @@
 # 	# 			.format(get_link_to_form("Salary Component", salary_component))
 # 	# 		)
 
-# 	# 	print(account, "account get_salary_component_account=======")
 # 	# 	return account
 
 
-# 	# def get_salary_component_accounts(self, salary_component, fund, employee, department=None):
-# 	# 	print(salary_component, fund, department, employee, "salary_component, fund, department get_salary_component_accountssssssss=======")
+# 	# def get_salary_component_accounts(self, salary_component, fund, department=None, employee=None):
+# 	# 	print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None sss///////////////")
+# 	# 	comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
 
-# 	# 	comp_doc = frappe.get_doc("Salary Component", salary_component)
-
-# 	# 	# 🔥 INSURANCE OVERRIDE (NEW)
-# 	# 	if (
-# 	# 		comp_doc.type == "Deduction"
-# 	# 		and comp_doc.custom_is_this_insurance_component
+# 	# 	# 🔹 INSURANCE OVERRIDE (merged ER + EE)
+# 	# 	if comp_doc.type == "Deduction" and (
+# 	# 		comp_doc.custom_is_this_insurance_component
+# 	# 		or comp_doc.custom_is_this_employers_insurance_component
 # 	# 	):
-# 	# 		print("check 111111111111 =======")
-# 	# 		return self.get_insurance_provider_account(
-# 	# 			salary_component=salary_component,
-# 	# 			employee=employee,
-# 	# 			fund=fund,
-# 	# 			department=department,
+# 	# 		provider, category = self.get_insurance_details_from_ssa(
+# 	# 			employee, salary_component
 # 	# 		)
 
-# 	# 	# ---------------- EXISTING LOGIC (UNCHANGED) ----------------
+# 	# 		if provider:
+# 	# 			return self.get_insurance_provider_account(
+# 	# 				provider, salary_component, fund, department
+# 	# 			)
 
+# 	# 	# 🔹 EXISTING LOGIC (UNCHANGED)
 # 	# 	filters = {"parent": salary_component, "custom_fund": fund}
+# 	# 	account = None
 
-# 	# 	if comp_doc.type == "Earning":
-# 	# 		print("earningsss =======")
+# 	# 	for row in comp_doc.accounts:
+# 	# 		acc_doc = frappe.get_cached_doc("Account", row.get("account"))
+# 	# 		dept = acc_doc.custom_department_number
+
+# 	# 		if department and department == dept:
+# 	# 			filters = {
+# 	# 				"parent": salary_component,
+# 	# 				"custom_fund": fund,
+# 	# 				"custom_department_name": department,
+# 	# 			}
+# 	# 			break
+
+# 	# 	if department:
+# 	# 		account = frappe.db.get_value(
+# 	# 			"Salary Component Account", filters, "account", cache=True
+# 	# 		)
+# 	# 	else:
 # 	# 		for row in comp_doc.accounts:
-# 	# 			acc_doc = frappe.get_doc("Account", row.get("account"))
-# 	# 			dept = acc_doc.custom_department_number
-# 	# 			print(department,dept, "department dept 1122=======")
-# 	# 			if department and department == dept:
-# 	# 				print(department, "department =======")
-# 	# 				filters = {
-# 	# 					"parent": salary_component,
-# 	# 					"custom_fund": fund,
-# 	# 					"custom_department_name": department,
-# 	# 				}
+# 	# 			if row.get("custom_fund") == fund:
+# 	# 				account = row.get("account")
 # 	# 				break
 
-# 	# 		account = None
-# 	# 		print(filters, "filters =======")
-
-# 	# 		if department:
-# 	# 			account = frappe.db.get_value(
-# 	# 				"Salary Component Account",
-# 	# 				filters,
-# 	# 				"account",
-# 	# 				cache=True,
-# 	# 			)
-# 	# 		else:
-# 	# 			for row in comp_doc.accounts:
-# 	# 				if row.get("custom_fund") == fund:
-# 	# 					account = row.get("account")
-# 	# 					break
-
-# 	# 	if comp_doc.type == "Deduction":
-# 	# 		for row in comp_doc.accounts:
-# 	# 			acc_doc = frappe.get_doc("Account", row.get("account"))
-# 	# 			dept = acc_doc.custom_department_number
-
-# 	# 			if department and department == dept:
-# 	# 				filters = {
-# 	# 					"parent": salary_component,
-# 	# 					"custom_fund": fund,
-# 	# 					"custom_department_name": department,
-# 	# 				}
-# 	# 				break
-
-# 	# 		account = None
-
-# 	# 		if department:
-# 	# 			account = frappe.db.get_value(
-# 	# 				"Salary Component Account",
-# 	# 				filters,
-# 	# 				"account",
-# 	# 				cache=True,
-# 	# 			)
-
-# 	# 		if fund:
-# 	# 			for row in comp_doc.accounts:
-# 	# 				if row.get("custom_fund") == fund:
-# 	# 					account = row.get("account")
-# 	# 					break
-# 	# 	print(account, "account check 2222222222=======")				
 # 	# 	if not account:
 # 	# 		frappe.throw(
 # 	# 			_("Please set account in Salary Component {0}")
 # 	# 			.format(get_link_to_form("Salary Component", salary_component))
 # 	# 		)
 
-# 	# 	print(account, "account get_salary_component_accountsssss=======")
 # 	# 	return account
-
-
 
 
 # 	def get_salary_components(self, component_type):
@@ -1061,7 +1120,7 @@
 # 							component_type, item.employee, amount_against_cost_center
 # 						)
 
-# 			print(component_dict,"===component_dict2222222")
+# 			print(component_dict,"F22")
 # 			employer_expense_account_details = self.get_employer_expense_account(component_dict=component_dict)
 			
 # 			print(employer_expense_account_details,"===employer_expense_account_details")
@@ -1070,10 +1129,10 @@
 # 	def should_add_component_to_accrual_jv(self, component_type: str, item: dict) -> bool:
 # 		add_component_to_accrual_jv = True
 # 		if component_type == "earnings":
-# 			is_flexible_benefit, only_tax_impact = frappe.get_cached_value(
-# 				"Salary Component", item["salary_component"], ["is_flexible_benefit", "only_tax_impact"]
+# 			is_flexible_benefit, custom_only_tax_impact = frappe.get_cached_value(
+# 				"Salary Component", item["salary_component"], ["is_flexible_benefit", "custom_only_tax_impact"]
 # 			)
-# 			if cint(is_flexible_benefit) and cint(only_tax_impact):
+# 			if cint(is_flexible_benefit) and cint(custom_only_tax_impact):
 # 				add_component_to_accrual_jv = False
 
 # 		return add_component_to_accrual_jv
@@ -1200,16 +1259,15 @@
 # 		# First pass: resolve accounts for all components
 # 		for key in component_dict:
 # 			component, cost_center, fund, department, employee = key
-# 			account = self.get_salary_component_accounts(component, fund, department)
+# 			account = self.get_salary_component_accounts(component, fund, department, employee)
+# 			print(account, "account ------------------------------------------------------")
 # 			account_map[key] = account
-# 			print(account_map[key], "account_map[key] 22222 ************")
 
 # 		# Second pass: aggregate amounts with deduction logic
 # 		for key, amount in component_dict.items():
 # 			component, cost_center, fund, department, employee = key
 # 			comp_doc = frappe.get_doc("Salary Component", component)
 # 			account = account_map[key]
-# 			print(account, "account 333333 ************")
 
 # 			# Deduction logic: check for matching account with opposite do_not_include_in_total
 # 			if comp_doc.type == "Deduction":
@@ -1250,17 +1308,15 @@
 # 		# First pass: resolve accounts
 # 		for key in component_dict:
 # 			component, cost_center, fund, department, employee = key
-# 			account = self.get_salary_component_account(component, fund, department)
+# 			account = self.get_salary_component_account(component, fund, department, employee)
+# 			print(account, "account ----------------------------------tttttttttttttttttttttt")
 # 			account_map[key] = account
-
-# 		print(account_map[key], "account_map[key]2222222 *************************")
 
 # 		# Second pass: aggregate
 # 		for key, amount in component_dict.items():
 # 			component, cost_center, fund, department, employee = key
 # 			comp_doc = frappe.get_doc("Salary Component", component)
 # 			account_info = account_map[key]
-# 			print(account_info, "account_info333333 *************************")
 
 # 			if isinstance(account_info, dict):
 # 				# Deduction with do_not_include_in_total = True
@@ -1964,7 +2020,7 @@
 # 	# 		if salary_detail.parentfield == "earnings":
 # 	# 			(
 # 	# 				is_flexible_benefit,
-# 	# 				only_tax_impact,
+# 	# 				custom_only_tax_impact,
 # 	# 				create_separate_je,
 # 	# 				statistical_component,
 # 	# 			) = frappe.db.get_value(
@@ -1972,14 +2028,14 @@
 # 	# 				salary_detail.salary_component,
 # 	# 				(
 # 	# 					"is_flexible_benefit",
-# 	# 					"only_tax_impact",
-# 	# 					"create_separate_payment_entry_against_benefit_claim",
+# 	# 					"custom_only_tax_impact",
+# 	# 					"custom_create_separate_payment_entry_against_benefit_claim",
 # 	# 					"statistical_component",
 # 	# 				),
 # 	# 				cache=True,
 # 	# 			)
 
-# 	# 			if only_tax_impact != 1 and statistical_component != 1:
+# 	# 			if custom_only_tax_impact != 1 and statistical_component != 1:
 # 	# 				if is_flexible_benefit == 1 and create_separate_je == 1:
 
 # 	# 					self.set_accounting_entries_for_bank_entry(
@@ -2045,7 +2101,7 @@
 # 	# 		if salary_detail.parentfield == "earnings":
 # 	# 			(
 # 	# 				is_flexible_benefit,
-# 	# 				only_tax_impact,
+# 	# 				custom_only_tax_impact,
 # 	# 				create_separate_je,
 # 	# 				statistical_component,
 # 	# 			) = frappe.db.get_value(
@@ -2053,14 +2109,14 @@
 # 	# 				salary_detail.salary_component,
 # 	# 				(
 # 	# 					"is_flexible_benefit",
-# 	# 					"only_tax_impact",
-# 	# 					"create_separate_payment_entry_against_benefit_claim",
+# 	# 					"custom_only_tax_impact",
+# 	# 					"custom_create_separate_payment_entry_against_benefit_claim",
 # 	# 					"statistical_component",
 # 	# 				),
 # 	# 				cache=True,
 # 	# 			)
 
-# 	# 			if only_tax_impact != 1 and statistical_component != 1:
+# 	# 			if custom_only_tax_impact != 1 and statistical_component != 1:
 # 	# 				if is_flexible_benefit == 1 and create_separate_je == 1:
 # 	# 					print(salary_detail.amount,"salary_detail.amount111111111")
 
@@ -2139,7 +2195,7 @@
 # 			if salary_detail.parentfield == "earnings":
 # 				(
 # 					is_flexible_benefit,
-# 					only_tax_impact,
+# 					custom_only_tax_impact,
 # 					create_separate_je,
 # 					statistical_component,
 # 				) = frappe.db.get_value(
@@ -2147,14 +2203,14 @@
 # 					salary_detail.salary_component,
 # 					(
 # 						"is_flexible_benefit",
-# 						"only_tax_impact",
-# 						"create_separate_payment_entry_against_benefit_claim",
+# 						"custom_only_tax_impact",
+# 						"custom_create_separate_payment_entry_against_benefit_claim",
 # 						"statistical_component",
 # 					),
 # 					cache=True,
 # 				)
 
-# 				if only_tax_impact != 1 and statistical_component != 1:
+# 				if custom_only_tax_impact != 1 and statistical_component != 1:
 # 					if is_flexible_benefit == 1 and create_separate_je == 1:
 # 						self.set_accounting_entries_for_bank_entry(
 # 							salary_detail.amount, salary_detail.salary_component
@@ -2215,7 +2271,7 @@
 # 	# 		if salary_detail.parentfield == "earnings":
 # 	# 			(
 # 	# 				is_flexible_benefit,
-# 	# 				only_tax_impact,
+# 	# 				custom_only_tax_impact,
 # 	# 				create_separate_je,
 # 	# 				statistical_component,
 # 	# 			) = frappe.db.get_value(
@@ -2223,14 +2279,14 @@
 # 	# 				salary_detail.salary_component,
 # 	# 				(
 # 	# 					"is_flexible_benefit",
-# 	# 					"only_tax_impact",
-# 	# 					"create_separate_payment_entry_against_benefit_claim",
+# 	# 					"custom_only_tax_impact",
+# 	# 					"custom_create_separate_payment_entry_against_benefit_claim",
 # 	# 					"statistical_component",
 # 	# 				),
 # 	# 				cache=True,
 # 	# 			)
 
-# 	# 			if only_tax_impact != 1 and statistical_component != 1:
+# 	# 			if custom_only_tax_impact != 1 and statistical_component != 1:
 # 	# 				if is_flexible_benefit == 1 and create_separate_je == 1:
 # 	# 					self.set_accounting_entries_for_bank_entry(
 # 	# 						salary_detail.amount, salary_detail.salary_component
@@ -2291,7 +2347,7 @@
 # 			if salary_detail.parentfield == "earnings":
 # 				(
 # 					is_flexible_benefit,
-# 					only_tax_impact,
+# 					custom_only_tax_impact,
 # 					create_separate_je,
 # 					statistical_component,
 # 				) = frappe.db.get_value(
@@ -2299,14 +2355,14 @@
 # 					salary_detail.salary_component,
 # 					(
 # 						"is_flexible_benefit",
-# 						"only_tax_impact",
-# 						"create_separate_payment_entry_against_benefit_claim",
+# 						"custom_only_tax_impact",
+# 						"custom_create_separate_payment_entry_against_benefit_claim",
 # 						"statistical_component",
 # 					),
 # 					cache=True,
 # 				)
 
-# 				if only_tax_impact != 1 and statistical_component != 1:
+# 				if custom_only_tax_impact != 1 and statistical_component != 1:
 # 					if is_flexible_benefit == 1 and create_separate_je == 1:
 # 						self.set_accounting_entries_for_bank_entry(
 # 							salary_detail.amount, salary_detail.salary_component
@@ -3073,52 +3129,46 @@
 
 # @frappe.whitelist()
 # def get_start_end_dates(payroll_frequency, start_date=None, company=None):
-# 	"""Returns dict of start and end dates for given payroll frequency based on start_date"""
+#     """Returns dict of start and end dates for given payroll frequency based on start_date"""
 
-# 	if payroll_frequency == "Monthly" or payroll_frequency == "Bimonthly" or payroll_frequency == "":
-# 		fiscal_year = get_fiscal_year(start_date, company=company)[0]
-# 		month = "%02d" % getdate(start_date).month
-# 		m = get_month_details(fiscal_year, month)
-# 		if payroll_frequency == "Bimonthly":
-# 			if getdate(start_date).day <= 15:
-# 				start_date = m["month_start_date"]
-# 				end_date = m["month_mid_end_date"]
-# 			else:
-# 				start_date = m["month_mid_start_date"]
-# 				end_date = m["month_end_date"]
-# 		else:
-# 			start_date = m["month_start_date"]
-# 			end_date = m["month_end_date"]
+#     if payroll_frequency == "Monthly" or payroll_frequency == "Bimonthly" or payroll_frequency == "":
+#         fiscal_year = get_fiscal_year(start_date, company=company)[0]
+#         month = "%02d" % getdate(start_date).month
+#         m = get_month_details(fiscal_year, month)
+#         if payroll_frequency == "Bimonthly":
+#             if getdate(start_date).day <= 15:
+#                 start_date = m["month_start_date"]
+#                 end_date = m["month_mid_end_date"]
+#             else:
+#                 start_date = m["month_mid_start_date"]
+#                 end_date = m["month_end_date"]
+#         else:
+#             start_date = m["month_start_date"]
+#             end_date = m["month_end_date"]
 
-# 	if payroll_frequency == "Weekly":
-# 		end_date = add_days(start_date, 6)
+#     if payroll_frequency == "Weekly":
+#         end_date = add_days(start_date, 6)
+        
+#     if payroll_frequency == "Bi-Weekly":
+#         end_date = add_days(start_date, 13)
+    
+        
+#     if payroll_frequency == "Fortnightly":
+#         end_date = add_days(start_date, 13)
 
-# 	if payroll_frequency == "Fortnightly":
-# 		end_date = add_days(start_date, 13)
+#     if payroll_frequency == "Daily":
+#         end_date = start_date
 
-# 	if payroll_frequency == "Daily":
-# 		end_date = start_date
+#     return frappe._dict({"start_date": start_date, "end_date": end_date})
 
-# 	return frappe._dict({"start_date": start_date, "end_date": end_date})
-
-
-# def get_frequency_kwargs(frequency_name):
-# 	frequency_dict = {
-# 		"monthly": {"months": 1},
-# 		"fortnightly": {"days": 14},
-# 		"weekly": {"days": 7},
-# 		"daily": {"days": 1},
-# 	}
-# 	return frequency_dict.get(frequency_name)
 
 
 # @frappe.whitelist()
 # def get_end_date(start_date, frequency):
+# 	print(frequency,"--------------------")
 # 	start_date = getdate(start_date)
 # 	frequency = frequency.lower() if frequency else "monthly"
-# 	kwargs = (
-# 		get_frequency_kwargs(frequency) if frequency != "bimonthly" else get_frequency_kwargs("monthly")
-# 	)
+# 	kwargs = get_frequency_kwargs(frequency) if frequency != "bimonthly" else get_frequency_kwargs("monthly")
 
 # 	# weekly, fortnightly and daily intervals have fixed days so no problems
 # 	end_date = add_to_date(start_date, **kwargs) - relativedelta(days=1)
@@ -3127,6 +3177,16 @@
 
 # 	else:
 # 		return dict(end_date="")
+
+# def get_frequency_kwargs(frequency_name):
+# 	frequency_dict = {
+# 		"monthly": {"months": 1},
+# 		"fortnightly": {"days": 14},
+# 		"weekly": {"days": 7},
+# 		"daily": {"days": 1},
+#         "bi-weekly": {"days": 14},
+# 	}
+# 	return frequency_dict.get(frequency_name)
 
 
 # def get_month_details(year, month):
@@ -3497,8 +3557,7 @@
 # 		raise
 
 
-
-
+# =============================================================================================
 
 
 
@@ -3530,8 +3589,12 @@ from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
 from erpnext.accounts.utils import get_fiscal_year
 from frappe.utils import get_url
 from collections import defaultdict
+import time
+import logging
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
+logger = frappe.logger("payroll_jv", allow_site=True)
 
-class OverridePayrollEntry(Document):
+class OverridePayrollEntry(PayrollEntry):
 	def onload(self):
 		if not self.docstatus == 1 or self.salary_slips_submitted:
 			return
@@ -3736,49 +3799,6 @@ class OverridePayrollEntry(Document):
 
 		return self.get_employees_with_unmarked_attendance()
 
-	# @frappe.whitelist()
-	# def create_salary_slips(self):
-	# 	"""
-	# 	Creates salary slip for selected employees if already not created
-	# 	"""
-	# 	self.check_permission("write")
-	# 	employees = [emp.employee for emp in self.employees]
-
-	# 	if employees:
-	# 		args = frappe._dict(
-	# 			{
-	# 				"salary_slip_based_on_timesheet": self.salary_slip_based_on_timesheet,
-	# 				"payroll_frequency": self.payroll_frequency,
-	# 				"start_date": self.start_date,
-	# 				"end_date": self.end_date,
-	# 				"company": self.company,
-	# 				"posting_date": self.posting_date,
-	# 				"deduct_tax_for_unclaimed_employee_benefits": self.deduct_tax_for_unclaimed_employee_benefits,
-	# 				"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
-	# 				"payroll_entry": self.name,
-	# 				"exchange_rate": self.exchange_rate,
-	# 				"currency": self.currency,
-	# 			}
-	# 		)
-	# 		if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:
-	# 			self.db_set("status", "Queued")
-	# 			frappe.enqueue(
-	# 				create_salary_slips_for_employees,
-	# 				timeout=3000,
-	# 				employees=employees,
-	# 				args=args,
-	# 				publish_progress=False,
-	# 			)
-	# 			frappe.msgprint(
-	# 				_("Salary Slip creation is queued. It may take a few minutes"),
-	# 				alert=True,
-	# 				indicator="blue",
-	# 			)
-	# 		else:
-	# 			create_salary_slips_for_employees(employees, args, publish_progress=False)
-	# 			# since this method is called via frm.call this doc needs to be updated manually
-	# 			self.reload()
-
 
 	@frappe.whitelist()
 	def create_salary_slips(self):
@@ -3797,8 +3817,6 @@ class OverridePayrollEntry(Document):
 				fields=["name", "check_number"],
 				order_by="check_number ASC",
 			)
-			# if not available_check:
-   #              frappe.throw("No check available.")
 
 		available_check = available_check[::-1]
 
@@ -3819,7 +3837,7 @@ class OverridePayrollEntry(Document):
 						"end_date": self.end_date,
 						"company": self.company,
 						"posting_date": self.posting_date,
-						"deduct_tax_for_unclaimed_employee_benefits": self.deduct_tax_for_unclaimed_employee_benefits,
+						"deduct_tax_for_unclaimed_employee_benefits": 0,
 						"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
 						"payroll_entry": self.name,
 						"exchange_rate": self.exchange_rate,
@@ -3894,67 +3912,80 @@ class OverridePayrollEntry(Document):
 			for ss in submitted_ss:
 				ss.email_salary_slip()
 
-
-# # # ----------------------below is working in case of expense and  2 liability accounts-----------------
-# 	def get_salary_component_accounts(self, salary_component, fund, department=None):
-# 		print(salary_component, fund, department, "salary_component, fund, department =======")
+# # ----------------------below is working in case of expense and  2 liability accounts-----------------
+# 	def get_salary_component_accounts(self, salary_component):
 # 		comp_doc = frappe.get_doc("Salary Component", salary_component)
-# 		filters = {"parent": salary_component, "custom_fund": fund}  # default
+# 		# filters = {"parent": salary_component, "custom_fund": fund}  # default
 
 # 		if comp_doc.type == "Earning":
-# 			# Check for department match
-# 			for row in comp_doc.accounts:
-# 				acc_doc = frappe.get_doc("Account", row.get("account"))
-# 				dept = acc_doc.custom_department_number
+# 			# # Check for department match
+# 			# for row in comp_doc.accounts:
+# 			# 	acc_doc = frappe.get_doc("Account", row.get("account"))
+# 			# 	dept = acc_doc.custom_department_number
 
-# 				if department and department == dept:
-# 					filters = {
-# 						"parent": salary_component,
-# 						"custom_fund": fund,
-# 						"custom_department_name": department,
-# 					}
-# 					break  # stop at first department match
+# 			# 	if department and department == dept:
+# 			# 		filters = {
+# 			# 			"parent": salary_component,
+# 			# 			"custom_fund": fund,
+# 			# 			"custom_department_name": department,
+# 			# 		}
+# 			# 		break  # stop at first department match
 
-# 			account = None
+# 			# account = None
 
-# 			if department:
-# 				# Use existing logic if department is provided
-# 				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+# 			# if department:
+# 			# 	# Use existing logic if department is provided
+# 			# 	account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
 			
-# 			else:
-# 				# Fund-only case: pick first matching row from the child table
-# 				for row in comp_doc.accounts:
-# 					if row.get("custom_fund") == fund:
-# 						account = row.get("account")
-# 						break
+# 			# else:
+# 			# 	# Fund-only case: pick first matching row from the child table
+# 			# 	for row in comp_doc.accounts:
+# 			# 		if row.get("custom_fund") == fund:
+# 			# 			account = row.get("account")
+# 			# 			break
+
+# 			account = frappe.db.get_value(
+# 				"Salary Component Account",
+# 				{"parent": salary_component, "company": self.company},
+# 				"account",
+# 				cache=True,
+# 			)
 
 # 		if comp_doc.type == "Deduction":
-# 			# Check for department match
-# 			for row in comp_doc.accounts:
-# 				acc_doc = frappe.get_doc("Account", row.get("account"))
-# 				dept = acc_doc.custom_department_number
+# 			# # Check for department match
+# 			# for row in comp_doc.accounts:
+# 			# 	acc_doc = frappe.get_doc("Account", row.get("account"))
+# 			# 	dept = acc_doc.custom_department_number
 
-# 				if department and department == dept:
-# 					filters = {
-# 						"parent": salary_component,
-# 						"custom_fund": fund,
-# 						"custom_department_name": department,
-# 					}
-# 					print(filters, "department match")
-# 					break  # stop at first department match
+# 			# 	if department and department == dept:
+# 			# 		filters = {
+# 			# 			"parent": salary_component,
+# 			# 			"custom_fund": fund,
+# 			# 			"custom_department_name": department,
+# 			# 		}
+# 			# 		print(filters, "department match")
+# 			# 		break  # stop at first department match
 
-# 			account = None
+# 			# account = None
 
-# 			if department:
-# 				# Use existing logic if department is provided
-# 				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+# 			# if department:
+# 			# 	# Use existing logic if department is provided
+# 			# 	account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
 			
-# 			if fund:
-# 				# Fund-only case: pick first matching row from the child table
-# 				for row in comp_doc.accounts:
-# 					if row.get("custom_fund") == fund:
-# 						account = row.get("account")
-# 						break
+# 			# if fund:
+# 			# 	# Fund-only case: pick first matching row from the child table
+# 			# 	for row in comp_doc.accounts:
+# 			# 		if row.get("custom_fund") == fund:
+# 			# 			account = row.get("account")
+# 			# 			break
+
+# 			account = frappe.db.get_value(
+# 				"Salary Component Account",
+# 				{"parent": salary_component, "company": self.company},
+# 				"account",
+# 				cache=True,
+# 			)
+
 # 		if not account:
 # 			frappe.throw(
 # 				_("Please set account in Salary Component {0}").format(
@@ -3962,303 +3993,99 @@ class OverridePayrollEntry(Document):
 # 				)
 # 			)
 
-
-# 		print(account, "account =======")
-
 # 		return account
 
 
 # # ----------------------below is working in case of expense and liability----------------
-# 	def get_salary_component_account(self, salary_component, fund, department=None):
-# 		print(salary_component, fund, department, "salary_component, fund, department 222222222=======")
+# 	def get_salary_component_account(self, salary_component):
 # 		comp_doc = frappe.get_doc("Salary Component", salary_component)
-# 		filters = {"parent": salary_component, "custom_fund": fund}
+# 		# filters = {"parent": salary_component, "custom_fund": fund}
 # 		account = None
 
 # 		if comp_doc.type in ["Earning", "Deduction"]:
-# 			for row in comp_doc.accounts:
-# 				acc_doc = frappe.get_doc("Account", row.get("account"))
-# 				dept = acc_doc.custom_department_number
+# 			# for row in comp_doc.accounts:
+# 			# 	acc_doc = frappe.get_doc("Account", row.get("account"))
+# 			# 	dept = acc_doc.custom_department_number
 
-# 				if department and department == dept:
-# 					filters = {
-# 						"parent": salary_component,
-# 						"custom_fund": fund,
-# 						"custom_department_name": department,
-# 					}
-# 					break
+# 			# 	if department and department == dept:
+# 			# 		filters = {
+# 			# 			"parent": salary_component,
+# 			# 			"custom_fund": fund,
+# 			# 			"custom_department_name": department,
+# 			# 		}
+# 			# 		break
 
-# 			if department:
-# 				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
-# 			else:
-# 				for row in comp_doc.accounts:
-# 					if row.get("custom_fund") == fund:
-# 						account = row.get("account")
-# 						break
+# 			# if department:
+# 			# 	account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+# 			# else:
+# 			# 	for row in comp_doc.accounts:
+# 			# 		if row.get("custom_fund") == fund:
+# 			# 			account = row.get("account")
+# 			# 			break
+
+# 			account = frappe.db.get_value(
+# 				"Salary Component Account",
+# 				{"parent": salary_component, "company": self.company},
+# 				"account",
+# 				cache=True,
+# 			)
 
 # 			if comp_doc.type == "Deduction" and comp_doc.do_not_include_in_total and comp_doc.custom_is_employer_component:
-# 				fund_account = None
-# 				dept_account = None
+# 				liability_account = None
+# 				expense_account = None
 # 				for row in comp_doc.accounts:
 # 					acc_doc = frappe.get_doc("Account", row.get("account"))
-# 					dept = acc_doc.custom_department_number
+# 					# dept = acc_doc.custom_department_number
 
-# 					if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
-# 						fund_account = row.get("account")
+# 					if acc_doc.root_type == "Liability":
+# 						liability_account = row.get("account")
 
-# 					elif acc_doc.root_type == "Expense" and department == dept:
-# 						dept_account = row.get("account")
+# 					elif acc_doc.root_type == "Expense":
+# 						expense_account = row.get("account")
 
-# 				if not fund_account:
+# 				if not liability_account:
 # 					frappe.throw(_("Please set Liability account in Salary Component {0}").format(
 # 						get_link_to_form("Salary Component", salary_component)
 # 					))
 
-# 				if not dept_account:
+# 				if not expense_account:
 # 					frappe.throw(_("Please set Expense account in Salary Component {0}").format(
 # 						get_link_to_form("Salary Component", salary_component)
 # 					))
 
-# 				return {"fund_account": fund_account, "dept_account": dept_account}
+# 				return {"liability_account": liability_account, "expense_account": expense_account}
 # 		if not account:
 # 			frappe.throw(_("Please set account in Salary Component {0}").format(
 # 				get_link_to_form("Salary Component", salary_component)
 # 			))
 
-# 		print(account, "account22222222222222 =======")
-
 # 		return account
 
 
-	def get_insurance_details_from_ssa(self, employee, salary_component):
-		ssa = frappe.db.get_value(
-			"Salary Structure Assignment",
-			{
-				"employee": employee,
-				"docstatus": 1
-			},
-			"name"
-		)
-
-		if not ssa:
-			return None, None   # ✅ ALWAYS return tuple
-
-		print(employee,ssa,salary_component,"employee,ssa,salary_component 0000000000000" )
-
-		result = frappe.db.get_value(
-			"Employee Insurance Deduction",
-			{
-				"parent": ssa,
-				"salary_component": salary_component
-			},
-			["insurance_company", "category"]
-		)
-
-		if not result:
-			return None, None   # ✅ ALWAYS return tuple
-
-		print(result,"resultsssssssssssssssssssssssssssssssssssssssssssssssss" )
-
-		return result
-
-
-	# def get_insurance_provider_account(
-	# 	self,
-	# 	provider,
-	# 	salary_component,
-	# 	fund,
-	# 	department=None
-	# ):
-	# 	provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
-	# 	comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-
-	# 	for row in provider_doc.accounts:
-	# 		if row.custom_fund != fund:
-	# 			continue
-
-	# 		acc_doc = frappe.get_cached_doc("Account", row.account)
-	# 		dept = acc_doc.custom_department_number
-
-	# 		# 🔹 Employee Insurance → Liability
-	# 		if comp_doc.custom_is_this_insurance_component:
-	# 			if acc_doc.root_type == "Liability":
-	# 				return row.account
-
-	# 		# 🔹 Employer Insurance → Expense
-	# 		if comp_doc.custom_is_this_employers_insurance_component:
-	# 			if acc_doc.root_type == "Expense":
-	# 				if department and department == dept:
-	# 					return row.account
-
-	# 	frappe.throw(
-	# 		_("Please set proper Insurance account in Insurance Provider {0}")
-	# 		.format(provider)
-	# 	)
-
-	def get_insurance_provider_account(
-		self,
-		provider,
-		salary_component,
-		fund,
-		department=None
-	):
-		provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
-		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-		filters = {"parent": salary_component, "custom_fund": fund}
-		for row in provider_doc.accounts:
-			if row.custom_fund != fund:
-				continue
-
-			acc_doc = frappe.get_cached_doc("Account", row.account)
-			dept = acc_doc.custom_department_number
-
-			if department and department == dept:
-				filters = {
-					"parent": "Insurance Provider",
-					"custom_fund": fund,
-					"custom_department_name": department,
-				}
-				print(filters, "department match")
-				break  # stop at first department match
-
+# # ----------------------below is working in case of expense and  2 liability accounts-----------------
+	def get_salary_component_accounts(self, salary_component):
+		comp_doc = frappe.get_doc("Salary Component", salary_component)
 		account = None
 
-		if department:
-			# Use existing logic if department is provided
-			account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
-		
-		if fund:
-			# Fund-only case: pick first matching row from the child table
-			for row in provider_doc.accounts:
-				if row.get("custom_fund") == fund:
-					account = row.get("account")
+		# Deduction + employer component:
+		# pick LIABILITY account so ER + EE merge in JE credit
+		if (
+			comp_doc.type == "Deduction"
+			and comp_doc.custom_is_employer_component
+		):
+			for row in comp_doc.accounts:
+				acc_doc = frappe.get_doc("Account", row.account)
+
+				if acc_doc.root_type == "Liability":
+					account = row.account
 					break
 
-		if not account:		
-			frappe.throw(
-				_("Please set proper Insurance account in Insurance Provider {0}")
-				.format(provider)
-			)
-
-		return account
-
-
-
-	def get_er_insurance_account(
-		self,
-		provider,
-		salary_component,
-		fund,
-		department=None
-	):
-		provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
-		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-
-		if comp_doc.do_not_include_in_total and comp_doc.custom_is_employer_component:
-			fund_account = None
-			dept_account = None
-			for row in provider_doc.accounts:
-				acc_doc = frappe.get_doc("Account", row.get("account"))
-				dept = acc_doc.custom_department_number
-
-				if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
-					fund_account = row.get("account")
-
-				elif acc_doc.root_type == "Expense" and department == dept:
-					dept_account = row.get("account")
-
-			if not fund_account:
-				frappe.throw(_("Please set Liability account in Insurance Provider {0}").format(
-					get_link_to_form("Salary Component", salary_component)
-				))
-
-			if not dept_account:
-				frappe.throw(_("Please set Expense account in Insurance Provider {0}").format(
-					get_link_to_form("Salary Component", salary_component)
-				))
-
-			return {"fund_account": fund_account, "dept_account": dept_account}
-
-
-
-	# # ----------------------below is working in case of expense and  2 liability accounts-----------------
-	def get_salary_component_accounts(self, salary_component, fund, department=None, employee=None):
-		print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None /////////////////")
-		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-
-		# 🔹 INSURANCE OVERRIDE (Employee or Employer)
-		if comp_doc.type == "Deduction" and (
-			comp_doc.custom_is_this_insurance_component
-			or comp_doc.custom_is_this_employers_insurance_component
-		):
-			provider, category = self.get_insurance_details_from_ssa(
-				employee, salary_component
-			)
-
-			print(provider, category, "provider, category ==============")
-
-			if provider:
-				return self.get_insurance_provider_account(
-					provider, salary_component, fund, department
-				)
-
-		# 🔹 EXISTING LOGIC (UNCHANGED)
-		filters = {"parent": salary_component, "custom_fund": fund}  # default
-
-		if comp_doc.type == "Earning":
-			# Check for department match
+		# Normal earning/deduction
+		if not account:
 			for row in comp_doc.accounts:
-				acc_doc = frappe.get_doc("Account", row.get("account"))
-				dept = acc_doc.custom_department_number
+				account = row.account
+				break
 
-				if department and department == dept:
-					filters = {
-						"parent": salary_component,
-						"custom_fund": fund,
-						"custom_department_name": department,
-					}
-					break  # stop at first department match
-
-			account = None
-
-			if department:
-				# Use existing logic if department is provided
-				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
-			
-			else:
-				# Fund-only case: pick first matching row from the child table
-				for row in comp_doc.accounts:
-					if row.get("custom_fund") == fund:
-						account = row.get("account")
-						break
-
-		if comp_doc.type == "Deduction":
-			# Check for department match
-			for row in comp_doc.accounts:
-				acc_doc = frappe.get_doc("Account", row.get("account"))
-				dept = acc_doc.custom_department_number
-
-				if department and department == dept:
-					filters = {
-						"parent": salary_component,
-						"custom_fund": fund,
-						"custom_department_name": department,
-					}
-					print(filters, "department match")
-					break  # stop at first department match
-
-			account = None
-
-			if department:
-				# Use existing logic if department is provided
-				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
-			
-			if fund:
-				# Fund-only case: pick first matching row from the child table
-				for row in comp_doc.accounts:
-					if row.get("custom_fund") == fund:
-						account = row.get("account")
-						break
 		if not account:
 			frappe.throw(
 				_("Please set account in Salary Component {0}").format(
@@ -4266,230 +4093,63 @@ class OverridePayrollEntry(Document):
 				)
 			)
 
-
-		print(account, "account =======")
-
 		return account
 
-
-# ----------------------below is working in case of expense and liability----------------
-	def get_salary_component_account(self, salary_component, fund, department=None, employee=None):
-		print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None /////////////////")
-		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-
-		# 🔹 INSURANCE OVERRIDE (Employee or Employer)
-		if comp_doc.type == "Deduction" and (
-			comp_doc.custom_is_this_insurance_component
-			or comp_doc.custom_is_this_employers_insurance_component
-		):
-			provider, category = self.get_insurance_details_from_ssa(
-				employee, salary_component
-			)
-
-			print(provider, category, "provider, category ==============")
-
-			if provider:
-				return self.get_er_insurance_account(
-					provider, salary_component, fund, department
-				)
-
-		# 🔹 EXISTING LOGIC (UNCHANGED)
-		filters = {"parent": salary_component, "custom_fund": fund}
+# # ----------------------below is working in case of expense and liability----------------
+	def get_salary_component_account(self, salary_component):
+		comp_doc = frappe.get_doc("Salary Component", salary_component)
 		account = None
 
-		if comp_doc.type in ["Earning", "Deduction"]:
+		# Employer deduction with separate liability + expense
+		if (
+			comp_doc.type == "Deduction"
+			and comp_doc.do_not_include_in_total
+			and comp_doc.custom_is_employer_component
+		):
+			liability_account = None
+			expense_account = None
+
 			for row in comp_doc.accounts:
-				acc_doc = frappe.get_doc("Account", row.get("account"))
-				dept = acc_doc.custom_department_number
+				acc_doc = frappe.get_doc("Account", row.account)
 
-				if department and department == dept:
-					filters = {
-						"parent": salary_component,
-						"custom_fund": fund,
-						"custom_department_name": department,
-					}
-					break
+				if acc_doc.root_type == "Liability" and not liability_account:
+					liability_account = row.account
 
-			if department:
-				account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
-			else:
-				for row in comp_doc.accounts:
-					if row.get("custom_fund") == fund:
-						account = row.get("account")
-						break
+				elif acc_doc.root_type == "Expense" and not expense_account:
+					expense_account = row.account
 
-			if comp_doc.type == "Deduction" and comp_doc.do_not_include_in_total and comp_doc.custom_is_employer_component:
-				fund_account = None
-				dept_account = None
-				for row in comp_doc.accounts:
-					acc_doc = frappe.get_doc("Account", row.get("account"))
-					dept = acc_doc.custom_department_number
-
-					if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
-						fund_account = row.get("account")
-
-					elif acc_doc.root_type == "Expense" and department == dept:
-						dept_account = row.get("account")
-
-				if not fund_account:
-					frappe.throw(_("Please set Liability account in Salary Component {0}").format(
+			if not liability_account:
+				frappe.throw(
+					_("Please set Liability account in Salary Component {0}").format(
 						get_link_to_form("Salary Component", salary_component)
-					))
+					)
+				)
 
-				if not dept_account:
-					frappe.throw(_("Please set Expense account in Salary Component {0}").format(
+			if not expense_account:
+				frappe.throw(
+					_("Please set Expense account in Salary Component {0}").format(
 						get_link_to_form("Salary Component", salary_component)
-					))
+					)
+				)
 
-				return {"fund_account": fund_account, "dept_account": dept_account}
+			return {
+				"liability_account": liability_account,
+				"expense_account": expense_account,
+			}
+
+		# Normal earning/deduction
+		for row in comp_doc.accounts:
+			account = row.account
+			break
+
 		if not account:
-			frappe.throw(_("Please set account in Salary Component {0}").format(
-				get_link_to_form("Salary Component", salary_component)
-			))
-
-		print(account, "account22222222222222 =======")
+			frappe.throw(
+				_("Please set account in Salary Component {0}").format(
+					get_link_to_form("Salary Component", salary_component)
+				)
+			)
 
 		return account
-
-
-	# def get_salary_component_account(self, salary_component, fund, department=None, employee=None):
-	# 	print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None /////////////////")
-	# 	comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-
-	# 	# 🔹 INSURANCE OVERRIDE (Employee or Employer)
-	# 	if comp_doc.type == "Deduction" and (
-	# 		comp_doc.custom_is_this_insurance_component
-	# 		or comp_doc.custom_is_this_employers_insurance_component
-	# 	):
-	# 		provider, category = self.get_insurance_details_from_ssa(
-	# 			employee, salary_component
-	# 		)
-
-	# 		print(provider, category, "provider, category ==============")
-
-	# 		if provider:
-	# 			return self.get_insurance_provider_account(
-	# 				provider, salary_component, fund, department
-	# 			)
-
-	# 	# 🔹 EXISTING LOGIC (UNCHANGED)
-	# 	filters = {"parent": salary_component, "custom_fund": fund}
-	# 	account = None
-
-	# 	if comp_doc.type in ["Earning", "Deduction"]:
-	# 		for row in comp_doc.accounts:
-	# 			acc_doc = frappe.get_cached_doc("Account", row.get("account"))
-	# 			dept = acc_doc.custom_department_number
-
-	# 			if department and department == dept:
-	# 				filters = {
-	# 					"parent": salary_component,
-	# 					"custom_fund": fund,
-	# 					"custom_department_name": department,
-	# 				}
-	# 				break
-
-	# 		if department:
-	# 			account = frappe.db.get_value(
-	# 				"Salary Component Account", filters, "account", cache=True
-	# 			)
-	# 		else:
-	# 			for row in comp_doc.accounts:
-	# 				if row.get("custom_fund") == fund:
-	# 					account = row.get("account")
-	# 					break
-
-	# 		# Employer contribution (ER Expense + Liability)
-	# 		if (
-	# 			comp_doc.type == "Deduction"
-	# 			and comp_doc.do_not_include_in_total
-	# 			and comp_doc.custom_is_employer_component
-	# 		):
-	# 			fund_account = None
-	# 			dept_account = None
-
-	# 			for row in comp_doc.accounts:
-	# 				acc_doc = frappe.get_cached_doc("Account", row.get("account"))
-	# 				dept = acc_doc.custom_department_number
-
-	# 				if acc_doc.root_type == "Liability" and row.get("custom_fund") == fund:
-	# 					fund_account = row.get("account")
-
-	# 				elif acc_doc.root_type == "Expense" and department == dept:
-	# 					dept_account = row.get("account")
-
-	# 			if not fund_account or not dept_account:
-	# 				frappe.throw(
-	# 					_("Please set Expense and Liability accounts in Salary Component {0}")
-	# 					.format(get_link_to_form("Salary Component", salary_component))
-	# 				)
-
-	# 			return {
-	# 				"fund_account": fund_account,
-	# 				"dept_account": dept_account
-	# 			}
-
-	# 	if not account:
-	# 		frappe.throw(
-	# 			_("Please set account in Salary Component {0}")
-	# 			.format(get_link_to_form("Salary Component", salary_component))
-	# 		)
-
-	# 	return account
-
-
-	# def get_salary_component_accounts(self, salary_component, fund, department=None, employee=None):
-	# 	print(salary_component, fund, employee, department, "salary_component, fund, employee=None, department=None sss///////////////")
-	# 	comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-
-	# 	# 🔹 INSURANCE OVERRIDE (merged ER + EE)
-	# 	if comp_doc.type == "Deduction" and (
-	# 		comp_doc.custom_is_this_insurance_component
-	# 		or comp_doc.custom_is_this_employers_insurance_component
-	# 	):
-	# 		provider, category = self.get_insurance_details_from_ssa(
-	# 			employee, salary_component
-	# 		)
-
-	# 		if provider:
-	# 			return self.get_insurance_provider_account(
-	# 				provider, salary_component, fund, department
-	# 			)
-
-	# 	# 🔹 EXISTING LOGIC (UNCHANGED)
-	# 	filters = {"parent": salary_component, "custom_fund": fund}
-	# 	account = None
-
-	# 	for row in comp_doc.accounts:
-	# 		acc_doc = frappe.get_cached_doc("Account", row.get("account"))
-	# 		dept = acc_doc.custom_department_number
-
-	# 		if department and department == dept:
-	# 			filters = {
-	# 				"parent": salary_component,
-	# 				"custom_fund": fund,
-	# 				"custom_department_name": department,
-	# 			}
-	# 			break
-
-	# 	if department:
-	# 		account = frappe.db.get_value(
-	# 			"Salary Component Account", filters, "account", cache=True
-	# 		)
-	# 	else:
-	# 		for row in comp_doc.accounts:
-	# 			if row.get("custom_fund") == fund:
-	# 				account = row.get("account")
-	# 				break
-
-	# 	if not account:
-	# 		frappe.throw(
-	# 			_("Please set account in Salary Component {0}")
-	# 			.format(get_link_to_form("Salary Component", salary_component))
-	# 		)
-
-	# 	return account
-
 
 	def get_salary_components(self, component_type):
 		salary_slips = self.get_sal_slip_list(ss_status=1, as_dict=True)
@@ -4541,35 +4201,17 @@ class OverridePayrollEntry(Document):
 						self.add_advance_deduction_entry(
 							item, amount_against_cost_center, cost_center, employee_advance
 						)
-
-						print(component_dict.get(key, 0),"component_dict.get(key, 0)0000000000000000000000")
 					else:
-
-						fund = [_.custom_fund for _ in self.employees if _.employee == item.employee][0]
 						employee = [_.employee for _ in self.employees if _.employee == item.employee][0]
-
-						emp_department = [_.custom_department_name for _ in self.employees if _.employee == item.employee][0]
-
-
-						# key = (item.salary_component, cost_center, fund, employee)
-
-						if emp_department:
-							key = (item.salary_component, cost_center, fund, emp_department, employee)
-						else:
-							key = (item.salary_component, cost_center, fund, None, employee)
-
-						print(component_dict.get(key, 0),"component_dict.get(key, 0)-----------------------")
-						component_dict[key] = component_dict.get(key, 0) + amount_against_cost_center
-						
+						key = (item.salary_component, cost_center)
+		
+						component_dict[key] = component_dict.get(key, 0) + amount_against_cost_center						
 
 					if employee_wise_accounting_enabled:
 						self.set_employee_based_payroll_payable_entries(
 							component_type, item.employee, amount_against_cost_center
 						)
-			print(component_dict,"===component_dict")
 			account_details = self.get_account(component_dict=component_dict)
-
-			print(account_details,"===account_detailssssssssssssssssssssssssssssss")
 			return account_details
 
 
@@ -4581,7 +4223,6 @@ class OverridePayrollEntry(Document):
 	):
 
 		salary_components = self.get_salary_components(component_type)
-
 		if salary_components:
 			component_dict = {}
 			for item in salary_components:
@@ -4603,17 +4244,8 @@ class OverridePayrollEntry(Document):
 						)
 
 					else:
-						fund = [_.custom_fund for _ in self.employees if _.employee == item.employee][0]
 						employee = [_.employee for _ in self.employees if _.employee == item.employee][0]
-
-						emp_department = [_.custom_department_name for _ in self.employees if _.employee == item.employee][0]
-
-						# key = (item.salary_component, cost_center, fund, employee)
-
-						if emp_department:
-							key = (item.salary_component, cost_center, fund, emp_department, employee)
-						else:
-							key = (item.salary_component, cost_center, fund, None, employee)
+						key = (item.salary_component, cost_center)
 
 						component_dict[key] = component_dict.get(key, 0) + amount_against_cost_center
 						
@@ -4621,20 +4253,16 @@ class OverridePayrollEntry(Document):
 						self.set_employee_based_payroll_payable_entries(
 							component_type, item.employee, amount_against_cost_center
 						)
-
-			print(component_dict,"F22")
 			employer_expense_account_details = self.get_employer_expense_account(component_dict=component_dict)
-			
-			print(employer_expense_account_details,"===employer_expense_account_details")
 			return employer_expense_account_details
 
 	def should_add_component_to_accrual_jv(self, component_type: str, item: dict) -> bool:
 		add_component_to_accrual_jv = True
 		if component_type == "earnings":
-			is_flexible_benefit, only_tax_impact = frappe.get_cached_value(
-				"Salary Component", item["salary_component"], ["is_flexible_benefit", "only_tax_impact"]
+			is_flexible_benefit, custom_only_tax_impact = frappe.get_cached_value(
+				"Salary Component", item["salary_component"], ["is_flexible_benefit", "custom_only_tax_impact"]
 			)
-			if cint(is_flexible_benefit) and cint(only_tax_impact):
+			if cint(is_flexible_benefit) and cint(custom_only_tax_impact):
 				add_component_to_accrual_jv = False
 
 		return add_component_to_accrual_jv
@@ -4702,13 +4330,9 @@ class OverridePayrollEntry(Document):
 		self, component_type, employee, amount, salary_structure=None
 	):
 
-		print(amount, "call in set_employee_based_payroll_payable_entries------------")
 		employee_details = self.employee_based_payroll_payable_entries.setdefault(employee, {})
-
 		employee_details.setdefault(component_type, 0)
 		employee_details[component_type] += amount
-
-		# frappe.throw("======================")
 
 		if salary_structure and "salary_structure" not in employee_details:
 			employee_details["salary_structure"] = salary_structure
@@ -4752,96 +4376,170 @@ class OverridePayrollEntry(Document):
 
 		return self.employee_cost_centers.get(employee, {})
 
+
 # --------------------------------------below is working function in case of ER + EE amounts-----------------------------
-	def get_account(self, component_dict=None, employee=None):
-		print(component_dict, employee, "component_dict,employee111111 emprnexpense account with er+ee amnt*************************")
-		account_dict = {}
-		account_map = {}  # Maps (component, fund, department) to account
+	# def get_account(self, component_dict=None, employee=None):
+	# 	account_dict = {}
+	# 	account_map = {}  # Maps (component, fund, department) to account
 
-		# First pass: resolve accounts for all components
-		for key in component_dict:
-			component, cost_center, fund, department, employee = key
-			account = self.get_salary_component_accounts(component, fund, department, employee)
-			print(account, "account ------------------------------------------------------")
-			account_map[key] = account
+	# 	# First pass: resolve accounts for all components
+	# 	for key in component_dict:
+	# 		component, cost_center, fund, department, employee = key
+	# 		account = self.get_salary_component_accounts(component, fund, department)
+	# 		account_map[key] = account
 
-		# Second pass: aggregate amounts with deduction logic
-		for key, amount in component_dict.items():
-			component, cost_center, fund, department, employee = key
-			comp_doc = frappe.get_doc("Salary Component", component)
-			account = account_map[key]
+	# 	# Second pass: aggregate amounts with deduction logic
+	# 	for key, amount in component_dict.items():
+	# 		component, cost_center, fund, department, employee = key
+	# 		comp_doc = frappe.get_doc("Salary Component", component)
+	# 		account = account_map[key]
 
-			# Deduction logic: check for matching account with opposite do_not_include_in_total
-			if comp_doc.type == "Deduction":
-				for other_key, other_account in account_map.items():
-					if other_key == key:
-						continue
+	# 		# Deduction logic: check for matching account with opposite do_not_include_in_total
+	# 		if comp_doc.type == "Deduction":
+	# 			for other_key, other_account in account_map.items():
+	# 				if other_key == key:
+	# 					continue
 
-					other_component, _, other_fund, other_department, _ = other_key
-					if other_fund != fund or other_department != department:
-						continue
+	# 				other_component, _, other_fund, other_department, _ = other_key
+	# 				if other_fund != fund or other_department != department:
+	# 					continue
 
-					other_doc = frappe.get_doc("Salary Component", other_component)
-					if other_doc.type == "Deduction" and other_account == account:
-						if comp_doc.do_not_include_in_total != other_doc.do_not_include_in_total:
-							# Merge amounts under same accounting key
-							key = other_key if other_doc.do_not_include_in_total is False else key
-							break
+	# 				other_doc = frappe.get_doc("Salary Component", other_component)
+	# 				if other_doc.type == "Deduction" and other_account == account:
+	# 					if comp_doc.do_not_include_in_total != other_doc.do_not_include_in_total:
+	# 						# Merge amounts under same accounting key
+	# 						key = other_key if other_doc.do_not_include_in_total is False else key
+	# 						break
 
-			# Build accounting key
-			if department:
-				accounting_key = (account, cost_center, fund, department, employee)
-			else:
-				accounting_key = (account, cost_center, fund, employee)
+	# 		# Build accounting key
+	# 		if department:
+	# 			accounting_key = (account, cost_center, fund, department, employee)
+	# 		else:
+	# 			accounting_key = (account, cost_center, fund, employee)
 
-			account_dict[accounting_key] = account_dict.get(accounting_key, 0) + amount
+	# 		account_dict[accounting_key] = account_dict.get(accounting_key, 0) + amount
 
-		print(account_dict, "account_dict 4444444444 er+ee amnt ************")
+	# 	return account_dict
 
-		return account_dict
-	
 
-# --------------------------------------below is working function in case of ER + EE, ER expense separate amounts-----------------------------
-	def get_employer_expense_account(self, component_dict=None, employee=None):
-		print(component_dict, employee, "component_dict,employee111111 emprnexpense account*************************")
+# 	def get_account(self, component_dict=None):
+# 		account_dict = {}
+# 		for key, amount in component_dict.items():
+# 			component, cost_center = key
+# 			account = self.get_salary_component_accounts(component)
+# 			accounting_key = (account, cost_center)
+
+# 			account_dict[accounting_key] = account_dict.get(accounting_key, 0) + amount
+
+# 		return account_dict
+
+# # --------------------------------------below is working function in case of ER + EE, ER expense separate amounts-----------------------------
+# 	def get_employer_expense_account(self, component_dict=None, employee=None):
+# 		account_dict = {}
+# 		account_map = {}
+
+# 		# First pass: resolve accounts
+# 		for key in component_dict:
+# 			component, cost_center = key
+# 			account = self.get_salary_component_account(component)
+# 			account_map[key] = account
+
+# 		# Second pass: aggregate
+# 		for key, amount in component_dict.items():
+# 			component, cost_center = key
+# 			comp_doc = frappe.get_doc("Salary Component", component)
+# 			account_info = account_map[key]
+
+# 			if isinstance(account_info, dict):
+# 				# Deduction with do_not_include_in_total = True
+# 				liability_account = account_info["liability_account"]
+# 				expense_account = account_info["expense_account"]
+
+# 				# expense_account gets only ER
+# 				if comp_doc.type == "Deduction" and comp_doc.do_not_include_in_total:
+# 					expense_key = (expense_account, cost_center, employee)
+# 					account_dict[expense_key] = account_dict.get(expense_key, 0) + amount
+
+# 		return account_dict
+
+
+	def get_account(self, component_dict=None):
 		account_dict = {}
 		account_map = {}
 
 		# First pass: resolve accounts
 		for key in component_dict:
-			component, cost_center, fund, department, employee = key
-			account = self.get_salary_component_account(component, fund, department, employee)
-			print(account, "account ----------------------------------tttttttttttttttttttttt")
-			account_map[key] = account
+			component, cost_center = key
+			account_map[key] = self.get_salary_component_accounts(component)
 
-		# Second pass: aggregate
+		# Second pass: aggregate with deduction merge logic
 		for key, amount in component_dict.items():
-			component, cost_center, fund, department, employee = key
+			component, cost_center = key
 			comp_doc = frappe.get_doc("Salary Component", component)
-			account_info = account_map[key]
+			account = account_map[key]
 
-			if isinstance(account_info, dict):
-				# Deduction with do_not_include_in_total = True
-				fund_account = account_info["fund_account"]
-				dept_account = account_info["dept_account"]
+			if comp_doc.type == "Deduction":
+				for other_key, other_account in account_map.items():
+					if other_key == key:
+						continue
 
-				# # Normalize keys to always include department (even if None)
-				# fund_key = (fund_account, cost_center, fund, department, employee)
-				# account_dict[fund_key] = account_dict.get(fund_key, 0) + amount
+					other_component, other_cost_center = other_key
+					if other_cost_center != cost_center:
+						continue
 
-				# Dept account gets only ER
-				if comp_doc.type == "Deduction" and comp_doc.do_not_include_in_total:
-					dept_key = (dept_account, cost_center, fund, department, employee)
-					account_dict[dept_key] = account_dict.get(dept_key, 0) + amount
+					other_doc = frappe.get_doc("Salary Component", other_component)
 
-		print(account_dict, "account_dict44444444 get_employer_expense_account*************************")
+					if (
+						other_doc.type == "Deduction"
+						and other_account == account
+						and comp_doc.do_not_include_in_total != other_doc.do_not_include_in_total
+					):
+						key = (
+							other_key
+							if other_doc.do_not_include_in_total is False
+							else key
+						)
+						break
+
+			accounting_key = (account, cost_center)
+			account_dict[accounting_key] = account_dict.get(accounting_key, 0) + amount
+
+
 
 		return account_dict
 
 
+	def get_employer_expense_account(self, component_dict=None):
+		account_dict = {}
+		account_map = {}
+
+		# First pass: resolve accounts
+		for key in component_dict:
+			component, cost_center = key
+			account_map[key] = self.get_salary_component_account(component)
+
+		# Second pass: aggregate employer expense only
+		for key, amount in component_dict.items():
+			component, cost_center = key
+			comp_doc = frappe.get_doc("Salary Component", component)
+			account_info = account_map[key]
+
+			if isinstance(account_info, dict):
+				expense_account = account_info["expense_account"]
+
+				if (
+					comp_doc.type == "Deduction"
+					and comp_doc.do_not_include_in_total
+				):
+					expense_key = (expense_account, cost_center)
+					account_dict[expense_key] = (
+						account_dict.get(expense_key, 0) + amount
+					)
+
+		return account_dict
+
 
 	def make_accrual_jv_entry(self, submitted_salary_slips):
-		print("call in make_accrual_jv_entry---------------------------------------------")
 		self.check_permission("write")
 		employee_wise_accounting_enabled = frappe.db.get_single_value(
 			"Payroll Settings", "process_payroll_accounting_entry_based_on_employee"
@@ -4875,8 +4573,6 @@ class OverridePayrollEntry(Document):
 
 		precision = frappe.get_precision("Journal Entry Account", "debit_in_account_currency")
 
-
-
 		if earnings or deductions:
 			accounts = []
 			currencies = []
@@ -4884,25 +4580,18 @@ class OverridePayrollEntry(Document):
 			accounting_dimensions = get_accounting_dimensions() or []
 			company_currency = erpnext.get_company_currency(self.company)
 
-			print(earnings,"============ererer")
-			print(deductions,"============dddd")
-			print(employer_expense,"============eeeeeeeeeeeeeeee")
-
-
 			for emp in self.employees:
 				payable_amount = 0
 				# _earnings = {k:v for k,v in earnings.items() if k[-2] == emp.custom_fund and k[-1] == emp.employee}
 				# _deductions = {k:v for k,v in deductions.items() if k[-2] == emp.custom_fund and k[-1] == emp.employee}
 
-				_earnings = filter_salary_components(earnings, emp)
-				_deductions = filter_salary_components(deductions, emp)
-				_employer_expense = filter_salary_components(employer_expense, emp)
-				
-				print(_earnings,"============_earnings")
-				print(_deductions,"============_deductions")
-				print(_employer_expense,"============_employer_expense")
+				# _earnings = filter_salary_components(earnings, emp)
+				# _deductions = filter_salary_components(deductions, emp)
+				# _employer_expense = filter_salary_components(employer_expense, emp)
 
-				# frappe.throw("pppppppppppppppppppppppppppppppp")
+				_earnings = earnings
+				_deductions = deductions
+				_employer_expense = employer_expense
 
 				payable_amount = self.get_payable_amount_for_earnings_and_deductions(
 					accounts,
@@ -4970,10 +4659,19 @@ class OverridePayrollEntry(Document):
 
 			if bank_accounts:
 
+				# for slip in bank_salary_slips:
+				# 	slip_doc = frappe.get_doc("Salary Slip", slip.name)					
+				# 	cheque_no = slip_doc.custom_check_no or "PY Bank Entry"
+
+				cheque_no = None
 				for slip in bank_salary_slips:
 					slip_doc = frappe.get_doc("Salary Slip", slip.name)
-					
-					cheque_no = slip_doc.custom_check_no or "PY Bank Entry"
+					if slip_doc.custom_check_no:
+						cheque_no = slip_doc.custom_check_no
+						break
+
+				cheque_no = cheque_no or "PY Bank Entry"
+
 				
 				self.queue_journal_entry(
 					bank_accounts,
@@ -5015,8 +4713,6 @@ class OverridePayrollEntry(Document):
 					
 					cheque_no = cur_salary_slip.custom_check_no or "PY Bank Entry"
 					
-
-					# frappe.throw("pppppppppppppppppppppppppppppppp")
 					self.queue_journal_entry(
 						ch_acc,
 						currencies,
@@ -5031,9 +4727,6 @@ class OverridePayrollEntry(Document):
 						submitted_salary_slips=check_salary_slips,
 						cheque_no = cheque_no,
 					)
-
-		
-
 
 	def create_payment_entries_by_method(self):
 		bank_employees = []
@@ -5055,7 +4748,6 @@ class OverridePayrollEntry(Document):
 			self.create_check_entry_for_employee(emp)
 
 
-
 	def queue_journal_entry(
 		self,
 		accounts,
@@ -5069,10 +4761,16 @@ class OverridePayrollEntry(Document):
 		submit_journal_entry=False,
 		cheque_no=None,
 	):
+		logger.info(
+			f"[JV QUEUE] Payroll Entry={self.name}, "
+			f"Voucher={voucher_type}, "
+			f"Accounts={len(accounts)}"
+		)
+
 		frappe.enqueue(
 			"us_payroll.override.payroll_entry.enqueue_make_journal_entry",
-			queue="long",
-			timeout=1800,
+			queue="long",               # ✅ IMPORTANT
+			timeout=3600,
 			docname=self.name,
 			accounts=accounts,
 			currencies=currencies,
@@ -5087,10 +4785,11 @@ class OverridePayrollEntry(Document):
 		)
 
 		frappe.msgprint(
-			_("Journal Entry creation has started in background."),
+			_("Journal Entry creation started in background."),
 			alert=True,
 			indicator="blue",
 		)
+
 
 	def make_journal_entry(
 		self,
@@ -5106,47 +4805,35 @@ class OverridePayrollEntry(Document):
 		cheque_no = None,
 	):
 
-		print("call in make_journal_entry=============")		
-
 		if voucher_type == "Journal Entry":
-
 			payable_amount = 0
 			payable_amount_dict = {}
 			for acc in accounts:
-
-				if not acc.get("fund"):
-					acc_doc = frappe.get_doc("Account",{"name":acc.get("account")})
-					acc['fund'] = acc_doc.custom_fund
-
 				if "reference_name" in acc:
 					payable_amount = acc.get("credit_in_account_currency")
-					payable_amount_dict[(acc['fund'], acc['employee'])] = payable_amount
-					# payable_amount_dict[acc['fund']] = payable_amount
+					payable_amount_dict[(acc['employee'])] = payable_amount
 
 			fund_account_mapping = {}
-
 
 			bank_employees = []
 			check_employees = []
 
 			# payroll's account from Fund Setting
 			for row in self.employees:	
-
-				fund_value = row.custom_fund
 				employee = row.employee
 				
-				if not (fund_value, row.employee) in payable_amount_dict:
+				if not (row.employee) in payable_amount_dict:
 					continue
 
-				fund_setting_accounts = frappe.get_all("Payroll Accounts Config", 
-								filters={"parent": "Fund Settings", "fund":fund_value}, 
-								fields=["fund", "due_to_account", "due_from_account"])
+				payroll_config_accounts = frappe.get_all("Payroll Accounts Config", 
+								filters={"parent": "Payroll Config"}, 
+								fields=["due_to_account", "due_from_account"])
 
 
-				if fund_setting_accounts:
+				if payroll_config_accounts:
 					
-					due_from_account = fund_setting_accounts[0].get("due_from_account")
-					due_to_account = fund_setting_accounts[0].get("due_to_account")
+					due_from_account = payroll_config_accounts[0].get("due_from_account")
+					due_to_account = payroll_config_accounts[0].get("due_to_account")
 
 					acc_doc = frappe.get_doc("Account",{"name":due_from_account})
 					due_from_account_name = f"{acc_doc.account_name} fund {fund_value}"
@@ -5160,7 +4847,7 @@ class OverridePayrollEntry(Document):
 							'cost_center': '',
 							'project': None, 
 							# 'debit_in_account_currency': payable_amount_dict[fund_value], 
-							'debit_in_account_currency': payable_amount_dict[(fund_value, row.employee)], 
+							'debit_in_account_currency': payable_amount_dict[(row.employee)], 
 							'fund': fund_value
 						})
 
@@ -5171,18 +4858,17 @@ class OverridePayrollEntry(Document):
 							'cost_center': '', 
 							'project': None, 
 							# 'credit_in_account_currency': payable_amount_dict[fund_value], 
-							'credit_in_account_currency': payable_amount_dict[(fund_value, row.employee)],
+							'credit_in_account_currency': payable_amount_dict[(row.employee)],
 							'fund': fund_value
 						})
 
 
 				else:				
 					site_url = get_url()
-					fund_settings_url = f"{site_url}/app/fund-settings/Fund%20Settings"
+					payroll_config_url = f"{site_url}/desk/payroll-config"
 
-					frappe.throw(f"Please add Payroll Accounts for fund <b>{fund_value}</b> in <b>Payroll Accounts Config</b> table in <a href= '{fund_settings_url}' >Fund Settings</a>")
+					frappe.throw(f"Please add Payroll Accounts in <b>Payroll Accounts Config</b> table in <a href= '{payroll_config_url}' >Payroll Config</a>")
 
-		# frappe.throw("[pppppppppppppppppppppppp")
 
 		multi_currency = 0
 		if len(currencies) > 1:
@@ -5257,8 +4943,6 @@ class OverridePayrollEntry(Document):
 				accounts=accounts,
 			)
 
-		print(payable_amount, "payable_amount ======== earningsssssssssssss")
-
 		# Deductions
 		for acc_cc, amount in deductions.items():
 			payable_amount = self.get_accounting_entries_and_payable_amount(
@@ -5273,10 +4957,6 @@ class OverridePayrollEntry(Document):
 				entry_type="credit",
 				accounts=accounts,
 			)
-
-
-		print(payable_amount, "payable_amount ======== deductionssssssssssssssss")
-
 
 		# Employer Expense
 		for acc_cc, amount in employer_expense.items():
@@ -5293,10 +4973,6 @@ class OverridePayrollEntry(Document):
 				accounts=accounts,
 			)
 
-		print(payable_amount, "payable_amount ======== employer_expenseeeeeeeeeeeeee")
-
-		# frappe.throw("pppppppppppppppppppppppppppppppp")
-
 		return payable_amount
 
 	def set_payable_amount_against_payroll_payable_account(
@@ -5312,18 +4988,6 @@ class OverridePayrollEntry(Document):
 	):
 		# Payable amount
 		if employee_wise_accounting_enabled:
-			"""
-			employee_based_payroll_payable_entries = {
-							'HREMP00004': {
-											'earnings': 83332.0,
-											'deductions': 2000.0
-							},
-							'HREMP00005': {
-											'earnings': 50000.0,
-											'deductions': 2000.0
-							}
-			}
-			"""
 			for employee, employee_details in self.employee_based_payroll_payable_entries.items():
 				payable_amount = employee_details.get("earnings", 0) - employee_details.get("deductions", 0)
 
@@ -5488,193 +5152,11 @@ class OverridePayrollEntry(Document):
 			# }
 
 			employee_exchange_rate_amount[employee] = employee_amount
-			
-
-			
-
 		return exchange_rate, employee_exchange_rate_amount
-
-
-
-	# @frappe.whitelist()
-	# def make_bank_entry(self):
-	# 	print("call in make bank entry ====================")
-	# 	self.check_permission("write")
-	# 	self.employee_based_payroll_payable_entries = {}
-	# 	employee_wise_accounting_enabled = frappe.db.get_single_value(
-	# 		"Payroll Settings", "process_payroll_accounting_entry_based_on_employee"
-	# 	)
-
-	# 	print(employee_wise_accounting_enabled,"employee_wise_accounting_enabled in make bank entry 000000000000000000000")
-
-	# 	employee_totals = {}
-
-	# 	salary_slips = self.get_salary_slip_details()
-
-	# 	print(salary_slips,"salary_slips in make bank entry 11111111111111")
-
-	# 	for salary_detail in salary_slips:
-	# 		employee = salary_detail.employee
-
-	# 		if employee not in employee_totals:
-	# 			employee_totals[employee] = 0
-
-	# 		if salary_detail.parentfield == "earnings":
-	# 			(
-	# 				is_flexible_benefit,
-	# 				only_tax_impact,
-	# 				create_separate_je,
-	# 				statistical_component,
-	# 			) = frappe.db.get_value(
-	# 				"Salary Component",
-	# 				salary_detail.salary_component,
-	# 				(
-	# 					"is_flexible_benefit",
-	# 					"only_tax_impact",
-	# 					"create_separate_payment_entry_against_benefit_claim",
-	# 					"statistical_component",
-	# 				),
-	# 				cache=True,
-	# 			)
-
-	# 			if only_tax_impact != 1 and statistical_component != 1:
-	# 				if is_flexible_benefit == 1 and create_separate_je == 1:
-
-	# 					self.set_accounting_entries_for_bank_entry(
-	# 						salary_detail.amount, salary_detail.salary_component
-	# 					)
-	# 				else:
-	# 					if employee_wise_accounting_enabled:
-	# 						self.set_employee_based_payroll_payable_entries(
-	# 							"earnings",
-	# 							salary_detail.employee,
-	# 							salary_detail.amount,
-	# 							salary_detail.salary_structure,
-	# 						)
-	# 					employee_totals[employee] += salary_detail.amount
-
-	# 		if salary_detail.parentfield == "deductions":
-	# 			statistical_component = frappe.db.get_value(
-	# 				"Salary Component", salary_detail.salary_component, "statistical_component", cache=True
-	# 			)
-
-	# 			if not statistical_component:
-	# 				if employee_wise_accounting_enabled:
-	# 					print(employee_wise_accounting_enabled,"employee_wise_accounting_enabled in make bank entry 22222222222")
-	# 					self.set_employee_based_payroll_payable_entries(
-	# 						"deductions",
-	# 						salary_detail.employee,
-	# 						salary_detail.amount,
-	# 						salary_detail.salary_structure,
-	# 					)
-	# 				employee_totals[employee] -= salary_detail.amount
-
-	# 	total_salary_slip_amount = sum(employee_totals.values())
-	# 	print(total_salary_slip_amount,"total_salary_slip_amount in make bank entry 33333333333333")
-	# 	if total_salary_slip_amount > 0:
-	# 		self.set_accounting_entries_for_bank_entry(employee_totals, "salary")
-
-
-	# @frappe.whitelist()
-	# def make_bank_entry(self):
-	# 	print("call in make bank entry ====================")
-	# 	self.check_permission("write")
-	# 	self.employee_based_payroll_payable_entries = {}
-	# 	employee_wise_accounting_enabled = frappe.db.get_single_value(
-	# 		"Payroll Settings", "process_payroll_accounting_entry_based_on_employee"
-	# 	)
-
-	# 	employee_totals = {}
-	# 	employer_totals = {}
-
-	# 	salary_slips = self.get_salary_slip_details()
-
-	# 	print(salary_slips,"salary_slips in make bank entry 11111111111111")
-
-	# 	for salary_detail in salary_slips:
-	# 		employee = salary_detail.employee
-
-	# 		if employee not in employee_totals:
-	# 			employee_totals[employee] = 0
-
-	# 		if employee not in employer_totals:
-	# 			employer_totals[employee] = 0
-
-	# 		if salary_detail.parentfield == "earnings":
-	# 			(
-	# 				is_flexible_benefit,
-	# 				only_tax_impact,
-	# 				create_separate_je,
-	# 				statistical_component,
-	# 			) = frappe.db.get_value(
-	# 				"Salary Component",
-	# 				salary_detail.salary_component,
-	# 				(
-	# 					"is_flexible_benefit",
-	# 					"only_tax_impact",
-	# 					"create_separate_payment_entry_against_benefit_claim",
-	# 					"statistical_component",
-	# 				),
-	# 				cache=True,
-	# 			)
-
-	# 			if only_tax_impact != 1 and statistical_component != 1:
-	# 				if is_flexible_benefit == 1 and create_separate_je == 1:
-	# 					print(salary_detail.amount,"salary_detail.amount111111111")
-
-	# 					self.set_accounting_entries_for_bank_entry(
-	# 						salary_detail.amount, salary_detail.salary_component
-	# 					)
-	# 				else:
-	# 					if employee_wise_accounting_enabled:
-	# 						self.set_employee_based_payroll_payable_entries(
-	# 							"earnings",
-	# 							salary_detail.employee,
-	# 							salary_detail.amount,
-	# 							salary_detail.salary_structure,
-	# 						)
-	# 					employee_totals[employee] += salary_detail.amount
-
-	# 				print(employee_totals,"employee_totals in make bank entry 0000000")
-
-	# 		if salary_detail.parentfield == "deductions":
-	# 			statistical_component = frappe.db.get_value(
-	# 				"Salary Component", salary_detail.salary_component, "statistical_component", cache=True
-	# 			)
-
-	# 			if not statistical_component:
-	# 				if employee_wise_accounting_enabled:
-	# 					self.set_employee_based_payroll_payable_entries(
-	# 						"deductions",
-	# 						salary_detail.employee,
-	# 						salary_detail.amount,
-	# 						salary_detail.salary_structure,
-	# 					)
-	# 				employee_totals[employee] -= salary_detail.amount
-
-	# 				comp_doc = frappe.get_doc("Salary Component", salary_detail.salary_component)
-	# 				if comp_doc.do_not_include_in_total:
-	# 					employer_totals[employee] += salary_detail.amount
-
-
-	# 	total_salary_slip_amount = sum(employee_totals.values())
-	# 	print(total_salary_slip_amount,"total_salary_slip_amount in make bank entry 33333333333333")
-
-	# 	employer_salary_slip_amount = sum(employer_totals.values())
-
-	# 	print(employer_salary_slip_amount,"employer_salary_slip_amount in make bank entry 444444444444")
-
-	# 	salary_slip_amount_totals = total_salary_slip_amount + employer_salary_slip_amount
-
-	# 	print(salary_slip_amount_totals,"salary_slip_amount_totals in make bank entry 44444444444444")
-
-	# 	if salary_slip_amount_totals > 0:
-	# 		self.set_accounting_entries_for_bank_entry(salary_slip_amount_totals, "salary")
 
 
 	@frappe.whitelist()
 	def make_bank_entry(self):
-		print("call in make bank entry ====================")
 		self.check_permission("write")
 		self.employee_based_payroll_payable_entries = {}
 		employee_wise_accounting_enabled = frappe.db.get_single_value(
@@ -5697,7 +5179,7 @@ class OverridePayrollEntry(Document):
 			if salary_detail.parentfield == "earnings":
 				(
 					is_flexible_benefit,
-					only_tax_impact,
+					custom_only_tax_impact,
 					create_separate_je,
 					statistical_component,
 				) = frappe.db.get_value(
@@ -5705,14 +5187,14 @@ class OverridePayrollEntry(Document):
 					salary_detail.salary_component,
 					(
 						"is_flexible_benefit",
-						"only_tax_impact",
-						"create_separate_payment_entry_against_benefit_claim",
+						"custom_only_tax_impact",
+						"custom_create_separate_payment_entry_against_benefit_claim",
 						"statistical_component",
 					),
 					cache=True,
 				)
 
-				if only_tax_impact != 1 and statistical_component != 1:
+				if custom_only_tax_impact != 1 and statistical_component != 1:
 					if is_flexible_benefit == 1 and create_separate_je == 1:
 						self.set_accounting_entries_for_bank_entry(
 							salary_detail.amount, salary_detail.salary_component
@@ -5752,81 +5234,9 @@ class OverridePayrollEntry(Document):
 		if salary_slip_amount_totals > 0:
 			self.set_accounting_entries_for_bank_entry(total_net_salary, "salary")
 
-	# @frappe.whitelist()
-	# def make_check_entry(self):
-	# 	self.check_permission("write")
-	# 	self.employee_based_payroll_payable_entries = {}
-	# 	employee_wise_accounting_enabled = frappe.db.get_single_value(
-	# 		"Payroll Settings", "process_payroll_accounting_entry_based_on_employee"
-	# 	)
-
-	# 	employee_totals = {}
-
-	# 	salary_slips = self.get_salary_slip_details()
-
-	# 	for salary_detail in salary_slips:
-	# 		employee = salary_detail.employee
-
-	# 		if employee not in employee_totals:
-	# 			employee_totals[employee] = 0
-
-	# 		if salary_detail.parentfield == "earnings":
-	# 			(
-	# 				is_flexible_benefit,
-	# 				only_tax_impact,
-	# 				create_separate_je,
-	# 				statistical_component,
-	# 			) = frappe.db.get_value(
-	# 				"Salary Component",
-	# 				salary_detail.salary_component,
-	# 				(
-	# 					"is_flexible_benefit",
-	# 					"only_tax_impact",
-	# 					"create_separate_payment_entry_against_benefit_claim",
-	# 					"statistical_component",
-	# 				),
-	# 				cache=True,
-	# 			)
-
-	# 			if only_tax_impact != 1 and statistical_component != 1:
-	# 				if is_flexible_benefit == 1 and create_separate_je == 1:
-	# 					self.set_accounting_entries_for_bank_entry(
-	# 						salary_detail.amount, salary_detail.salary_component
-	# 					)
-	# 				else:
-	# 					if employee_wise_accounting_enabled:
-	# 						self.set_employee_based_payroll_payable_entries(
-	# 							"earnings",
-	# 							salary_detail.employee,
-	# 							salary_detail.amount,
-	# 							salary_detail.salary_structure,
-	# 						)
-	# 					employee_totals[employee] += salary_detail.amount
-
-	# 		if salary_detail.parentfield == "deductions":
-	# 			statistical_component = frappe.db.get_value(
-	# 				"Salary Component", salary_detail.salary_component, "statistical_component", cache=True
-	# 			)
-
-	# 			if not statistical_component:
-	# 				if employee_wise_accounting_enabled:
-	# 					self.set_employee_based_payroll_payable_entries(
-	# 						"deductions",
-	# 						salary_detail.employee,
-	# 						salary_detail.amount,
-	# 						salary_detail.salary_structure,
-	# 					)
-	# 				employee_totals[employee] -= salary_detail.amount
-
-	# 	total_salary_slip_amount = sum(employee_totals.values())
-
-	# 	if total_salary_slip_amount > 0:
-	# 		self.set_accounting_entries_for_check_entry(employee_totals, "salary")
-
 
 	@frappe.whitelist()
 	def make_check_entry(self):
-		print("call in make make_check_entry entry ====================")
 		self.check_permission("write")
 		self.employee_based_payroll_payable_entries = {}
 		employee_wise_accounting_enabled = frappe.db.get_single_value(
@@ -5849,7 +5259,7 @@ class OverridePayrollEntry(Document):
 			if salary_detail.parentfield == "earnings":
 				(
 					is_flexible_benefit,
-					only_tax_impact,
+					custom_only_tax_impact,
 					create_separate_je,
 					statistical_component,
 				) = frappe.db.get_value(
@@ -5857,14 +5267,14 @@ class OverridePayrollEntry(Document):
 					salary_detail.salary_component,
 					(
 						"is_flexible_benefit",
-						"only_tax_impact",
-						"create_separate_payment_entry_against_benefit_claim",
+						"custom_only_tax_impact",
+						"custom_create_separate_payment_entry_against_benefit_claim",
 						"statistical_component",
 					),
 					cache=True,
 				)
 
-				if only_tax_impact != 1 and statistical_component != 1:
+				if custom_only_tax_impact != 1 and statistical_component != 1:
 					if is_flexible_benefit == 1 and create_separate_je == 1:
 						self.set_accounting_entries_for_bank_entry(
 							salary_detail.amount, salary_detail.salary_component
@@ -5929,8 +5339,266 @@ class OverridePayrollEntry(Document):
 		).run(as_dict=True)
 
 
+	# def set_accounting_entries_for_bank_entry(self, je_payment_amount, user_remark):
+	# 	payroll_payable_account = self.payroll_payable_account
+	# 	precision = frappe.get_precision("Journal Entry Account", "debit_in_account_currency")
+
+	# 	accounts = []
+	# 	currencies = []
+	# 	company_currency = erpnext.get_company_currency(self.company)
+	# 	accounting_dimensions = get_accounting_dimensions() or []
+
+	# 	# Payroll Bank Cash Accounts Config from Fund Setting	
+	# 	for row in self.employees:
+
+	# 		fund_value = row.custom_fund
+	# 		employee = row.employee
+
+	# 		common_account_for_bank_entry = frappe.get_all("Payroll Accounts Config", 
+	# 						filters={"parent": "Fund Settings", "fund":fund_value}, 
+	# 						fields=["fund", "due_from_account"])
+
+	# 		for common_acc in common_account_for_bank_entry:
+	# 			common_account = common_acc.get("due_from_account")
+
+	# 			acc_doc = frappe.get_doc("Account",{"name":common_account})
+	# 			due_from_account_name = f"{acc_doc.account_name} fund {fund_value}"
+
+	# 			common_fund = acc_doc.custom_fund
+
+	# 			common_cash_account_for_bank_entry = frappe.get_value("Payroll Bank Cash Accounts Config", 
+	# 				{"parent": "Fund Settings", "fund": common_fund}, 
+	# 				"account")
+
+	# 		fund_setting_accounts_for_bank_entry = frappe.get_all("Payroll Bank Cash Accounts Config", 
+	# 						filters={"parent": "Fund Settings", "fund":fund_value}, 
+	# 						fields=["fund", "account"])
+
+	# 		if fund_setting_accounts_for_bank_entry:				
+	# 			bank_cash_account = fund_setting_accounts_for_bank_entry[0].get("account")
+	# 			if bank_cash_account:
+	# 				exchange_rate, emplyee_amount_mapping = self.get_amount_and_exchange_rate_for_bank_entry(
+	# 					bank_cash_account, je_payment_amount, company_currency, currencies
+	# 				)
+				
+	# 				for emp,amount in emplyee_amount_mapping.items():
+	# 					if emp == row.employee:
+	# 						emp_amount = amount
+					
+	# 						accounts.append(
+	# 							self.update_accounting_dimensions(
+	# 								{
+	# 									"account": bank_cash_account,
+	# 									"bank_account": self.bank_account,
+	# 									"credit_in_account_currency": flt(emp_amount, precision),
+	# 									"exchange_rate": flt(exchange_rate),
+	# 									"cost_center": self.cost_center,
+	# 									"employee":row.employee
+	# 								},
+	# 								accounting_dimensions,
+	# 							)
+	# 						)
+
+	# 				if self.employee_based_payroll_payable_entries:
+	# 					for employee, employee_details in self.employee_based_payroll_payable_entries.items():
+	# 						je_payment_amount = employee_details.get("earnings", 0) - (
+	# 							employee_details.get("deductions", 0)
+	# 						)
+							
+	# 						exchange_rate, emplyee_amount_mapping = self.get_amount_and_exchange_rate_for_bank_entry(
+	# 							bank_cash_account, je_payment_amount, company_currency, currencies
+	# 						)
+
+	# 						cost_centers = self.get_payroll_cost_centers_for_employee(
+	# 							employee, employee_details.get("salary_structure")
+	# 						)
+
+	# 						for cost_center, percentage in cost_centers.items():
+	# 							for emp,amount in emplyee_amount_mapping.items():
+	# 								if emp == row.employee:
+	# 									emp_amount = amount
+	# 									amount_against_cost_center = flt(emp_amount) * percentage / 100
+	# 									accounts.append(
+	# 										self.update_accounting_dimensions(
+	# 											{
+	# 												"account": row.custom_payroll_payable_account,
+	# 												"debit_in_account_currency": flt(amount_against_cost_center, precision),
+	# 												"exchange_rate": flt(exchange_rate),
+	# 												"reference_type": self.doctype,
+	# 												"reference_name": self.name,
+	# 												"party_type": "Employee",
+	# 												"party": employee,
+	# 												"cost_center": cost_center,
+	# 												# "fund": fund
+	# 											},
+	# 											accounting_dimensions,
+	# 										)
+	# 									)
+
+	# 									accounts.append(
+	# 										self.update_accounting_dimensions(
+	# 											{
+	# 												"account": common_account,
+	# 												"custom_account_number": due_from_account_name,
+	# 												"bank_account": self.bank_account,
+	# 												"credit_in_account_currency": flt(emp_amount, precision),
+	# 												"exchange_rate": flt(exchange_rate),
+	# 												"cost_center": self.cost_center,
+	# 											},
+	# 											accounting_dimensions,
+	# 										)
+	# 									)
+
+	# 									accounts.append(
+	# 										self.update_accounting_dimensions(
+	# 											{
+	# 												"account": common_cash_account_for_bank_entry,
+	# 												"bank_account": self.bank_account,
+	# 												"debit_in_account_currency": flt(emp_amount, precision),
+	# 												"exchange_rate": flt(exchange_rate),
+	# 												"cost_center": self.cost_center,
+	# 											},
+	# 											accounting_dimensions,
+	# 										)
+	# 									)
+
+	# 				else:
+	# 					exchange_rate, emplyee_amount_mapping = self.get_amount_and_exchange_rate_for_bank_entry(
+	# 						bank_cash_account, je_payment_amount, company_currency, currencies
+	# 					)
+
+	# 					for emp,amount in emplyee_amount_mapping.items():
+	# 						if emp == row.employee:
+	# 							emp_amount = amount
+								
+	# 							accounts.append(
+	# 								self.update_accounting_dimensions(
+	# 									{
+	# 										"account": row.custom_payroll_payable_account,
+	# 										"debit_in_account_currency": flt(emp_amount, precision),
+	# 										"exchange_rate": flt(exchange_rate),
+	# 										"reference_type": self.doctype,
+	# 										"reference_name": self.name,
+	# 										"cost_center": self.cost_center,
+	# 										"employee":row.employee
+	# 									},
+	# 									accounting_dimensions,
+	# 								)
+	# 							)
+
+	# 							accounts.append(
+	# 								self.update_accounting_dimensions(
+	# 									{
+	# 										"account": common_account,
+	# 										"custom_account_number": due_from_account_name,
+	# 										"bank_account": self.bank_account,
+	# 										"credit_in_account_currency": flt(emp_amount, precision),
+	# 										"exchange_rate": flt(exchange_rate),
+	# 										"cost_center": self.cost_center,
+	# 										"employee":row.employee
+	# 									},
+	# 									accounting_dimensions,
+	# 								)
+	# 							)
+
+	# 							accounts.append(
+	# 								self.update_accounting_dimensions(
+	# 									{
+	# 										"account": common_cash_account_for_bank_entry,
+	# 										"bank_account": self.bank_account,
+	# 										"debit_in_account_currency": flt(emp_amount, precision),
+	# 										"exchange_rate": flt(exchange_rate),
+	# 										"cost_center": self.cost_center,
+	# 										"employee":row.employee
+	# 									},
+	# 									accounting_dimensions,
+	# 								)
+	# 							)			
+
+	# 		else:				
+	# 			site_url = get_url()
+	# 			fund_settings_url = f"{site_url}/app/fund-settings/Fund%20Settings"
+	# 			frappe.throw(f"Please add Payroll Bank/Cash Accounts for fund <b>{fund_value}</b> in <b>Payroll Bank Cash Accounts Config</b> table in <a href= '{fund_settings_url}' >Fund Settings</a>")
+
+	# 	# -------------------------------------------------------------------------------------------------
+
+	# 	grouped_accounts = {"bank": [], "check": []}
+	# 	temp_group = []
+	# 	current_employee = None
+
+	# 	for entry in accounts:			
+	# 		current_employee = entry["employee"]
+	# 		payment_method = frappe.db.get_value("Employee", current_employee, "custom_payment_method")
+	# 		if payment_method == "Bank":
+	# 			grouped_accounts["bank"].append(entry)
+	# 		else:
+	# 			temp_group.append(entry)
+	# 			grouped_accounts["check"].append(entry)
+					
+	# 	#for bank type entry 
+	# 	bank_accounts = grouped_accounts["bank"]
+	# 	if bank_accounts:
+	# 		# # Default cheque_no for Bank Entry
+	# 		cheque_no = "PY Bank Entry"
+
+	# 		self.queue_journal_entry(
+	# 			bank_accounts,
+	# 			currencies,
+	# 			voucher_type="Bank Entry",
+	# 			custom_check_entry=False,
+	# 			cheque_date = self.posting_date,
+	# 			user_remark=_("Payment of {0} from {1} to {2}").format(
+	# 				user_remark, self.start_date, self.end_date
+	# 			),
+	# 			submit_journal_entry=True,
+	# 			cheque_no = cheque_no,
+	# 		)
+
+	# 	#for check type entryes -------------------------------------------------------------
+	# 	submitted_salary_slips = frappe.db.get_all("Salary Slip", filters={"payroll_entry": self.name, "docstatus": 1}, fields=["name"])	
+
+	# 	check_accounts = grouped_accounts["check"]
+	# 	if check_accounts:
+	# 		grouped_by_employee = defaultdict(list)
+	# 		for entry in check_accounts:
+	# 			grouped_by_employee[entry['employee']].append(entry)
+			
+	# 		grouped_by_employee = dict(grouped_by_employee)
+	# 		check_type_employees = []
+	# 		for emp, ch_acc in grouped_by_employee.items():
+	# 			if emp and emp not in check_type_employees:
+	# 					check_type_employees.append(emp)
+
+	# 			# check_salary_slips  = [_ for _ in submitted_salary_slips if _.employee in check_type_employees]
+
+	# 			check_salary_slip_check_no = []
+	# 			current_salary_slip = []
+	# 			for sl in submitted_salary_slips:
+	# 				slip_doc = frappe.get_doc("Salary Slip", sl.get("name"))
+
+	# 				if slip_doc.employee in check_type_employees and slip_doc.employee == emp:
+
+	# 					check_salary_slip_check_no.append(slip_doc.custom_check_no)				
+
+	# 			if check_salary_slip_check_no:
+	# 				check_salary_slip_check_no = check_salary_slip_check_no[0]
+				
+	# 			cheque_no = check_salary_slip_check_no or "PY Bank Entry"
+	# 			self.queue_journal_entry(
+	# 				ch_acc,
+	# 				currencies,
+	# 				voucher_type="Bank Entry",
+	# 				custom_check_entry=False,
+	# 				cheque_date = self.posting_date,
+	# 				user_remark=_("Payment of {0} from {1} to {2}").format(
+	# 					user_remark, self.start_date, self.end_date
+	# 				),
+	# 				submit_journal_entry=True,
+	# 				cheque_no = cheque_no,
+	# 			)
+
+
 	def set_accounting_entries_for_bank_entry(self, je_payment_amount, user_remark):
-		print(je_payment_amount, " je_payment_amount, set_accounting_entries_for_bank_entry in make bank entry -------------------")
 		payroll_payable_account = self.payroll_payable_account
 		precision = frappe.get_precision("Journal Entry Account", "debit_in_account_currency")
 
@@ -5941,29 +5609,23 @@ class OverridePayrollEntry(Document):
 
 		# Payroll Bank Cash Accounts Config from Fund Setting	
 		for row in self.employees:
-
-			fund_value = row.custom_fund
 			employee = row.employee
 
 			common_account_for_bank_entry = frappe.get_all("Payroll Accounts Config", 
-							filters={"parent": "Fund Settings", "fund":fund_value}, 
-							fields=["fund", "due_from_account"])
+							filters={"parent": "Payroll Config",}, 
+							fields=["due_from_account"])
 
 			for common_acc in common_account_for_bank_entry:
 				common_account = common_acc.get("due_from_account")
 
 				acc_doc = frappe.get_doc("Account",{"name":common_account})
-				due_from_account_name = f"{acc_doc.account_name} fund {fund_value}"
-
-				common_fund = acc_doc.custom_fund
+				due_from_account_name = f"{acc_doc.account_name}"
 
 				common_cash_account_for_bank_entry = frappe.get_value("Payroll Bank Cash Accounts Config", 
-					{"parent": "Fund Settings", "fund": common_fund}, 
-					"account")
+					{"parent": "Payroll Config"}, "account")
 
 			fund_setting_accounts_for_bank_entry = frappe.get_all("Payroll Bank Cash Accounts Config", 
-							filters={"parent": "Fund Settings", "fund":fund_value}, 
-							fields=["fund", "account"])
+							filters={"parent": "Payroll Config"}, fields=["account"])
 
 			if fund_setting_accounts_for_bank_entry:				
 				bank_cash_account = fund_setting_accounts_for_bank_entry[0].get("account")
@@ -6108,8 +5770,8 @@ class OverridePayrollEntry(Document):
 
 			else:				
 				site_url = get_url()
-				fund_settings_url = f"{site_url}/app/fund-settings/Fund%20Settings"
-				frappe.throw(f"Please add Payroll Bank/Cash Accounts for fund <b>{fund_value}</b> in <b>Payroll Bank Cash Accounts Config</b> table in <a href= '{fund_settings_url}' >Fund Settings</a>")
+				payroll_config_url = f"{site_url}/desk/payroll-config"
+				frappe.throw(f"Please add Payroll Bank/Cash Accounts in <b>Payroll Bank Cash Accounts Config</b> table in <a href= '{payroll_config_url}' >Payroll Config</a>")
 
 		# -------------------------------------------------------------------------------------------------
 
@@ -6468,6 +6130,32 @@ class OverridePayrollEntry(Document):
 		frappe.msgprint(_("Creating Check JV for {0}").format(employee))
 		self.employees = [row for row in self.employees if row.employee == employee]
 		self.make_check_entry()
+
+	@frappe.whitelist()
+	def enqueue_make_accrual_jv(self):
+		"""
+		Lightweight request method.
+		Only enqueues background job.
+		"""
+
+		self.check_permission("write")
+
+		# self.db_set("status", "Queued")
+		self.db_set("status", "Submitted")
+
+		frappe.enqueue(
+			"us_payroll.override.payroll_entry.process_accrual_jv",
+			queue="long",
+			timeout=7200,
+			payroll_entry_name=self.name,
+			enqueue_after_commit=True,   # ✅ THIS FIXES IT
+		)
+
+		frappe.msgprint(
+			_("Accrual Journal Entry creation is queued and running in background."),
+			indicator="blue",
+			alert=True,
+		)
 
 	
 
@@ -6865,9 +6553,13 @@ def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 				frappe.publish_progress(count * 100 / len(salary_slips), title=_("Submitting Salary Slips..."))
 
 		if submitted:
-			payroll_entry.make_accrual_jv_entry(submitted)
+			print(submitted, "submitted===================================")
+			# payroll_entry.make_accrual_jv_entry(submitted)
+			payroll_entry.enqueue_make_accrual_jv()
 			payroll_entry.email_salary_slip(submitted)
-			payroll_entry.db_set({"salary_slips_submitted": 1, "status": "Submitted", "error_message": ""})
+			# payroll_entry.db_set({"salary_slips_submitted": 1, "status": "Submitted", "error_message": ""})
+			payroll_entry.db_set({"salary_slips_submitted": 1, "error_message": ""})
+
 
 		show_payroll_submission_status(submitted, unsubmitted, payroll_entry)
 
@@ -6939,7 +6631,6 @@ def get_employee_list(
 	return remove_payrolled_employees(employees_to_check, filters.start_date, filters.end_date)
 
 
-
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def employee_query(doctype, txt, searchfield, start, page_len, filters):
@@ -6981,7 +6672,76 @@ def filter_salary_components(components, emp):
 				filtered[k] = v
 	return filtered
 
+# def enqueue_make_journal_entry(
+# 	docname,
+# 	accounts,
+# 	currencies,
+# 	payroll_payable_account=None,
+# 	voucher_type="Journal Entry",
+# 	custom_check_entry=False,
+# 	cheque_date="",
+# 	user_remark="",
+# 	submitted_salary_slips=None,
+# 	submit_journal_entry=False,
+# 	cheque_no=None,
+# ):
+# 	"""
+# 	Background job with realtime progress (no custom fields)
+# 	"""
 
+# 	try:
+# 		frappe.publish_progress(
+# 			0,
+# 			title=_("Queued"),
+# 			description=_("Waiting for worker"),
+# 		)
+
+# 		doc = frappe.get_doc("Payroll Entry", docname)
+
+# 		frappe.publish_progress(
+# 			20,
+# 			title=_("Processing"),
+# 			description=_("Preparing Journal Entry"),
+# 		)
+
+# 		# MAIN LOGIC
+# 		frappe.publish_progress(
+# 			50,
+# 			title=_("Processing"),
+# 			description=_("Creating Journal Entry"),
+# 		)
+
+# 		doc.make_journal_entry(
+# 			accounts=accounts,
+# 			currencies=currencies,
+# 			payroll_payable_account=payroll_payable_account,
+# 			voucher_type=voucher_type,
+# 			custom_check_entry=custom_check_entry,
+# 			cheque_date=cheque_date,
+# 			user_remark=user_remark,
+# 			submitted_salary_slips=submitted_salary_slips,
+# 			submit_journal_entry=submit_journal_entry,
+# 			cheque_no=cheque_no,
+# 		)
+
+# 		frappe.publish_progress(
+# 			100,
+# 			title=_("Completed"),
+# 			description=_("Journal Entry created successfully"),
+# 		)
+
+# 	except Exception:
+# 		frappe.publish_progress(
+# 			100,
+# 			title=_("Failed"),
+# 			description=_("Error occurred. Check Error Log"),
+# 		)
+
+# 		frappe.log_error(
+# 			frappe.get_traceback(),
+# 			"Payroll Journal Entry Background Job Failed",
+# 		)
+# 		raise
 
 def enqueue_make_journal_entry(
 	docname,
@@ -6996,30 +6756,19 @@ def enqueue_make_journal_entry(
 	submit_journal_entry=False,
 	cheque_no=None,
 ):
-	"""
-	Background job with realtime progress (no custom fields)
-	"""
+	start = time.time()
+	stage = "INIT"
 
 	try:
-		frappe.publish_progress(
-			0,
-			title=_("Queued"),
-			description=_("Waiting for worker"),
-		)
+		logger.info(f"[JV START] Payroll Entry={docname}")
 
 		doc = frappe.get_doc("Payroll Entry", docname)
 
-		frappe.publish_progress(
-			20,
-			title=_("Processing"),
-			description=_("Preparing Journal Entry"),
-		)
-
-		# MAIN LOGIC
-		frappe.publish_progress(
-			50,
-			title=_("Processing"),
-			description=_("Creating Journal Entry"),
+		stage = "MAKE_JV"
+		logger.info(
+			f"[JV PROCESS] Stage={stage}, "
+			f"Accounts={len(accounts)}, "
+			f"Voucher={voucher_type}"
 		)
 
 		doc.make_journal_entry(
@@ -7035,26 +6784,65 @@ def enqueue_make_journal_entry(
 			cheque_no=cheque_no,
 		)
 
-		frappe.publish_progress(
-			100,
-			title=_("Completed"),
-			description=_("Journal Entry created successfully"),
+		logger.info(
+			f"[JV SUCCESS] Payroll Entry={docname}, "
+			f"TimeTaken={round(time.time() - start, 2)}s"
 		)
 
 	except Exception:
-		frappe.publish_progress(
-			100,
-			title=_("Failed"),
-			description=_("Error occurred. Check Error Log"),
+		logger.error(
+			f"[JV FAILED] Payroll Entry={docname}, "
+			f"Stage={stage}, "
+			f"TimeTaken={round(time.time() - start, 2)}s\n"
+			f"{frappe.get_traceback()}"
 		)
 
 		frappe.log_error(
 			frappe.get_traceback(),
-			"Payroll Journal Entry Background Job Failed",
+			"Payroll JV Background Job Failed",
 		)
 		raise
 
 
+def process_accrual_jv(payroll_entry_name):
+	"""
+	Background job:
+	- Load Payroll Entry
+	- Load Salary Slips from DB
+	- Run existing accrual logic
+	"""
 
+	frappe.set_user("Administrator")
 
+	pe = frappe.get_doc("Payroll Entry", payroll_entry_name)
 
+	# Safety check: avoid duplicate JV creation
+	existing_jv = frappe.db.exists(
+		"Journal Entry Account",
+		{
+			"reference_type": "Payroll Entry",
+			"reference_name": pe.name,
+			"docstatus": 1,
+		},
+	)
+	if existing_jv:
+		return
+
+	# Load submitted salary slips INSIDE worker
+	submitted_salary_slips = frappe.get_all(
+		"Salary Slip",
+		filters={
+			"payroll_entry": pe.name,
+			"docstatus": 1,
+		},
+		fields=["name", "employee", "custom_check_no"],
+	)
+
+	if not submitted_salary_slips:
+		frappe.throw("No submitted Salary Slips found for accrual JV")
+
+	# Existing heavy logic – UNCHANGED
+	pe.make_accrual_jv_entry(submitted_salary_slips)
+
+	# Update status after success
+	pe.db_set("status", "Submitted")

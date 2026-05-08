@@ -2,6 +2,7 @@ frappe.ui.form.on('Journal Entry', {
 	
 	setup: function(frm) {
 		frm.trigger("replace_message");	
+		frm.trigger("set_cheque_date");
 	},
 
 	validate:function(frm){
@@ -51,7 +52,7 @@ frappe.ui.form.on('Journal Entry', {
     set_default_company:function(frm){
     	if (frm.doc.__islocal == 1) {
 	        frappe.call({
-	            method: 'us_payroll.us_payroll.custom_script.journal_entry.journal_entry.get_global_defaults_values',
+	            method: 'us_payroll.custom_script.journal_entry.get_global_defaults_values',
 	            args: {
 	                doctype: "Global Defaults",	                
 	            },
@@ -107,11 +108,9 @@ frappe.ui.form.on('Journal Entry', {
     },
 
     set_cheque_date:function(frm){
-    	if (frm.doc.custom_is_inter_fund_transaction) {
-	    	if (frm.doc.posting_date) {	    		
-				frm.set_value('cheque_date', frm.doc.posting_date);
-		    }
-		}
+    	console.log("call======")
+    	const today = frappe.datetime.get_today();
+		frm.set_value('cheque_date', today);  
     },
 
 

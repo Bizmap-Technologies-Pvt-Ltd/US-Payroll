@@ -8790,7 +8790,7 @@
   "type": "Workspace"
  },
  {
-  "app": null,
+  "app": "frappe",
   "charts": [],
   "content": "[{\"id\":\"2eyXSHwMTE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\">Hi,</span>\",\"col\":12}},{\"id\":\"ZusKvFOXgu\",\"type\":\"paragraph\",\"data\":{\"text\":\"I guess you don't have access to any workspace yet, but you can create one just for yourself. Click on the <b>Create Workspace</b> button to create one.<br>\",\"col\":12}}]",
   "custom_blocks": [],
@@ -8818,7 +8818,7 @@
   "sequence_id": 22.0,
   "shortcuts": [],
   "title": "Welcome Workspace",
-  "type": null
+  "type": "Workspace"
  },
  {
   "app": "erpnext",

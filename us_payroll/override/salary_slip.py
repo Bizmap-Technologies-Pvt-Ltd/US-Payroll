@@ -34,13 +34,13 @@ from erpnext.utilities.transaction_base import TransactionBase
 
 from hrms.hr.utils import validate_active_employee
 from hrms.payroll.doctype.additional_salary.additional_salary import get_additional_salaries
-from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
-	get_benefit_component_amount,
-)
-from hrms.payroll.doctype.employee_benefit_claim.employee_benefit_claim import (
-	get_benefit_claim_amount,
-	get_last_payroll_period_benefits,
-)
+# from hrms.payroll.doctype.employee_benefit_application.employee_benefit_application import (
+# 	get_benefit_component_amount,
+# )
+# from hrms.payroll.doctype.employee_benefit_claim.employee_benefit_claim import (
+# 	get_benefit_claim_amount,
+# 	get_last_payroll_period_benefits,
+# )
 # from hrms.payroll.doctype.payroll_entry.payroll_entry import get_start_end_dates
 # /home/suraj/frappe-bench/apps/overtonfa/overtonfa/override/payroll_entry.py
 from us_payroll.override.payroll_entry import get_start_end_dates
@@ -56,10 +56,13 @@ from hrms.payroll.doctype.salary_slip.salary_slip_loan_utils import (
 from hrms.payroll.utils import sanitize_expression
 from hrms.utils.holiday_list import get_holiday_dates_between
 
-from overtime.custom_script.data import money_in_words
+from us_payroll.custom_script.data import money_in_words
+
+from us_payroll.custom_script.employee_benefit_application import get_benefit_component_amount
 
 
-from overtime.employee_overtime.salary_slip import OverrideSalarySlip
+from hrms.payroll.doctype.salary_slip.salary_slip import SalarySlip
+# from us_payroll.us_payroll.salary_slip import OverrideSalarySlip
 
 # cache keys
 HOLIDAYS_BETWEEN_DATES = "holidays_between_dates"
@@ -68,7 +71,9 @@ SALARY_COMPONENT_VALUES = "salary_component_values"
 TAX_COMPONENTS_BY_COMPANY = "tax_components_by_company"
 
 
-class OverrideSalarySlip(OverrideSalarySlip):
+# class OverrideSalarySlip(OverrideSalarySlip):
+class OverrideSalarySlip(SalarySlip):
+
 	def __init__(self, *args, **kwargs):
 		super(OverrideSalarySlip, self).__init__(*args, **kwargs)
 		self.series = "Sal Slip/{0}/.#####".format(self.employee)
@@ -2014,7 +2019,8 @@ class OverrideSalarySlip(OverrideSalarySlip):
 			status = self.get_status()
 		self.db_set("status", status)
 
-	def process_salary_structure(self, for_preview=0):
+	# def process_salary_structure(self, for_preview=0):
+	def process_salary_structure(self, for_preview=0, lwp_days_corrected=None):
 		"""Calculate salary after salary structure details have been updated"""
 		if not self.salary_slip_based_on_timesheet:
 			self.get_date_details()
@@ -2110,9 +2116,25 @@ class OverrideSalarySlip(OverrideSalarySlip):
 		year_to_date = 0
 		period_start_date, period_end_date = self.get_year_to_date_period()
 
+		# salary_slip_sum = frappe.get_list(
+		# 	"Salary Slip",
+		# 	fields=["sum(net_pay) as net_sum", "sum(gross_pay) as gross_sum", "sum(total_deduction) as total_deduction_sum"],
+		# 	filters={
+		# 		"employee": self.employee,
+		# 		"start_date": [">=", period_start_date],
+		# 		"end_date": ["<", period_end_date],
+		# 		"name": ["!=", self.name],
+		# 		"docstatus": 1,
+		# 	},
+		# )
+
 		salary_slip_sum = frappe.get_list(
 			"Salary Slip",
-			fields=["sum(net_pay) as net_sum", "sum(gross_pay) as gross_sum", "sum(total_deduction) as total_deduction_sum"],
+			fields=[
+				{"SUM": "net_pay", "as": "net_sum"},
+				{"SUM": "gross_pay", "as": "gross_sum"},
+				{"SUM": "total_deduction", "as": "total_deduction_sum"},
+			],
 			filters={
 				"employee": self.employee,
 				"start_date": [">=", period_start_date],
@@ -2135,12 +2157,34 @@ class OverrideSalarySlip(OverrideSalarySlip):
 		self.custom_deduction_year_to_date = deduction_year_to_date 
 
 
+	# def compute_month_to_date(self):
+	# 	month_to_date = 0
+	# 	first_day_of_the_month = get_first_day(self.start_date)
+	# 	salary_slip_sum = frappe.get_list(
+	# 		"Salary Slip",
+	# 		fields=["sum(net_pay) as sum"],
+	# 		filters={
+	# 			"employee": self.employee,
+	# 			"start_date": [">=", first_day_of_the_month],
+	# 			"end_date": ["<", self.start_date],
+	# 			"name": ["!=", self.name],
+	# 			"docstatus": 1,
+	# 		},
+	# 	)
+
+	# 	month_to_date = flt(salary_slip_sum[0].sum) if salary_slip_sum else 0.0
+
+	# 	month_to_date += self.net_pay
+	# 	self.month_to_date = month_to_date
+
+
 	def compute_month_to_date(self):
 		month_to_date = 0
 		first_day_of_the_month = get_first_day(self.start_date)
+
 		salary_slip_sum = frappe.get_list(
 			"Salary Slip",
-			fields=["sum(net_pay) as sum"],
+			fields=[{"SUM": "net_pay", "as": "sum"}],
 			filters={
 				"employee": self.employee,
 				"start_date": [">=", first_day_of_the_month],
@@ -2154,7 +2198,7 @@ class OverrideSalarySlip(OverrideSalarySlip):
 
 		month_to_date += self.net_pay
 		self.month_to_date = month_to_date
-
+	
 	def compute_component_wise_year_to_date(self):
 		period_start_date, period_end_date = self.get_year_to_date_period()
 

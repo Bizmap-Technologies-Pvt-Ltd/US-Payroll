@@ -1,0 +1,74 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-07 10:00:27.485480",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "use_project_code",
+  "default_working_hours",
+  "use_three_bank_accounts",
+  "deduct_flat_amount_from_net_pay",
+  "total_weeks_of_the_year"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "description": "This is use in Account naming.",
+   "fieldname": "use_project_code",
+   "fieldtype": "Check",
+   "label": "Use Project Code"
+  },
+  {
+   "fieldname": "default_working_hours",
+   "fieldtype": "Float",
+   "label": "Default Working Hours"
+  },
+  {
+   "default": "0",
+   "description": "For Payroll ACH",
+   "fieldname": "use_three_bank_accounts",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Use Three Bank Accounts"
+  },
+  {
+   "default": "0",
+   "description": "For Payroll ACH",
+   "fieldname": "deduct_flat_amount_from_net_pay",
+   "fieldtype": "Check",
+   "label": "Deduct Flat Amount from Net Pay"
+  },
+  {
+   "fieldname": "total_weeks_of_the_year",
+   "fieldtype": "Float",
+   "label": "Total weeks of the year"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-07 15:47:00.553689",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "Client Setup",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

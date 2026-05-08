@@ -224,7 +224,7 @@ def calculate_leaves_taken(doc):
 
 
 def salary_calulations_for_fit(doc):
-	fund_settings_doc = frappe.get_doc("Fund Settings", "Fund Settings")
+	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
 	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
 
 	# --- 1. Non-taxable earnings (from Earnings table) ---
@@ -254,8 +254,8 @@ def salary_calulations_for_fit(doc):
 		annualized_wages = taxable_wages * total_weeks_of_the_year
 	else:
 		site_url = get_url()
-		fund_settings_url = f"{site_url}/app/fund-settings/Fund%20Settings"
-		frappe.throw(f"Please add <b>Total weeks of the year</b> in Fund settings. <a href= '{fund_settings_url}' >Fund Settings</a>")
+		fund_settings_url = f"{site_url}/desk/client-setup"
+		frappe.throw(f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>")
 	
 	doc.custom_annualized_wages = annualized_wages
 	# adjusted_annual_wages = flt(doc.custom_standard_deduction) - flt(doc.custom_annualized_wages)
@@ -272,7 +272,7 @@ def salary_calulations_for_fit(doc):
 
 @frappe.whitelist()
 def tax_calulations_for_fit(doc):
-	fund_settings_doc = frappe.get_doc("Fund Settings", "Fund Settings")
+	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
 	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
 
 	sal_structure = doc.salary_structure
@@ -301,6 +301,8 @@ def tax_calulations_for_fit(doc):
 
 	# fit_amount = 0  #extra=================
 	print(fit_component, "call before if fit_component 111111111111111111111")
+
+	fit_amount = 0
 	if fit_component and it_slab_doc:	
 		print(fit_component, "call in if fit_component 2222222222222222222222")
 		custom_annualized_wages = doc.custom_annualized_wages
@@ -367,8 +369,8 @@ def tax_calulations_for_fit(doc):
 
 	else:
 		site_url = get_url()
-		fund_settings_url = f"{site_url}/app/fund-settings/Fund%20Settings"
-		frappe.throw(f"Please add <b>Total weeks of the year</b> in Fund settings. <a href= '{fund_settings_url}' >Fund Settings</a>")
+		fund_settings_url = f"{site_url}/desk/client-setup"
+		frappe.throw(f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>")
 	
 	doc.save()
 

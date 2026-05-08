@@ -49,8 +49,9 @@ doctype_js = {
                 "Salary Structure Assignment" : "custom_script/salary_structure_assignment.js",
                 "Salary Component" : "custom_script/salary_component.js",
                 "Employee" : "custom_script/employee.js", 
-                "Journal Entry": "custom_script/journal_entry/journal_entry.js",
-
+                "Journal Entry": "custom_script/journal_entry.js",
+                "Attendance": "custom_script/attendance/attendance.js",
+                "Payroll Entry": "custom_script/payroll_entry.js",
             }
 
 
@@ -144,8 +145,8 @@ doctype_list_js = {
 
 override_doctype_class = {
     # "ToDo": "custom_app.overrides.CustomToDo"
-    "Salary Slip":"us_payroll.override.salary_slip.OverrideSalarySlip",
-    "Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry"
+    "Salary Slip": "us_payroll.override.salary_slip.OverrideSalarySlip",
+    # "Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry"
 }
 
 # Document Events
@@ -161,12 +162,6 @@ override_doctype_class = {
 # }
 
 doc_events = {
-    #   "*": {
-    #       "on_update": "method",
-    #       "on_cancel": "method",
-    #       "on_trash": "method"
-    #   }
-
     "Salary Slip":{
                    "after_insert":"us_payroll.custom_script.salary_slip.after_insert",
                    "validate":"us_payroll.custom_script.salary_slip.validate",
@@ -179,20 +174,23 @@ doc_events = {
         "validate":"us_payroll.custom_script.employee.validate"
   },
 
+    "Attendance": {
+        "validate": "us_payroll.custom_script.attendance.validate",
+        "on_submit": "us_payroll.custom_script.attendance.on_submit"
+    },
 
-  # "Payroll Entry":{ 
-  #                   "validate":"overtonfa.custom_script.payroll_entry.validate",
-  #                   "before_submit": "overtonfa.custom_script.payroll_entry.before_submit"
+    "Payroll Entry":{
+        "validate":"us_payroll.custom_script.payroll_entry.validate",
+        "before_save":"us_payroll.custom_script.payroll_entry.before_save",
+        "on_submit":"us_payroll.custom_script.payroll_entry.on_submit",
+        "before_submit":"us_payroll.custom_script.payroll_entry.before_submit",
+  },
 
-  #               },
+    "Journal Entry": {
+        # "validate": "us_payroll.custom_script.journal_entry.validate",
 
-  # "Batch Payment Entry":{"validate":"overtonfa.custom_script.batch_payment_entry.validate"},
+    }
 
-  # "Leave Allocation" : {
-  #                       "validate":"overtonfa.custom_script.leave_allocation.validate",
-  #                       "before_insert":"overtonfa.custom_script.leave_allocation.before_insert",
-  #                       "after_insert":"overtonfa.custom_script.leave_allocation.after_insert"
-  #                       }
 }
 
 

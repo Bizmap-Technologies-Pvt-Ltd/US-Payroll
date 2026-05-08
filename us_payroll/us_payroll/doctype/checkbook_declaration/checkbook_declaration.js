@@ -32,7 +32,7 @@ frappe.ui.form.on("Checkbook Declaration", {
 
 	create_all_checks: function(frm) {
 		frappe.call({
-			method: 'fund_accounting.fund_accounting.doctype.checkbook_declaration.checkbook_declaration.generate_checks',
+			method: 'us_payroll.us_payroll.doctype.checkbook_declaration.checkbook_declaration.generate_checks',
 			args: {
 				docname: frm.doc.name
 			},
