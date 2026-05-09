@@ -59,7 +59,6 @@ def before_submit(doc, method):
 	set_insurance_componence_amount_to_zero(doc)
 
 def set_insurance_component_name(doc):
-	print("call in set_insurance_component_name11111111111111")
 	sal_assignment_name = frappe.get_value(
 		"Salary Structure Assignment",
 		{"employee": doc.employee, "docstatus": 1},
@@ -70,18 +69,14 @@ def set_insurance_component_name(doc):
 
 	sal_assignment_doc = frappe.get_doc("Salary Structure Assignment", sal_assignment_name)
 	for deduction_row in doc.deductions:
-		print("call in set_insurance_component_name 222222222222222")
 		for row in sal_assignment_doc.custom_employee_insurance_deduction:
 			if (row.salary_component == deduction_row.salary_component
 				and row.insurance_component  # <-- this is child table field
 			):
 				if row.tax_type == "Before Tax":
-					print("call in set_insurance_component_name before 33333333333333333")
 					deduction_row.component_name = f"{row.insurance_company}-{row.salary_component}-BT"
 
-
 				if row.tax_type == "After Tax":
-					print("call in set_insurance_component_name after 444444444444444444")
 					deduction_row.component_name = f"{row.insurance_company}-{row.salary_component}-AT"
 	
 

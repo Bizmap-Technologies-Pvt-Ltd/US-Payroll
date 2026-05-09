@@ -45,6 +45,8 @@ frappe.ui.form.on('Payroll Entry', {
 		frm.fields_dict['employees'].grid.wrapper.on('grid-rows-rendered', function () {
 			frm.trigger('hide_add_row_btn');
 		});
+		frm.set_value('exchange_rate', 1.0);
+		
     },
 
     validate:function(frm){

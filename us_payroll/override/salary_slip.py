@@ -1215,11 +1215,21 @@ class OverrideSalarySlip(SalarySlip):
 				formula = sanitize_expression(struct_row.formula)
 				
 				if formula.startswith("custom_formula"):					
-					sal_assignment_name = frappe.db.get_value("Salary Structure Assignment",												{"employee":self.employee,"salary_structure":self.salary_structure},"name")
+					sal_assignment_name = frappe.db.get_value(
+															"Salary Structure Assignment",
+															{
+																"employee": self.employee,
+																"salary_structure": self.salary_structure
+															},
+															"name"
+														)
 					if sal_assignment_name:
+						print(sal_assignment_name,"sal_assignment_name =============================")
 						sal_assignment_doc = frappe.get_doc("Salary Structure Assignment",sal_assignment_name)
 						for r in sal_assignment_doc.custom_employee_insurance_deduction:
+							print(r.salary_component, struct_row.salary_component,"r.salary_component,struct_row.salary_component111111111111111111111111111111111111")
 							if r.salary_component == struct_row.salary_component:
+								print(r,struct_row,"r struct_row")
 								return r.amount
 
 						# for r in sal_assignment_doc.custom_employee_earnings:
@@ -1353,9 +1363,9 @@ class OverrideSalarySlip(SalarySlip):
 	def get_tax_components(self) -> list:
 		"""
 		Returns:
-		        list: A list of tax components specific to the company.
-		        If no tax components are defined for the company,
-		        it returns the default tax components.
+				list: A list of tax components specific to the company.
+				If no tax components are defined for the company,
+				it returns the default tax components.
 		"""
 		tax_components = frappe.cache().get_value(
 			TAX_COMPONENTS_BY_COMPANY, self._fetch_tax_components_by_company
@@ -1367,10 +1377,10 @@ class OverrideSalarySlip(SalarySlip):
 	def _fetch_tax_components_by_company(self) -> dict:
 		"""
 		Returns:
-		    dict: A dictionary containing tax components grouped by company.
+			dict: A dictionary containing tax components grouped by company.
 
 		Raises:
-		    None
+			None
 		"""
 
 		tax_components = {}

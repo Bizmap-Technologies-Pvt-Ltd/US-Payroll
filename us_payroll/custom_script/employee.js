@@ -222,7 +222,7 @@ frappe.ui.form.on('Employee', {
     set_default_company:function(frm){
         if (frm.doc.__islocal == 1) {
             frappe.call({
-                method: 'overtime.custom_script.employee.get_global_defaults_values',
+                method: 'us_payroll.custom_script.employee.get_global_defaults_values',
                 args: {
                     doctype: "Global Defaults",                 
                 },

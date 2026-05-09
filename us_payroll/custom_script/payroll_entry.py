@@ -17,6 +17,31 @@ from frappe.utils import (
 	today,
 )
 
+
+from dateutil.relativedelta import relativedelta
+from frappe.desk.reportview import get_match_cond
+from frappe.model.document import Document
+from frappe.query_builder.functions import Coalesce, Count
+from frappe.utils import (
+    DATE_FORMAT,
+    add_days,
+    add_to_date,
+    cint,
+    comma_and,
+    date_diff,
+    flt,
+    get_link_to_form,
+    getdate,
+)
+import erpnext
+from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
+    get_accounting_dimensions,
+)
+from erpnext.accounts.utils import get_fiscal_year
+# from hrms.payroll.doctype.salary_withholding.salary_withholding import link_bank_entry_in_salary_withholdings
+from hrms.payroll.doctype.payroll_entry.payroll_entry import get_month_details
+
+
 def validate(doc, method):
 	insurance_deduction_limitation(doc)
 	validate_do_not_include_in_total(doc)
@@ -720,3 +745,63 @@ def get_department_working_hours(employee):
 	
 	except Exception as e:
 		return {"error": f"Unexpected error: {str(e)}"}
+
+@frappe.whitelist()
+def get_start_end_dates(payroll_frequency, start_date=None, company=None):
+    """Returns dict of start and end dates for given payroll frequency based on start_date"""
+
+    if payroll_frequency == "Monthly" or payroll_frequency == "Bimonthly" or payroll_frequency == "":
+        fiscal_year = get_fiscal_year(start_date, company=company)[0]
+        month = "%02d" % getdate(start_date).month
+        m = get_month_details(fiscal_year, month)
+        if payroll_frequency == "Bimonthly":
+            if getdate(start_date).day <= 15:
+                start_date = m["month_start_date"]
+                end_date = m["month_mid_end_date"]
+            else:
+                start_date = m["month_mid_start_date"]
+                end_date = m["month_end_date"]
+        else:
+            start_date = m["month_start_date"]
+            end_date = m["month_end_date"]
+
+    if payroll_frequency == "Weekly":
+        end_date = add_days(start_date, 6)
+        
+    if payroll_frequency == "Bi-Weekly":
+        end_date = add_days(start_date, 13)
+    
+        
+    if payroll_frequency == "Fortnightly":
+        end_date = add_days(start_date, 13)
+
+    if payroll_frequency == "Daily":
+        end_date = start_date
+
+    return frappe._dict({"start_date": start_date, "end_date": end_date})
+
+
+
+@frappe.whitelist()
+def get_end_date(start_date, frequency):
+	start_date = getdate(start_date)
+	frequency = frequency.lower() if frequency else "monthly"
+	kwargs = get_frequency_kwargs(frequency) if frequency != "bimonthly" else get_frequency_kwargs("monthly")
+
+	# weekly, fortnightly and daily intervals have fixed days so no problems
+	end_date = add_to_date(start_date, **kwargs) - relativedelta(days=1)
+	if frequency != "bimonthly":
+		return dict(end_date=end_date.strftime(DATE_FORMAT))
+
+	else:
+		return dict(end_date="")
+
+def get_frequency_kwargs(frequency_name):
+	frequency_dict = {
+		"monthly": {"months": 1},
+		"fortnightly": {"days": 14},
+		"weekly": {"days": 7},
+		"daily": {"days": 1},
+        "bi-weekly": {"days": 14},
+	}
+	return frequency_dict.get(frequency_name)

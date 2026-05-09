@@ -146,7 +146,7 @@ doctype_list_js = {
 override_doctype_class = {
     # "ToDo": "custom_app.overrides.CustomToDo"
     "Salary Slip": "us_payroll.override.salary_slip.OverrideSalarySlip",
-    # "Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry"
+    "Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry"
 }
 
 # Document Events
