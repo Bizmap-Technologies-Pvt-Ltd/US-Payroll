@@ -57,6 +57,32 @@ frappe.ui.form.on('Payroll Entry', {
 		frm.fields_dict['employees'].grid.wrapper.find('.grid-add-row').remove();
 	},
 
+	start_date: function (frm) {
+		if (!in_progress && frm.doc.start_date) {
+			frm.trigger("set_end_date");
+		} else {
+			// reset flag
+			in_progress = false;
+		}
+		frm.events.clear_employee_table(frm);
+	},
+
+	set_end_date: function (frm) {
+		frappe.call({
+			method: "us_payroll.custom_script.payroll_entry.get_end_date",
+			args: {
+				frequency: frm.doc.payroll_frequency,
+				start_date: frm.doc.start_date,
+			},
+			callback: function (r) {
+				console.log(frm.doc.payroll_frequency,"========")
+				if (r.message) {
+					frm.set_value("end_date", r.message.end_date);
+				}
+			},
+		});
+	},
+
 
     set_default_company:function(frm){
     	if (frm.doc.__islocal == 1) {
