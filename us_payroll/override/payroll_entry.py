@@ -3104,11 +3104,11 @@
 
 #     if payroll_frequency == "Weekly":
 #         end_date = add_days(start_date, 6)
-        
+		
 #     if payroll_frequency == "Bi-Weekly":
 #         end_date = add_days(start_date, 13)
-    
-        
+	
+		
 #     if payroll_frequency == "Fortnightly":
 #         end_date = add_days(start_date, 13)
 
@@ -6676,7 +6676,7 @@ class OverridePayrollEntry(PayrollEntry):
 				"parent": ssa,
 				"salary_component": salary_component
 			},
-			["insurance_company", "category"]
+			["insurance_company", "salary_component"]
 		)
 		if not result:
 			return None, None   # ✅ ALWAYS return tuple
@@ -6685,35 +6685,47 @@ class OverridePayrollEntry(PayrollEntry):
 		return result
 
 
-	def get_insurance_provider_account(
-		self,
-		provider,
-		salary_component
-	):
-		provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
-		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
-		filters = {"parent": salary_component, "custom_fund": fund}
-		for row in provider_doc.accounts:
-			acc_doc = frappe.get_cached_doc("Account", row.account)
+	# def get_insurance_provider_account(
+	# 	self,
+	# 	provider,
+	# 	salary_component
+	# ):
+	# 	provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
+	# 	comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
+	# 	for row in provider_doc.accounts:
+	# 		acc_doc = frappe.get_cached_doc("Account", row.account)
 
-			filters = {
-				"parent": "Insurance Provider",
-			}
-			print(filters, "department match")
-			break  # stop at first department match
+	# 		filters = {
+	# 			"parent": "Insurance Provider",
+	# 		}
+	# 		print(filters, "department match")
+	# 		break  # stop at first department match
 
-		account = None
-		account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
+	# 	account = None
+	# 	account = frappe.db.get_value("Salary Component Account", filters, "account", cache=True)
 		
-		if not account:		
-			frappe.throw(
-				_("Please set proper Insurance account in Insurance Provider {0}")
-				.format(provider)
-			)
-		return account
+	# 	if not account:		
+	# 		frappe.throw(
+	# 			_("Please set proper Insurance account in Insurance Provider {0}")
+	# 			.format(provider)
+	# 		)
+	# 	return account
+
+	def get_insurance_provider_account(self, provider, salary_component):
+		provider_doc = frappe.get_cached_doc("Insurance Provider", provider)
+
+		for row in provider_doc.accounts:
+			if row.account:
+				return row.account
+
+		frappe.throw(
+			_("Please set proper Insurance account in Insurance Provider {0}")
+			.format(provider)
+		)
 
 
 	def get_salary_component_account(self, salary_component, employee=None):
+		print("get_salary_component_account calllllllllllllllllllllllllll")
 		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
 		# 🔹 INSURANCE OVERRIDE (Employee or Employer)
 		if comp_doc.type == "Deduction" and (
@@ -6800,6 +6812,7 @@ class OverridePayrollEntry(PayrollEntry):
 
 						employee = [_.employee for _ in self.employees if _.employee == item.employee][0]
 						key = (item.salary_component, cost_center, employee)
+						component_dict[key] = component_dict.get(key, 0) + amount_against_cost_center
 
 					if employee_wise_accounting_enabled:
 						self.set_employee_based_payroll_payable_entries(
@@ -6930,14 +6943,18 @@ class OverridePayrollEntry(PayrollEntry):
 		account_dict = {}
 		for key, amount in component_dict.items():
 			component, cost_center, employee = key
-			account = self.get_salary_component_account(component)
+			account = self.get_salary_component_account(component, employee)
+			print(account,"account****************************")
 			accounting_key = (account, cost_center)
 
 			account_dict[accounting_key] = account_dict.get(accounting_key, 0) + amount
 
+			print(account_dict,"account_dict+++++++++++++++++++++++++++")
+
 		return account_dict
 
 	def make_accrual_jv_entry(self, submitted_salary_slips):
+		print(submitted_salary_slips,"call in make_accrual_jv_entry =========================")
 		self.check_permission("write")
 		employee_wise_accounting_enabled = frappe.db.get_single_value(
 			"Payroll Settings", "process_payroll_accounting_entry_based_on_employee"
@@ -6952,6 +6969,7 @@ class OverridePayrollEntry(PayrollEntry):
 			)
 			or {}
 		)
+		print(earnings,"earnings")
 
 		deductions = (
 			self.get_salary_component_total(
@@ -6960,10 +6978,14 @@ class OverridePayrollEntry(PayrollEntry):
 			)
 			or {}
 		)
+		print(deductions,"deductions ")
 
 		precision = frappe.get_precision("Journal Entry Account", "debit_in_account_currency")
 
+		print(earnings,deductions,"earnings,deductions 00000000000000000000000000")
+
 		if earnings or deductions:
+			print(earnings,deductions,"earnings,deductions 11111111111111111111111111")
 			accounts = []
 			currencies = []
 			payable_amount = 0
@@ -7030,6 +7052,8 @@ class OverridePayrollEntry(PayrollEntry):
 		multi_currency = 0
 		if len(currencies) > 1:
 			multi_currency = 1
+
+		print("make_journal_entry --------------------------")
 
 		journal_entry = frappe.new_doc("Journal Entry")
 		journal_entry.voucher_type = voucher_type
@@ -7121,14 +7145,14 @@ class OverridePayrollEntry(PayrollEntry):
 		if employee_wise_accounting_enabled:
 			"""
 			employee_based_payroll_payable_entries = {
-			                'HREMP00004': {
-			                                'earnings': 83332.0,
-			                                'deductions': 2000.0
-			                },
-			                'HREMP00005': {
-			                                'earnings': 50000.0,
-			                                'deductions': 2000.0
-			                }
+							'HREMP00004': {
+											'earnings': 83332.0,
+											'deductions': 2000.0
+							},
+							'HREMP00005': {
+											'earnings': 50000.0,
+											'deductions': 2000.0
+							}
 			}
 			"""
 			for employee, employee_details in self.employee_based_payroll_payable_entries.items():
@@ -7292,6 +7316,7 @@ class OverridePayrollEntry(PayrollEntry):
 
 	@frappe.whitelist()
 	def make_bank_entry(self, for_withheld_salaries=False):
+		print("call in make_bank_entry========")
 		self.check_permission("write")
 		self.employee_based_payroll_payable_entries = {}
 		employee_wise_accounting_enabled = frappe.db.get_single_value(
@@ -7537,13 +7562,13 @@ class OverridePayrollEntry(PayrollEntry):
 	def get_employee_and_attendance_details(self) -> list[dict]:
 		"""Returns a list of employee and attendance details like
 		[
-		        {
-		                "name": "HREMP00001",
-		                "date_of_joining": "2019-01-01",
-		                "relieving_date": "2022-01-01",
-		                "holiday_list": "Holiday List Company",
-		                "attendance_count": 22
-		        }
+				{
+						"name": "HREMP00001",
+						"date_of_joining": "2019-01-01",
+						"relieving_date": "2022-01-01",
+						"holiday_list": "Holiday List Company",
+						"attendance_count": 22
+				}
 		]
 		"""
 		employees = [emp.employee for emp in self.employees]
@@ -7860,7 +7885,6 @@ def get_frequency_kwargs(frequency_name):
 		"fortnightly": {"days": 14},
 		"weekly": {"days": 7},
 		"daily": {"days": 1},
-		"bi-weekly": {"days": 14},
 	}
 	return frequency_dict.get(frequency_name)
 
