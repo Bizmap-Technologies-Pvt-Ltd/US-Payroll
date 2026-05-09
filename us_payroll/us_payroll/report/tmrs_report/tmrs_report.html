@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            @top-center {
+                content: "Page " counter(page);
+            }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+        }
+
+        th, td {
+            border: none;
+            padding: 8px;
+            text-align: left;
+            line-height: 1.5px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tbody tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+   <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+       <div class="header"> <img src="/files/Logo1.PNG" alt="City of Overton Logo" style="width: 300px; height: auto; float: left;"></div>
+
+       <div style="text-align: right; float: right;">
+            <h1 style="font-size: 26px; margin: 0; white-space: nowrap;"><b>Texas Municipal Retirement Register</b></h1>
+            <div style="font-size: 22px; margin: 0;">Retirement Detail By Employee Name</div>
+        </div>
+    </div>
+
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">        
+        <div style="float: left;">
+            <div>City Name: 00962</div>
+            <div>Employer Name: {{ company_name }}</div>
+            <div>Report for the Month/Year: {{ month_year }}</div>
+            <div>Payment Dates: {{ formatted_start_end_date }}</div>
+        </div>
+
+        <div style="float: right; text-align: right;">
+            <div>Payroll Set: 01</div>
+            <div>Packet: PYPKT00881 tmrs</div>
+        </div>
+    </div>
+
+    <br>
+    <br>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="3" style="font-size: 12px; text-align: left;">Employee Name</th>
+                    <th rowspan="3" style="font-size: 12px; text-align: left;">Department</th>
+                    <th rowspan="3" style="font-size: 12px; text-align: left;">Social Security Number</th>
+                    <th rowspan="3" style="font-size: 12px; text-align: right;">Subject Wages</th>
+                    <th rowspan="3" style="font-size: 12px; text-align: right;">Employee Amount</th>
+                    <th rowspan="3" style="font-size: 12px; text-align: right;">Employer Amount</th>
+                    <th rowspan="3" style="font-size: 12px; text-align: right;">Total Contribution</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    {% if row %}
+
+                        {% if "employee" in row and row.get("employee") == "Total" %}
+                            <tr style="border-top: 2px solid black;">
+                                <td colspan="1"></td>
+                                <td colspan="1"></td>
+                                <td colspan="1"></td>
+                                <td colspan="7"></td>
+                                <td colspan="7"></td>
+                                <td colspan="7"></td>
+                                <td colspan="1"></td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td style="font-size: 12px;">
+                                {% if "employee" in row and row.get("employee") != "Total"%}
+                                    {{ row.get("employee", "") }}
+
+                                {% else %}
+                                    
+                                {% endif %}
+                            </td>
+                            
+                            <td style="font-size: 12px;">                               
+                                {% if "custom_department_name" in row %}
+                                    
+                                    {{ row.get("custom_department_name", "") }}
+                                
+                                {% else %}
+
+                                {% endif %} 
+                            </td>
+                            
+                            <td style="font-size: 12px;">
+                                {% if "custom_nomasked_social_security_number" in row  and "employee" in row and row.get("employee") == "Total"%}
+                                  
+                                    <b>{{ "Grand Totals:" }}</b>
+                               
+                                {% else %}
+
+                                    {{ row.get("custom_nomasked_social_security_number", "N/A") }}
+                                    
+
+                                {% endif %}
+                            
+                            </td>
+                            
+                            <td style="font-size: 12px; text-align: right;">                               
+                                {% if "gross_pay" in row  and "employee" in row and row.get("employee") == "Total"%}
+                                 
+                                    <b> ${{ "%.2f" | format(row.get("gross_pay", 0)) }} </b>
+                                {% else %}
+
+                                    ${{ "%.2f" | format(row.get("gross_pay", 0)) }} 
+                                    
+                                {% endif %}
+                               
+                            </td>
+                            
+                            <td style="font-size: 12px; text-align: right;">
+
+                                {% if "tmrs_employee_total" in row  and "employee" in row and row.get("employee") == "Total"%}
+                                   
+                                    <b> ${{ "%.2f" | format(row.get("tmrs_employee_total", 0)) }}</b>
+                 
+                                {% else %}
+
+                                    ${{ "%.2f" | format(row.get("tmrs_employee_total", 0)) }}
+                                    
+                                {% endif %}
+
+                            <td style="font-size: 12px; text-align: right;">
+
+                                {% if "tmrs_employer_total" in row  and "employee" in row and row.get("employee") == "Total"%}
+
+                                    <b>${{ "%.2f" | format(row.get("tmrs_employer_total", 0)) }}</b>
+
+                                {% else %}
+                                    
+                                    ${{ "%.2f" | format(row.get("tmrs_employer_total", 0)) }}
+
+                                {% endif %}
+
+                            </td>
+                            
+                            <td style="font-size: 12px; text-align: right;">
+                                {% if "total_contribution" in row   and "employee" in row and row.get("employee") == "Total"%}
+
+                                   <b> ${{ "%.2f" | format(row.get("total_contribution", 0)) }}</b>
+
+                                {% else %}
+
+                                    ${{ "%.2f" | format(row.get("total_contribution", 0)) }}
+                                    
+                                {% endif %}                   
+
+                            </td>                                                   
+                        </tr>
+
+                    {% else %}
+
+                    {% endif %}  
+                       
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Force a new page after the first table -->
+        <div style="page-break-after: always;"></div>
+        <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+           <div class="header"> <img src="/files/Logo1.PNG" alt="City of Overton Logo" style="width: 300px; height: auto; float: left;"></div>
+
+           <div style="text-align: right; float: right;">
+                <h1 style="font-size: 26px; margin: 0; white-space: nowrap;"><b>Texas Municipal Retirement Register</b></h1>
+                <div style="font-size: 22px; margin: 0;">Retirement Summary</div>
+            </div>
+
+        </div>
+    
+        <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+            <div style="float: left;">
+                <div>City Name: 00962</div>
+                <div>Employer Name: {{ company_name }}</div>
+                <div>Report for the Month/Year: {{ month_year }}</div>
+                <div>Payment Dates: {{ formatted_start_end_date }}</div>
+            </div>
+
+            <div style="float: right; text-align: right;">
+                <div>Payroll Set: 01</div>
+                <div>Packet: PYPKT00881 tmrs</div>
+            </div>
+        </div>
+
+        <br><br>
+
+        <!-- Retirement Summary Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th style="font-size: 12px;">Department</th>
+                    <th style="font-size: 12px;">Department Description</th>
+                    <th style="font-size: 12px;">Employee Count</th>
+                    <th style="font-size: 12px; text-align: right;">Subject Wages</th>
+                    <th style="font-size: 12px; text-align: right;">Employee Amount</th>
+                    <th style="font-size: 12px; text-align: right;">Employer Amount</th>
+                    <th style="font-size: 12px; text-align: right;">Total Contribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set grand_subject_wages = 0 %}
+                {% set grand_employee_amount = 0 %}
+                {% set grand_employer_amount = 0 %}
+                {% set grand_total_contribution = 0 %}
+                {% set grand_employee_count = 0 %}
+
+                {% for dept in department_data %}
+                <tr>
+                    <td style="font-size: 12px;">{{ dept.department_code }}</td>
+                    <td style="font-size: 12px;">{{ dept.department_description }}</td>
+                    <td style="font-size: 12px;">{{ dept.employee_count }}</td>
+                    <td style="font-size: 12px; text-align: right;">${{ "%.2f"|format(dept.subject_wages) }}</td>
+                    <td style="font-size: 12px; text-align: right;">${{ "%.2f"|format(dept.employee_amount) }}</td>
+                    <td style="font-size: 12px; text-align: right;">${{ "%.2f"|format(dept.employer_amount) }}</td>
+                    <td style="font-size: 12px; text-align: right;">${{ "%.2f"|format(dept.total_contribution) }}</td>
+                </tr>
+
+                {% set grand_subject_wages = grand_subject_wages + dept.subject_wages %}
+                {% set grand_employee_amount = grand_employee_amount + dept.employee_amount %}
+                {% set grand_employer_amount = grand_employer_amount + dept.employer_amount %}
+                {% set grand_total_contribution = grand_total_contribution + dept.total_contribution %}
+                {% set grand_employee_count = grand_employee_count + dept.employee_count %}
+                {% endfor %}
+
+                <!-- Grand Totals Row -->
+                    <tr style="border-top: 2px solid black;">
+                        <td colspan="1"></td>
+                        <td colspan="1"></td>
+                        <td colspan="1"></td>
+                        <td colspan="7"></td>
+                        <td colspan="7"></td>
+                        <td colspan="7"></td>
+                        <td colspan="1"></td>
+                    </tr>
+
+                    <td colspan="1" style="font-size: 12px; font-weight: bold;"></td>  
+
+                    <td colspan="1" style="font-size: 12px; font-weight: bold;">Grand Totals:</td>
+                    <td style="font-size: 12px; font-weight: bold;">{{ department_grand_totals.employee_count }}</td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold;">${{ "%.2f"|format(department_grand_totals.subject_wages) }}</td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold;">${{ "%.2f"|format(department_grand_totals.employee_amount) }}</td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold;">${{ "%.2f"|format(department_grand_totals.employer_amount) }}</td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold;">${{ "%.2f"|format(department_grand_totals.total_contribution) }}</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</body>
+</html>
+
+
+
+

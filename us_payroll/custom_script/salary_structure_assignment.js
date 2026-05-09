@@ -30,13 +30,14 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			};
 		});
 
-		// frm.set_query("earning_component", "custom_employee_earnings", function (doc, cdt, cdn) {
-		// 	return {
-		// 			filters: {
-		// 				type: "Earning"                    
-		// 			}
-		// 	};
-		// });
+		frm.set_query("earning_component", "custom_employee_earnings", function (doc, cdt, cdn) {
+			return {
+					filters: {
+						type: "Earning",
+						custom_is_variable_earning: 1                   
+					}
+			};
+		});
 	},
 
 	refresh:function(frm){

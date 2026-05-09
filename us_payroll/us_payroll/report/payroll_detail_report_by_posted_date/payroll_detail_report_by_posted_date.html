@@ -1,0 +1,103 @@
+<html>
+<head>
+    <style>
+        @page {
+            @top-center {
+                content: "Page " counter(page);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+        }
+
+        th, td {
+            border: none;
+            padding: 8px;
+            text-align: left;
+            line-height: 1.0;
+        }
+        
+        thead {
+            display: table-header-group;
+        }
+
+        tbody tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+       <div class="header"> 
+            <!-- <img src="/files/overton logo.PNG" style="width: 200px; height: auto; float:left;"> --> 
+            <img src="{{ letterhead_image }}" style="width: 200px; height: auto; float:left;">
+       </div>
+
+       <div style="text-align: right; float: right;">
+            <h1 style="font-size: 28px; margin: 0; white-space: nowrap; border-bottom: 2px solid black;"><b>Payroll Detail Report By Posted Date</b></h1>
+        </div>
+    </div>
+
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">        
+        <div style="float: left;">
+            <div>{{ formatted_date_range }}</div>
+            <div>{{ current_datetime }}</div>           
+        </div>
+    </div> 
+    <br>
+    <br>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <tbody>
+            {% for department in department_data %}
+                <tr>
+                    <td colspan="7" style="font-size: 14px; font-weight: bold; padding-top: 20px;">
+                        Department: {{ department.department_description }}
+                    </td>
+                </tr>     
+                <tr>
+                    <th style="font-size: 15px; text-align: left; width: 20%;">Employee Name</th>
+                    <th style="font-size: 15px; text-align: right; width: 20%;">Rate</th>
+                    <th style="font-size: 15px; text-align: right; width: 20%;">Net Pay</th>
+                    <th style="font-size: 15px; text-align: right; width: 20%;">Gross Pay</th>
+                </tr>
+                <tr>
+                    <td colspan="7" style="border-top: 1px solid black; padding-top: 2px;"></td>
+                </tr>
+
+                {% for employee in department.employees %}
+                    <tr>
+                        <td style="font-size: 12px; text-align: left; width: 20%;">{{ employee.employee_name }}</td>
+                        <td style="font-size: 12px; text-align: right; width: 20%;">{{ frappe.utils.fmt_money(employee.rate, currency="$") }}</td>
+                        <td style="font-size: 12px; text-align: right; width: 20%;">{{ frappe.utils.fmt_money(employee.net_pay, currency="$") }}</td>
+                        <td style="font-size: 12px; text-align: right; width: 20%;">{{ frappe.utils.fmt_money(employee.gross_pay, currency="$") }}</td>
+                    </tr>
+                {% endfor %}
+                 <!-- Department Totals -->
+                <tr>
+
+                    <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">Total:</td>
+                    <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">{{ frappe.utils.fmt_money(department.rate, currency="$") }}</td>
+                    <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">{{ frappe.utils.fmt_money(department.net_pay, currency="$") }}</td>
+                    <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">{{ frappe.utils.fmt_money(department.gross_pay, currency="$") }}</td>
+                   
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Grand Totals -->
+    <table style="width: 100%; margin-top: 20px; font-weight: bold;">
+        <tr>
+            <td style="text-align: left; width: 20%;">Grand Total:</td>
+            <td style="text-align: right; width: 20%;"></td>
+            <td style="text-align: right; width: 20%;">{{ frappe.utils.fmt_money(grand_totals.total_net_pay, currency="$") }}</td>
+            <td style="text-align: right; width: 20%;">{{ frappe.utils.fmt_money(grand_totals.total_gross_pay, currency="$") }}</td>
+        </tr>
+
+    </table>
+</body>
+</html>

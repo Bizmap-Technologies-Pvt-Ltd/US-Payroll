@@ -1232,9 +1232,11 @@ class OverrideSalarySlip(SalarySlip):
 								print(r,struct_row,"r struct_row")
 								return r.amount
 
-						# for r in sal_assignment_doc.custom_employee_earnings:
-						# 	if r.earning_component == struct_row.salary_component:
-						# 		return r.amount
+						for r in sal_assignment_doc.custom_employee_earnings:
+							print(r.earning_component, struct_row.salary_component,"r.salary_component,struct_row.salary_component222222222222222222222222222222222")
+							if r.earning_component == struct_row.salary_component:
+								print(r.amount, "r.amount if earning match=========")
+								return r.amount
 								
 					return 0.0
 				if formula:

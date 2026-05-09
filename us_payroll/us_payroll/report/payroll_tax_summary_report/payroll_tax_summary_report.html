@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            @top-center {
+                content: "Page " counter(page);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none; 
+        }
+
+        th, td {
+            border: none; 
+            padding: 8px;
+            text-align: left;
+            line-height: 1.5px; 
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tbody tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+
+   <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+       <div class="header"> 
+       		<!-- <img src="/files/overton logo.PNG" style="width: 200px; height: auto; float: left;">  -->
+       		<img src="{{ letterhead_image }}" style="width: 200px; height: auto; float: left;">
+
+       </div>
+
+       <div style="text-align: right; float: right;">
+            <h1 style="font-size: 26px; margin: 0; white-space: nowrap; border-bottom: 2px solid black;"><b>Payroll Tax Summary Report</b></h1>
+        </div>
+
+    </div>
+
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">      
+        <div style="float: left;">
+            <div>{{ formatted_date_range }}</div>
+            <div>{{ current_datetime }}</div>          
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="3" style="font-size: 13px; text-align: left;">Employee Name</th>
+                    <th rowspan="3" style="font-size: 13px; text-align: right;">Gross Wages</th>
+                    <th rowspan="3" style="font-size: 13px; text-align: right;">FIT withholdings</th>
+                    <th rowspan="3" style="font-size: 13px; text-align: right;">Social Security Wages</th>
+                    <th rowspan="3" style="font-size: 13px; text-align: right;">Medicare Wages</th>
+                    <th rowspan="3" style="font-size: 13px; text-align: right;">Unemployment insurance</th>
+                    <th rowspan="3" style="font-size: 13px; text-align: right;">Workers comp</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+				    {% if row.employee_name != "Total" %}
+				        <tr>
+				            <td style="font-size: 12px;">
+				                {{ row.employee_name or '' }}
+				            </td>
+
+				            <td style="font-size: 12px; text-align: right;">
+				                ${{ "%.2f"|format(row.gross_pay or 0) }}
+				            </td>
+
+				            <td style="font-size: 12px; text-align: right;">
+				                ${{ "%.2f"|format(row.fit_withholdings or 0) }}
+				            </td>
+
+				            <td style="font-size: 12px; text-align: right;">
+				                ${{ "%.2f"|format(row.social_security_wages or 0) }}
+				            </td>
+
+				            <td style="font-size: 12px; text-align: right;">
+				                ${{ "%.2f"|format(row.medicare_wages or 0) }}
+				            </td>
+
+				            <td style="font-size: 12px; text-align: right;">
+				                ${{ "%.2f"|format(row.workers_comp or 0) }}
+				            </td>
+
+				            <td style="font-size: 12px; text-align: right;">
+				                ${{ "%.2f"|format(row.unemployment_insurance or 0) }}
+				            </td>
+				        </tr>
+
+
+                    {% else %}
+                        <tr style="border-top: 2px solid black;">
+	                        <td colspan="1"></td>
+	                        <td colspan="1"></td>
+	                        <td colspan="1"></td>
+	                        <td colspan="7"></td>
+	                        <td colspan="7"></td>
+	                        <td colspan="7"></td>
+	                        <td colspan="1"></td>
+	                    </tr>
+
+	                    <tr>
+		                    <td style="font-size: 13px; font-weight: bold;">
+				                {{ row.employee_name or '' }}
+				            </td>
+
+				            <td style="font-size: 13px; text-align: right; font-weight: bold;">
+				                ${{ "%.2f"|format(row.gross_pay or 0) }}
+				            </td>
+
+				            <td style="font-size: 13px; text-align: right; font-weight: bold;">
+				                ${{ "%.2f"|format(row.fit_withholdings or 0) }}
+				            </td>
+
+				            <td style="font-size: 13px; text-align: right; font-weight: bold;">
+				                ${{ "%.2f"|format(row.social_security_wages or 0) }}
+				            </td>
+
+				            <td style="font-size: 13px; text-align: right; font-weight: bold;">
+				                ${{ "%.2f"|format(row.medicare_wages or 0) }}
+				            </td>
+
+				            <td style="font-size: 13px; text-align: right; font-weight: bold;">
+				                ${{ "%.2f"|format(row.workers_comp or 0) }}
+				            </td>
+
+				            <td style="font-size: 13px; text-align: right; font-weight: bold;">
+				                ${{ "%.2f"|format(row.unemployment_insurance or 0) }}
+				            </td>
+		                
+		                </tr>
+
+                    {% endif %}                          
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+
+
+
