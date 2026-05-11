@@ -1,6 +1,3 @@
-# Copyright (c) 2026, us_payroll and contributors
-# For license information, please see license.txt
-
 # Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
@@ -25,8 +22,8 @@ def get_data(filters):
 		"cs.posting_date BETWEEN %(from_date)s AND %(to_date)s"
 	]
 
-	# if filters.get("department_name"):
-	# 	conditions.append("cs.department = %(department_name)s")
+	if filters.get("department"):
+		conditions.append("cs.department = %(department)s")
 
 	condition_sql = " AND ".join(conditions)
 
@@ -34,6 +31,7 @@ def get_data(filters):
 		SELECT 
 			agg.employee,
 			agg.employee_name,
+			agg.department AS department,
 			SUM(agg.gross_pay) AS gross_pay,
 			SUM(agg.federal_withholding) AS federal_withholding,
 			SUM(agg.custom_total_pretax) AS pre_tax,
@@ -76,6 +74,7 @@ def get_data(filters):
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
+				emp.department,
 				cs.gross_pay,
 				cs.custom_total_pretax,
 				cs.custom_total_non_taxable_earnings,
@@ -127,8 +126,9 @@ def get_data(filters):
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
 			WHERE cs.docstatus = 1
 			AND cs.posting_date BETWEEN %(from_date)s AND %(to_date)s
+			{f"AND emp.department = %(department_name)s" if filters.get("department_name") else ""}
 		) agg
-		GROUP BY agg.employee, agg.employee_name
+		GROUP BY agg.employee, agg.employee_name, agg.department
 		ORDER BY agg.employee_name
 	""", filters, as_dict=True)
 	
@@ -150,10 +150,6 @@ def get_data(filters):
 		else:
 			row["taxable_wages"] = med_taxable_amount
 
-		# if row["department"]:
-		# 	dept_doc = frappe.get_doc("Cost Center", row["department"])
-		# 	row["department_name"] = dept_doc.custom_department_number
-
 		# row["wages_tips_compensation"] = 0
 		# row["ss_wages"] = (row.get("social_security_emp") or 0) / 0.062
 		# row["medicare_wages_tips"] = (row.get("medicare_emp") or 0)/  0.0145
@@ -173,13 +169,6 @@ def get_columns():
 		{
 			"label": _("Department"),
 			"fieldname": "department",
-			"fieldtype": "Data",
-			"width": 150,
-			"align": "left"
-		},
-		{
-			"label": _("Department Name"),
-			"fieldname": "department_name",
 			"fieldtype": "Data",
 			"width": 150,
 			"align": "left"

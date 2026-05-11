@@ -32,7 +32,6 @@
 <body>
     <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
        <div class="header"> 
-            <!-- <img src="/files/overton logo.PNG" style="width: 200px; height: auto; float:left;"> --> 
             <img src="{{ letterhead_image }}" style="width: 200px; height: auto; float:left;">
        </div>
 
@@ -55,7 +54,7 @@
             {% for department in department_data %}
                 <tr>
                     <td colspan="7" style="font-size: 14px; font-weight: bold; padding-top: 20px;">
-                        Department: {{ department.department_description }}
+                        Department: {{ department.department_code }}
                     </td>
                 </tr>     
                 <tr>

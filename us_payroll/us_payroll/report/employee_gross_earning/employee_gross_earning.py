@@ -1,4 +1,4 @@
-# Copyright (c) 2026, us_payroll and contributors
+# Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
 import frappe
@@ -33,6 +33,7 @@ def get_data(filters):
 		SELECT 
 			agg.employee,
 			agg.employee_name,
+			agg.department AS department,
 			SUM(agg.gross_pay) AS gross_pay
 			
 		FROM (
@@ -40,6 +41,7 @@ def get_data(filters):
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
+				emp.department,
 				cs.gross_pay
 
 			FROM `tabSalary Slip` cs
@@ -51,11 +53,6 @@ def get_data(filters):
 		GROUP BY agg.employee, agg.employee_name
 		ORDER BY agg.employee_name
 	""", filters, as_dict=True)
-
-	for row in results:
-		if row["department"]:
-			dept_doc = frappe.get_doc("Cost Center", row["department"])
-			row["department_name"] = dept_doc.custom_department_number
 		
 	return results
 
@@ -67,6 +64,13 @@ def get_columns():
 			"fieldname": "employee_name",
 			"fieldtype": "Data",
 			"width": 200,
+			"align": "left"
+		},
+		{
+			"label": _("Department"),
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"width": 150,
 			"align": "left"
 		},
 		{

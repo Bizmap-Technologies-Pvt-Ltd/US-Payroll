@@ -1,4 +1,4 @@
-# Copyright (c) 2026, us_payroll and contributors
+# Copyright (c) 2026, bizmap and contributors
 # For license information, please see license.txt
 
 import frappe
@@ -33,6 +33,7 @@ def get_data(filters):
 		SELECT 
 			agg.employee,
 			agg.employee_name,
+			agg.department AS department,
 			SUM(agg.gross_pay) AS gross_pay,
 			SUM(agg.hourly) AS hourly,
 			SUM(agg.overtime) AS overtime,
@@ -61,6 +62,7 @@ def get_data(filters):
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
+				emp.department,
 				cs.gross_pay,
 				cs.custom_total_pretax,
 				cs.custom_total_non_taxable_earnings,
@@ -243,11 +245,6 @@ def get_data(filters):
 		GROUP BY agg.employee, agg.employee_name
 		ORDER BY agg.employee_name
 	""", filters, as_dict=True)
-
-	# for row in results:
-	# 	if row["department"]:
-	# 		dept_doc = frappe.get_doc("Cost Center", row["department"])
-	# 		row["department_name"] = dept_doc.custom_department_number
 		
 	return results
 
@@ -261,13 +258,13 @@ def get_columns():
 			"width": 200,
 			"align": "left"
 		},
-		# {
-		# 	"label": _("Department Name"),
-		# 	"fieldname": "department_name",
-		# 	"fieldtype": "Data",
-		# 	"width": 150,
-		# 	"align": "left"
-		# },
+		{
+			"label": _("Department"),
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"width": 150,
+			"align": "left"
+		},
 		{
 			"label": _("Hourly"),
 			"fieldname": "hourly",
@@ -447,7 +444,7 @@ def generate_pdf(data):
 	formatted_end_date = to_date.strftime("%m/%d/%Y")
 	formatted_start_end_date = f"{formatted_start_date} - {formatted_end_date}"
 
-	template_path = 'overtonfa/overtonfa/report/employee_earning_reports_by_posted_date/employee_earning_reports_by_posted_date.html'
+	template_path = 'us_payroll/us_payroll/report/employee_earning_reports_by_posted_date/employee_earning_reports_by_posted_date.html'
 
 	data = data.get('data')["data"]
 	

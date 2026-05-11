@@ -42,7 +42,7 @@ frappe.query_reports["Employee Earning Reports By Posted Date"] = {
 	onload: function(report) {
 		// report.page.add_inner_button(__("Print"), function () {
 	 //        frappe.call({
-	 //            method: 'overtonfa.overtonfa.report.employee_earning_reports_by_posted_date.employee_earning_reports_by_posted_date.get_print',
+	 //            method: 'us_payroll.us_payroll.report.employee_earning_reports_by_posted_date.employee_earning_reports_by_posted_date.get_print',
 	 //            args: {
 	 //                report_data: {'filter': report.get_values(), 'data': report.data},
 	 //            },

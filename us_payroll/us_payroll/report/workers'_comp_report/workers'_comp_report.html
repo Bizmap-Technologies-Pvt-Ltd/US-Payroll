@@ -59,7 +59,7 @@
     {% for dept in department_data %}
     <div style="page-break-inside: avoid;">
         <h3 style="text-decoration: underline;">
-          Department: {{ dept.department_code }} - {{ dept.department_description }}
+          Department: {{ dept.department_code }}
         </h3>
 
 
@@ -173,7 +173,7 @@
             <tbody>
                 {% for dept in department_summary %}
                     <tr>
-                        <td style="width:20%; text-align:left">{{ dept.department_code }} - {{ dept.department_description }}</td>
+                        <td style="width:20%; text-align:left">{{ dept.department_code }}</td>
                         <td style="width:10%; text-align:center">{{ dept.employee_count }}</td>
                         <td style="width:15%; text-align:right">${{ "{:,.2f}".format(dept.earnings or 0) }}</td>
                         <td style="width:10%; text-align:right">{{ dept.hours | round(2) }}</td>

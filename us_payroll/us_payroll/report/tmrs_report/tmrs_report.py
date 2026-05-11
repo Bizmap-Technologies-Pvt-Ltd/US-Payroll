@@ -1,6 +1,3 @@
-# Copyright (c) 2026, us_payroll and contributors
-# For license information, please see license.txt
-
 # Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
@@ -54,6 +51,7 @@ def get_data(filters):
 				pe.name AS payroll_entry,
 				ped.employee,
 				ped.employee_name,
+				emp.department,
 				emp.custom_nomasked_social_security_number,
 				emp.first_name,
 				emp.middle_name,
@@ -69,7 +67,8 @@ def get_data(filters):
 			(CASE 
 				WHEN sd.salary_component = 'TMRS (Employer)' THEN sd.amount 
 				ELSE 0 
-			END) AS tmrs_employer_total
+			END) AS tmrs_employer_total,
+			dept.name as department
 
 			FROM 
 				`tabPayroll Entry` pe
@@ -81,6 +80,8 @@ def get_data(filters):
 				`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
 			LEFT JOIN 
 				`tabSalary Detail` sd ON sd.parent = cst.name
+			LEFT JOIN 
+				`tabDepartment` dept ON dept.name = emp.department
 
 			WHERE 
 				YEAR(pe.posting_date) = %(year)s
@@ -93,7 +94,68 @@ def get_data(filters):
 			"year": selected_year
 		}, as_dict=True)
 
+	# # Calculate previous month and year
+	# if selected_month == 1:
+	# 	prev_month = 12
+	# 	prev_year = selected_year - 1
+	# else:
+	# 	prev_month = selected_month - 1
+	# 	prev_year = selected_year
+
+	# # Get first and last day of previous month
+	# start_date = datetime(prev_year, prev_month, 1)
+	# last_day = calendar.monthrange(prev_year, prev_month)[1]
+	# end_date = datetime(prev_year, prev_month, last_day)
 	
+	# data = frappe.db.sql("""
+	# 		SELECT 
+	# 			pe.name AS payroll_entry,
+	# 			ped.employee,
+	# 			ped.employee_name,
+	# 			emp.custom_department_name,
+	# 			emp.custom_nomasked_social_security_number,
+	# 			emp.first_name,
+	# 			emp.middle_name,
+	# 			emp.last_name,
+	# 			cst.gross_pay AS gross_pay,
+	# 			cst.name AS salary_slip,
+	# 			sd.salary_component,
+	# 			sd.amount AS salary_component_amount,
+	# 			(CASE 
+	# 			WHEN sd.salary_component = 'TMRS (Employee)' THEN sd.amount 
+	# 			ELSE 0 
+	# 		END) AS tmrs_employee_total,
+	# 		(CASE 
+	# 			WHEN sd.salary_component = 'TMRS (Employer)' THEN sd.amount 
+	# 			ELSE 0 
+	# 		END) AS tmrs_employer_total,
+	# 		ct.cost_center_name as custom_department_name
+
+	# 		FROM 
+	# 			`tabPayroll Entry` pe
+	# 		JOIN 
+	# 			`tabPayroll Employee Detail` ped ON ped.parent = pe.name
+	# 		LEFT JOIN 
+	# 			`tabEmployee` emp ON emp.name = ped.employee
+	# 		LEFT JOIN 
+	# 			`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
+	# 		LEFT JOIN 
+	# 			`tabSalary Detail` sd ON sd.parent = cst.name
+	# 		LEFT JOIN 
+	# 			`tabCost Center` ct ON ct.name = emp.custom_department_name
+
+	# 		WHERE 
+	# 			YEAR(pe.posting_date) = %(year)s
+	# 			AND MONTH(pe.posting_date) = %(prev_month)s
+	# 			AND MONTH(cst.posting_date) = %(prev_month)s
+	# 			AND cst.docstatus = 1
+	# 			AND sd.salary_component IN ('TMRS (Employee)', 'TMRS (Employer)')
+	# 	""", {
+	# 		"prev_month": prev_month,
+	# 		"year": prev_year
+	# 	}, as_dict=True)
+
+
 	# Grouping by salary slip
 	grouped = {}
 	for row in data:
@@ -112,6 +174,7 @@ def get_data(filters):
 				'middle_name': row['middle_name'],
 				'last_name': row['last_name'],
 				'payroll_entry': row['payroll_entry'],
+				'department': row['department'],
 				'custom_nomasked_social_security_number': formatted_ssn,
 				'gross_pay': row['gross_pay'],  # Set once per slip
 				'tmrs_employee_total': 0.0,
@@ -147,6 +210,7 @@ def get_data(filters):
 				'middle_name': row['middle_name'],
 				'last_name': row['last_name'],
 				'payroll_entry': row['payroll_entry'],
+				'department': row['department'],
 				'custom_nomasked_social_security_number': emp_formatted_ssn,
 				'gross_pay': 0.0,  # Set once per slip
 				'tmrs_employee_total': 0.0,
@@ -168,6 +232,7 @@ def get_columns():
 	'payroll_entry'
 	columns = [
 		{'label': 'Employee', 'fieldname': 'employee', 'fieldtype': 'Data', 'width': 150},
+		{'label': 'Department', 'fieldname': 'department', 'fieldtype': 'Data','align': 'center','width': 150},
 		{'label': 'Social Security Number', 'fieldname': 'custom_nomasked_social_security_number', 'fieldtype': 'Data','width': 150},
 		{'label': 'Subject Wages', 'fieldname': 'gross_pay', 'fieldtype': 'Currency','width': 150},
 		{'label': 'Employee Amount', 'fieldname': 'tmrs_employee_total', 'fieldtype': 'Currency','width': 150},
@@ -269,7 +334,7 @@ def get_department_summary(data):
 	
 	data = [row for row in data if row.get("employee") != "Total"]
 	for row in data:
-		department = 'Unknown Department'
+		department = row.get('department') or 'Unknown Department'
 
 		if " " in department:
 			department_code, department_description = department.split(" ", 1)

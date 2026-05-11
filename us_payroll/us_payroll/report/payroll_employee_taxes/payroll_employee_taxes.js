@@ -20,10 +20,10 @@ frappe.query_reports["Payroll Employee Taxes"] = {
 			"width": "100px"
 		},
 		{
-			"fieldname": "department_name",
+			"fieldname": "department",
 			"fieldtype": "Link",
-			"options": "Cost Center",
-			"label": __("Department Name"),
+			"options": "Department",
+			"label": __("Department"),
 			"width": "50px"
 		},
 		

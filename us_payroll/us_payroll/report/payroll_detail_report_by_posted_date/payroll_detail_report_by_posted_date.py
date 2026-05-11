@@ -1,4 +1,4 @@
-# Copyright (c) 2026, us_payroll and contributors
+# Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
 import frappe
@@ -32,6 +32,10 @@ def get_data(filters):
 	if not from_date or not to_date:
 		frappe.throw("Please select both From Date and To Date.")
 
+	department_condition = ""
+	if department:
+		department_condition = " AND emp.department = %(department)s"
+
 	data = frappe.db.sql(f"""
 		SELECT
 			cst.payroll_entry AS payroll_entry,
@@ -42,14 +46,17 @@ def get_data(filters):
 			emp.last_name,
 			COALESCE(emp.custom_hourly_rate, 0) as rate,
 			cst.name AS salary_slip,
+			dept.name as department,
 			COALESCE(SUM(cst.net_pay), 0) AS net_pay,
 			COALESCE(SUM(cst.gross_pay), 0) AS gross_pay
 		FROM `tabSalary Slip` cst
 		LEFT JOIN `tabEmployee` emp ON emp.name = cst.employee
+		LEFT JOIN `tabDepartment` dept ON dept.name = emp.department
 		WHERE cst.posting_date BETWEEN %(from_date)s AND %(to_date)s
 		  AND cst.docstatus = 1
+		  {department_condition}
 		GROUP BY cst.employee
-	""".format(), {
+	""".format(department_condition=department_condition), {
 		"from_date": from_date,
 		"to_date": to_date,
 		"department": department
@@ -66,6 +73,7 @@ def get_data(filters):
 def get_columns():
 	columns = [
 		{'label': 'Employee Name', 'fieldname': 'employee_name', 'fieldtype': 'Data', 'width': 150},
+		{'label': 'Department', 'fieldname': 'department', 'fieldtype': 'Data','align': 'center','width': 150},
 		{'label': 'Rate', 'fieldname': 'rate', 'fieldtype': 'Float','align': 'center','width': 150},
 		{'label': 'Net Pay', 'fieldname': 'net_pay', 'fieldtype': 'Currency','width': 150},
 		{'label': 'Gross Pay', 'fieldname': 'gross_pay', 'fieldtype': 'Currency','width': 150},
@@ -158,21 +166,16 @@ def get_department_summary(data):
 	})
 
 	for row in data:
-		# department_code = row.get("custom_department_name") or "Unknown"
-		# department_name = row.get("custom_department_number") or "Unknown"
-
-		department_code = "Unknown"
-		department_name = "Unknown"
+		department_code = row.get("department") or "Unknown"
 
 		if department_code == "Unknown":
 			continue
 
-		department_code_name = f"{department_code}-{department_name}"
+		department_code_name = f"{department_code}"
 		summary = department_summary[department_code_name]
 
 		if not summary["department_code"]:
 			summary["department_code"] = department_code
-			summary["department_description"] = department_name
 
 		summary["employee_count"] += 1
 		summary["rate"] += float(row.get('rate') or 0)

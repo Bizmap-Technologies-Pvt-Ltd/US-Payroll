@@ -1,6 +1,3 @@
-# Copyright (c) 2026, us_payroll and contributors
-# For license information, please see license.txt
-
 # Copyright (c) 2026, bizmap and contributors
 # For license information, please see license.txt
 
@@ -24,6 +21,9 @@ def get_columns():
 	return [
 		# {"label": "Employee ID", "fieldname": "employee", "fieldtype": "Link", "options": "Employee", "width": 120},
 		{"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 180},
+		{"label": "Comp Code", "fieldname": "custom_comp_code", "fieldtype": "Link", "options": "Comp Code", "width": 120},
+		{"label": "Department", "fieldname": "department", "fieldtype": "Link", "options": "Department", "width": 150},
+		# {'label': 'Department Name', 'fieldname': 'department_name', 'fieldtype': 'Data','align': 'center','width': 150},
 		{"label": "Earnings", "fieldname": "earnings", "fieldtype": "Currency", "width": 150},
 		{"label": "Hours", "fieldname": "hours", "fieldtype": "Float", "width": 120},
 		{"label": "OT Rate", "fieldname": "ot_rate", "fieldtype": "Float", "width": 120},
@@ -48,6 +48,9 @@ def get_data(filters):
 		SELECT
 			agg.employee,
 			agg.employee_name,
+			agg.department AS department,
+			# agg.custom_department_number AS department_name,
+			agg.custom_comp_code AS custom_comp_code,
 			ROUND(SUM(agg.gross_pay), 2) AS gross_amount,
 			ROUND(SUM(agg.custom_custom_total_working_hours), 2) AS hours,
 			agg.custom_custom_overtime_hourly_rate AS ot_rate,
@@ -59,13 +62,18 @@ def get_data(filters):
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
+				emp.department,
+				emp.custom_comp_code,
 				cs.gross_pay,
 				cs.custom_custom_total_working_hours,
 				cs.custom_custom_overtime_hourly_rate,
 				cs.custom_custom_total_overtime_hours,
-				cs.custom_total_overtime_amount
+				cs.custom_total_overtime_amount,
+				ct.cost_center_name
+				# ct.custom_department_number
 			FROM `tabSalary Slip` cs
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
+			LEFT JOIN `tabCost Center` ct ON ct.name = emp.department
 			WHERE cs.docstatus = 1
 			AND cs.posting_date BETWEEN %(from_date)s AND %(to_date)s
 		) agg
@@ -134,6 +142,8 @@ def generate_pdf(data):
 		'margin-left': '20mm',
 	}
 
+	print(html,"html-----------------")
+
 	pdf_file = get_pdf(html, options=options)
 
 	return {
@@ -149,7 +159,7 @@ def generate_pdf(data):
 def get_department_summary(data):
 	department_summary = defaultdict(lambda: {
 		"department_code": "",
-		"department_description": "",
+		# "department_description": "",
 		"comp_codes": defaultdict(lambda: {
 			"comp_code": "",
 			"employees": [],
@@ -165,15 +175,15 @@ def get_department_summary(data):
 	# --- Build department + comp code structure ---
 	for row in data:
 		dept_code = row.get("department") or "Unknown"
-		dept_name = row.get("department_name") or "Unknown"
-		comp_code = "NA"
+		# dept_name = row.get("department_name") or "Unknown"
+		comp_code = row.get("custom_comp_code") or "NA"
 
-		if "Unknown" in (dept_code, dept_name):
+		if "Unknown" in (dept_code):
 			continue
 
 		summary = department_summary[dept_code]
 		summary["department_code"] = dept_code
-		summary["department_description"] = dept_name
+		# summary["department_description"] = dept_name
 
 		comp_summary = summary["comp_codes"][comp_code]
 		comp_summary["comp_code"] = comp_code
@@ -226,7 +236,7 @@ def get_department_summary(data):
 	for dept in department_list:
 		totals = {
 			"department_code": dept["department_code"],
-			"department_description": dept["department_description"],
+			# "department_description": dept["department_description"],
 			"employee_count": sum(comp["employee_count"] for comp in dept["comp_codes"].values()),
 			"earnings": sum(comp["earnings"] for comp in dept["comp_codes"].values()),
 			"hours": sum(comp["hours"] for comp in dept["comp_codes"].values()),

@@ -21,7 +21,7 @@ frappe.query_reports["Payroll Detail Report By Posted Date"] = {
 			"fieldname": "department",
 			"label": __("Department"),
 			"fieldtype": "Link",
-			"options": "Cost Center",
+			"options": "Department",
 			"width": 80,
 		},
 		{

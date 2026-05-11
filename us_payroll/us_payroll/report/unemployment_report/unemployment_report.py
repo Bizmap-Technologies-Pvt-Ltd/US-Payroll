@@ -1,6 +1,3 @@
-# Copyright (c) 2026, us_payroll and contributors
-# For license information, please see license.txt
-
 # Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
@@ -80,19 +77,6 @@ def execute(filters=None):
 	selected_months = quarter_to_months[filters.get('quarter')]
 	selected_year = int(filters.get('year'))
 
-	# salary_slips = frappe.db.sql("""
-	# 	SELECT DISTINCT cst.name, cst.posting_date, emp.gender
-	# 	FROM `tabSalary Slip` cst
-	# 	JOIN `tabEmployee` emp ON cst.employee = emp.name
-	# 	WHERE YEAR(cst.posting_date) = %(year)s
-	# 	AND MONTH(cst.posting_date) IN %(months)s
-	# 	AND cst.docstatus != 2
-	# """, {
-	# 	"year": selected_year,
-	# 	"months": tuple(selected_months)
-	# }, as_dict=True)
-
-
 	salary_slips = frappe.db.sql("""
 		SELECT
 			MONTH(cst.posting_date) AS month,
@@ -165,23 +149,25 @@ def get_data(filters):
 		frappe.throw("Please select a valid quarter.")
 
 	selected_months = quarter_to_months[selected_quarter]
-	# selected_months = [1,2,3,4,5,6,7,8,9,10,11,12]
 
 	data = frappe.db.sql("""
 		SELECT 
 			pe.name AS payroll_entry,
 			ped.employee,
 			ped.employee_name,
+			emp.department,
 			emp.custom_nomasked_social_security_number,
 			emp.gender,
 			emp.first_name,
 			emp.middle_name,
 			emp.last_name,
+			-- ct.department,
 			cst.posting_date,
 			cst.gross_pay AS gross_pay,
 			cst.name AS salary_slip,
 			sd.salary_component,
 			sd.amount AS salary_component_amount,
+			-- ct.cost_center_name as custom_department_name,
 			CEIL(MONTH(pe.posting_date)/3) AS quarter
 
 		FROM 
@@ -194,6 +180,8 @@ def get_data(filters):
 			`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
 		LEFT JOIN 
 			`tabSalary Detail` sd ON sd.parent = cst.name
+		LEFT JOIN 
+			`tabCost Center` ct ON ct.name = emp.department
 
 		WHERE 
 			YEAR(pe.posting_date) = %(year)s
@@ -226,9 +214,11 @@ def get_data(filters):
 				'middle_name': row['middle_name'],
 				'last_name': row['last_name'],
 				'payroll_entry': row['payroll_entry'],
+				'department': row['department'],
 				'custom_nomasked_social_security_number': formatted_ssn,
 				'gender': row['gender'],
 				'reportable_wages': row['gross_pay'],  # Set once per slip
+				# 'custom_department_number': row['custom_department_number'],
 				'posting_date' : row['posting_date']
 			}
 
@@ -256,6 +246,8 @@ def get_data(filters):
 				'middle_name': row['middle_name'],
 				'last_name': row['last_name'],
 				'payroll_entry': row['payroll_entry'],
+				'department': row['department'],
+				# 'custom_department_number': row['custom_department_number'],
 				'custom_nomasked_social_security_number': emp_formatted_ssn,
 				'gender': row['gender'],
 				'reportable_wages': 0.0,  # Set once per slip
@@ -274,6 +266,8 @@ def get_columns():
 		{'label': 'payroll_entry', 'fieldname': 'payroll_entry', 'fieldtype': 'Link', 'options': 'Payroll Entry','width': 150},
 		# {'label': 'Salary Slip', 'fieldname': 'salary_slip', 'fieldtype': 'Data'},
 		{'label': 'Employee Name', 'fieldname': 'employee', 'fieldtype': 'Data', 'width': 150},
+		{'label': 'Department', 'fieldname': 'department', 'fieldtype': 'Data','align': 'center','width': 150},
+		# {'label': 'Department Name', 'fieldname': 'custom_department_number', 'fieldtype': 'Data','align': 'center','width': 150},
 		{'label': 'Social Security Number', 'fieldname': 'custom_nomasked_social_security_number', 'fieldtype': 'Data','width': 150},
 		{'label': 'Reportable Wages', 'fieldname': 'reportable_wages', 'fieldtype': 'Currency','width': 150},
 		{'label': 'Excess Wages', 'fieldname': 'excess_wages', 'fieldtype': 'Currency','width': 150},
@@ -418,7 +412,7 @@ def generate_pdf(data):
 def get_department_summary(data):
 	department_summary = defaultdict(lambda: {
 		"department_code": "",
-		"department_description": "",
+		# "department_description": "",
 		"employee_count": 0,
 		"reportable_wages": 0.0,
 		"excess_wages": 0.0,
@@ -428,18 +422,18 @@ def get_department_summary(data):
 	})
 
 	for row in data:
-		department_code = "Unknown"
-		department_name = "Unknown"
+		department_code = row.get("department") or "Unknown"
+		# department_name = row.get("custom_department_number") or "Unknown"
 
 		if department_code == "Unknown":
 			continue
 			
-		department_code_name = f"{department_code}-{department_name}"
+		department_code_name = f"{department_code}"
 		summary = department_summary[department_code_name]
 		
 		if not summary["department_code"]:
 			summary["department_code"] = department_code
-			summary["department_description"] = department_name
+			# summary["department_description"] = department_name
 
 		summary["employee_count"] += 1
 		summary["reportable_wages"] += float(row.get('reportable_wages') or 0)
@@ -502,5 +496,6 @@ def download_excel(filters):
 	# saved_file = save_file(file_name, xlsx_file.getvalue(), None, None, is_private=1)
 
 	return {"file_url": saved_file.file_url}
+
 
 

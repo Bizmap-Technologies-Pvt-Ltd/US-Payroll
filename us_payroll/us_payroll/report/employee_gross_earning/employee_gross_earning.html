@@ -38,7 +38,6 @@
 
    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
        <div class="header">
-           <!-- <img src="/files/Logo1.PNG" alt="City of Overton Logo" style="width: 300px; height: auto; float: left;"> -->
            <img src="{{ letterhead_image }}" alt="City of Overton Logo" style="width: 300px; height: auto; float: left;">
        </div>
 
@@ -75,7 +74,7 @@
                         <!-- TOTAL ROW -->
                         <tr style="border-top: 2px solid black; font-weight: bold;">
                             <td>Total</td>
-                            <td>{{ row.get("department_name", "") }}</td>
+                            <td>{{ row.get("department", "") }}</td>
                             <td style="text-align: right;">${{ "{:,.2f}".format(row.get("gross_pay") or 0) }}</td>
                             
                         </tr>
@@ -83,7 +82,7 @@
                         <!-- EMPLOYEE ROW -->
                         <tr>
                             <td>{{ row.get("employee_name", "") }}</td>
-                            <td>{{ row.get("department_name", "") }}</td>
+                            <td>{{ row.get("department", "") }}</td>
                             <td style="text-align: right;">${{ "{:,.2f}".format(row.get("gross_pay") or 0) }}</td>
                             
                         </tr>

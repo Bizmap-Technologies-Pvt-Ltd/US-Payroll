@@ -194,7 +194,7 @@
     <!-- Second Page Header -->
     <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
         <div class="header">
-            <img src="/files/overton logo.PNG" alt="City of Overton Logo" style="width: 300px; height: auto; float: left;">
+            <img src="{{ letterhead_image }}" style="width: 300px; height: auto; float: left;">
         </div>
 
         <div style="text-align: left; margin-left: 320px;">
@@ -211,7 +211,7 @@
             {% for department in department_data %}
                 <tr>
                     <td colspan="7" style="font-size: 14px; font-weight: bold; padding-top: 20px;">
-                        Department: {{ department.department_code }} - {{ department.department_description }}
+                        Department: {{ department.department_code }}
                     </td>
                 </tr>
 
@@ -258,7 +258,7 @@
                     <td style="width: 20%;"></td>
 
                     <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">
-                        Department {{ department.department_description }} Total:
+                        Department {{ department.department_code }} Total:
                     </td>
                     <td style="font-size: 12px; text-align: right; font-weight: bold; width: 20%;">
                         {{ "%.2f"|format(department.reportable_wages) }}
@@ -308,7 +308,7 @@
     <!-- Third Page Header -->
     <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
         <div class="header">
-            <img src="/files/overton logo.PNG" alt="City of Overton Logo" style="width: 300px; height: auto; float: left;">
+            <img src="{{ letterhead_image }}" style="width: 300px; height: auto; float: left;">
         </div>
 
         <div style="text-align: left; margin-left: 320px;">

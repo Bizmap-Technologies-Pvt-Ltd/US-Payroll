@@ -727,13 +727,13 @@ def get_department_working_hours(employee):
 		return {"error": "Employee is required"}
 
 	employee_doc = frappe.get_doc("Employee", employee)
-	department_name = getattr(employee_doc, 'custom_department_name', None)
+	department_name = getattr(employee_doc, 'department', None)
 	if not department_name:
 		return {"working_hours": 0}
 
 	try:
-		# Fetch the department document from the Cost Center doctype
-		department_doc = frappe.get_doc("Cost Center", department_name)
+		# Fetch the department document from the department doctype
+		department_doc = frappe.get_doc("Department", department_name)
 		working_hours = getattr(department_doc, "custom_working_hours", None)
 		if not working_hours or working_hours == 0:
 			return {"working_hours": 0}
