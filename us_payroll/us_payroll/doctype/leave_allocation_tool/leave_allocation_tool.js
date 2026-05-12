@@ -45,7 +45,7 @@ frappe.ui.form.on("Leave Allocation Tool", {
         }
         
         frappe.call({
-            method: "overtonfa.overtonfa.doctype.leave_allocation_tool.leave_allocation_tool.get_employees",
+            method: "us_payroll.us_payroll.doctype.leave_allocation_tool.leave_allocation_tool.get_employees",
             args: {
                 department: frm.doc.department || null,
                 leave_type: frm.doc.leave_type,
@@ -91,7 +91,7 @@ frappe.ui.form.on("Leave Allocation Tool", {
         }
 
         frappe.call({
-            method: "overtonfa.overtonfa.doctype.leave_allocation_tool.leave_allocation_tool.generate_leave_allocations",
+            method: "us_payroll.us_payroll.doctype.leave_allocation_tool.leave_allocation_tool.generate_leave_allocations",
             args: {
                 doc: frm.doc
             },

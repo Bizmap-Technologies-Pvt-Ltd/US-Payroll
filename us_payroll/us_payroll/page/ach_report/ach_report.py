@@ -3,13 +3,13 @@ import frappe
 from datetime import datetime
 import math
 
-# import sys
-# sys.path.insert(0, '/home/suraj/frappe-bench/python-ach')
-# from ach.builder import AchFile
-
-import sys, os
-sys.path.insert(0, "/home/priya/workspace/bizmap_setup/frappe-bench-v16/python-ach")
+import sys
+sys.path.insert(0, '/home/bizmap/frappe-bench/python-ach')
 from ach.builder import AchFile
+
+# import sys, os
+# sys.path.insert(0, "/home/priya/workspace/bizmap_setup/frappe-bench-v16/python-ach")
+# from ach.builder import AchFile
 
 
 @frappe.whitelist()

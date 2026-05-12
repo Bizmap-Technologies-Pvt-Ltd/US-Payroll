@@ -31,7 +31,7 @@
    "label": "Employee Name"
   },
   {
-   "fetch_from": "employee.custom_department_name",
+   "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -42,7 +42,7 @@
    "fieldname": "department_id",
    "fieldtype": "Link",
    "label": "Department ID",
-   "options": "Cost Center"
+   "options": "Department"
   },
   {
    "fieldname": "leave_type",

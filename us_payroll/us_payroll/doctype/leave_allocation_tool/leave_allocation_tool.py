@@ -16,18 +16,18 @@ def get_employees(leave_type, from_date, to_date, department=None):
 	filters = {"status": "Active"} 
 
 	if department:   
-		filters["custom_department_name"] = department
+		filters["department"] = department
 
 	employees = frappe.get_all(
 		"Employee",
 		filters=filters,
-		fields=["name", "employee_name", "custom_department_name"]
+		fields=["name", "employee_name", "department"]
 	)
 
 	for emp in employees:
-		if emp.custom_department_name:
-			dept_doc = frappe.get_doc("Cost Center", emp.custom_department_name)
-			emp["custom_department_number"] = dept_doc.custom_department_number if dept_doc else None
+		if emp.department:
+			dept_doc = frappe.get_doc("Department", emp.department)
+			emp["department"] = dept_doc.name if dept_doc else None
 
 		employee = emp.name
 
