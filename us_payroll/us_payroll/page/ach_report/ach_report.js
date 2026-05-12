@@ -51,3 +51,37 @@ frappe.pages['ach-report'].on_page_load = function(wrapper) {
             }
         }
     });
+
+
+    const urlParams = new URLSearchParams(window.location.search);
+    var payroll_entry_value = urlParams.get('payroll_entry'); 
+    field.set_value(payroll_entry_value)
+
+    // Add a button to generate the ACH file
+    page.set_primary_action('Generate ACH File', () => {
+        if (!payroll_entry) {
+            frappe.msgprint(__('Please select a Payroll Entry'));
+            return;
+        }
+
+        frappe.call({
+            method: 'us_payroll.us_payroll.page.ach_report.ach_report.generate_ach_file',
+            args: {
+                payroll_entry: payroll_entry
+            },
+            callback: function(r) {
+                if (r.message) {
+                    frappe.msgprint(__('ACH File Generated Successfully'));
+
+                    // Automatically download the generated file
+                    const link = document.createElement('a');
+                    link.href = r.message;
+                    link.download = 'ach_file.txt';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        });
+    });
+};
