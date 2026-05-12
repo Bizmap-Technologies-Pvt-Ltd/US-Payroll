@@ -6572,42 +6572,62 @@ class OverridePayrollEntry(PayrollEntry):
 		"""
 		Creates salary slip for selected employees if already not created
 		"""
-		self.check_permission("write")
-		employees = [emp.employee for emp in self.employees]
+		add_check_employees = []
+		for row in self.employees:
+			employee_payment_method = frappe.db.get_value("Employee", row.employee, "custom_payment_method")
+			if employee_payment_method == "Check":
+				add_check_employees.append(row.employee)
 
-		if employees:
-			args = frappe._dict(
-				{
-					"salary_slip_based_on_timesheet": self.salary_slip_based_on_timesheet,
-					"payroll_frequency": self.payroll_frequency,
-					"start_date": self.start_date,
-					"end_date": self.end_date,
-					"company": self.company,
-					"posting_date": self.posting_date,
-					"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
-					"payroll_entry": self.name,
-					"exchange_rate": self.exchange_rate,
-					"currency": self.currency,
-				}
+		available_check = frappe.get_all(
+				"Check",
+				filters={"status": "Available"},
+				fields=["name", "check_number"],
+				order_by="check_number ASC",
 			)
-			if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:
-				self.db_set("status", "Queued")
-				frappe.enqueue(
-					create_salary_slips_for_employees,
-					timeout=3000,
-					employees=employees,
-					args=args,
-					publish_progress=False,
+
+		available_check = available_check[::-1]
+
+		if len(available_check) < len(add_check_employees):
+			frappe.throw("Number of available checks are less than the required.")
+
+		else:
+
+			self.check_permission("write")
+			employees = [emp.employee for emp in self.employees]
+
+			if employees:
+				args = frappe._dict(
+					{
+						"salary_slip_based_on_timesheet": self.salary_slip_based_on_timesheet,
+						"payroll_frequency": self.payroll_frequency,
+						"start_date": self.start_date,
+						"end_date": self.end_date,
+						"company": self.company,
+						"posting_date": self.posting_date,
+						"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
+						"payroll_entry": self.name,
+						"exchange_rate": self.exchange_rate,
+						"currency": self.currency,
+					}
 				)
-				frappe.msgprint(
-					_("Salary Slip creation is queued. It may take a few minutes"),
-					alert=True,
-					indicator="blue",
-				)
-			else:
-				create_salary_slips_for_employees(employees, args, publish_progress=False)
-				# since this method is called via frm.call this doc needs to be updated manually
-				self.reload()
+				if len(employees) > 30 or frappe.flags.enqueue_payroll_entry:
+					self.db_set("status", "Queued")
+					frappe.enqueue(
+						create_salary_slips_for_employees,
+						timeout=3000,
+						employees=employees,
+						args=args,
+						publish_progress=False,
+					)
+					frappe.msgprint(
+						_("Salary Slip creation is queued. It may take a few minutes"),
+						alert=True,
+						indicator="blue",
+					)
+				else:
+					create_salary_slips_for_employees(employees, args, publish_progress=False)
+					# since this method is called via frm.call this doc needs to be updated manually
+					self.reload()
 
 	def get_sal_slip_list(self, ss_status, as_dict=False):
 		"""
@@ -6962,6 +6982,8 @@ class OverridePayrollEntry(PayrollEntry):
 		self.employee_based_payroll_payable_entries = {}
 		self._advance_deduction_entries = []
 
+		employee_check_map = self.get_employee_check_numbers(submitted_salary_slips)
+
 		earnings = (
 			self.get_salary_component_total(
 				component_type="earnings",
@@ -7036,7 +7058,36 @@ class OverridePayrollEntry(PayrollEntry):
 				submit_journal_entry=True,
 				submitted_salary_slips=submitted_salary_slips,
 				employee_wise_accounting_enabled=employee_wise_accounting_enabled,
+				employee_check_map=employee_check_map,
 			)
+
+	def get_employee_check_numbers(self, submitted_salary_slips):
+		employee_check_map = {}
+
+		if not submitted_salary_slips:
+			return employee_check_map
+
+		salary_slip_names = []
+
+		for slip in submitted_salary_slips:
+			if isinstance(slip, str):
+				salary_slip_names.append(slip)
+			else:
+				salary_slip_names.append(slip.name)
+
+		salary_slips = frappe.get_all(
+			"Salary Slip",
+			filters={
+				"name": ["in", salary_slip_names],
+			},
+			fields=["employee", "custom_check_no"],
+		)
+
+		for slip in salary_slips:
+			if slip.custom_check_no:
+				employee_check_map[slip.employee] = slip.custom_check_no
+
+		return employee_check_map
 
 	def make_journal_entry(
 		self,
@@ -7048,6 +7099,7 @@ class OverridePayrollEntry(PayrollEntry):
 		submitted_salary_slips: list | None = None,
 		submit_journal_entry=False,
 		employee_wise_accounting_enabled=False,
+		employee_check_map=None,
 	) -> str:
 		multi_currency = 0
 		if len(currencies) > 1:
@@ -7061,6 +7113,15 @@ class OverridePayrollEntry(PayrollEntry):
 		journal_entry.company = self.company
 		journal_entry.posting_date = self.posting_date
 		journal_entry.party_not_required = True if not employee_wise_accounting_enabled else False
+
+		for row in accounts:
+			employee = row.get("party")
+			if (
+				employee_check_map
+				and employee
+				and employee in employee_check_map
+			):
+				row["user_remark"] = employee_check_map[employee]
 
 		journal_entry.set("accounts", accounts)
 		journal_entry.multi_currency = multi_currency
