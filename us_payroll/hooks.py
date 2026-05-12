@@ -313,5 +313,6 @@ fixtures = [
         ]
     },
     "Translation",
-    "Workspace"
+    "Workspace",
+    "Workspace Sidebar"
 ]
