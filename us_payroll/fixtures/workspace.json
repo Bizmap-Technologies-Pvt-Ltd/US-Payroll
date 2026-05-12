@@ -11372,7 +11372,7 @@
   "type": "Workspace"
  },
  {
-  "app": "hrms",
+  "app": "us_payroll",
   "charts": [
    {
     "chart_name": "Outgoing Salary",
@@ -11754,8 +11754,8 @@
     "type": "Link"
    }
   ],
-  "modified": "2026-05-12 20:02:21.533723",
-  "module": "Payroll",
+  "modified": "2026-05-12 20:28:02.861951",
+  "module": "us_payroll",
   "name": "US Payroll",
   "number_cards": [],
   "parent_page": "",
