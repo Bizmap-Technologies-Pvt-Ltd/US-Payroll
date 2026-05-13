@@ -22,7 +22,7 @@ frappe.ui.form.on('Payroll Entry', {
 		frm.trigger("set_total_amount");	
 		frm.trigger("change_button_label");
 		frm.trigger("payment_account_adjustment");
-		frm.trigger("make_check_entry");
+		// frm.trigger("make_check_entry");
 		frm.trigger('hide_add_row_btn'); 
 		frm.trigger("make_dashboard")
 		frm.trigger('void_check');
@@ -38,7 +38,7 @@ frappe.ui.form.on('Payroll Entry', {
        	frm.trigger("set_total_amount");
        	frm.trigger("change_button_label");
        	frm.trigger("payment_account_adjustment");
-       	frm.trigger("make_check_entry");
+       	// frm.trigger("make_check_entry");
        	frm.trigger('hide_add_row_btn');
 		frm.trigger('void_check');
 

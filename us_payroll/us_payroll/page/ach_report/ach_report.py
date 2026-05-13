@@ -43,18 +43,18 @@ def generate_ach_file(payroll_entry):
 			e.custom_second_bank_ac_no,
 			e.custom_second_routing_number,
 			e.custom_second_type_of_account,
-			e.custom_second_account_allocation_,
+			e.custom_second_account_allocation_
 
 			-- e.custom_third_bank_ac_no,
 			-- e.custom_third_routing_number,
 			-- e.custom_third_type_of_account,
-			-- e.custom_third_account_allocation,
+			-- e.custom_third_account_allocation
 
-			e.custom_flat_bank_ac_no,
-			e.custom_flat_routing_number,
-			e.custom_flat_type_of_account,
-			e.custom_flat_account_allocation,
-			e.custom_flat_amount
+			# e.custom_flat_bank_ac_no,
+			# e.custom_flat_routing_number,
+			# e.custom_flat_type_of_account,
+			# e.custom_flat_account_allocation,
+			# e.custom_flat_amount
 
 		FROM `tabSalary Slip` ss
 		LEFT JOIN `tabEmployee` e ON ss.employee = e.name
@@ -114,16 +114,16 @@ def generate_ach_file(payroll_entry):
 			# 	})
 
 
-			flat_amount = row.get("custom_flat_amount") or 0
-			# FLAT ACCOUNT
-			if deduct_flat_amount_from_net_pay and row.get("custom_flat_routing_number") and row.get("custom_flat_bank_ac_no") and flat_amount > 0:
-				entries.append({
-					"type": "22" if row.get('custom_flat_type_of_account') == "Checking" else "32",
-					"routing_number": row.get("custom_flat_routing_number"),
-					"account_number": row.get("custom_flat_bank_ac_no"),
-					"amount": flat_amount,
-					"name": row.get("employee_name")
-				})
+			# flat_amount = row.get("custom_flat_amount") or 0
+			# # FLAT ACCOUNT
+			# if deduct_flat_amount_from_net_pay and row.get("custom_flat_routing_number") and row.get("custom_flat_bank_ac_no") and flat_amount > 0:
+			# 	entries.append({
+			# 		"type": "22" if row.get('custom_flat_type_of_account') == "Checking" else "32",
+			# 		"routing_number": row.get("custom_flat_routing_number"),
+			# 		"account_number": row.get("custom_flat_bank_ac_no"),
+			# 		"amount": flat_amount,
+			# 		"name": row.get("employee_name")
+			# 	})
 
 	if not entries:
 		frappe.throw("No valid salary slips found for ACH generation.")
