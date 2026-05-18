@@ -40,6 +40,7 @@ from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
 from erpnext.accounts.utils import get_fiscal_year
 # from hrms.payroll.doctype.salary_withholding.salary_withholding import link_bank_entry_in_salary_withholdings
 from hrms.payroll.doctype.payroll_entry.payroll_entry import get_month_details
+from hrms.hr.doctype.leave_application.leave_application import get_leave_details
 
 
 def validate(doc, method):
