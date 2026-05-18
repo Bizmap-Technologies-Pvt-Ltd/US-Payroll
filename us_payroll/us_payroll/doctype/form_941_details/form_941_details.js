@@ -50,7 +50,7 @@ frappe.ui.form.on("Form 941 Details", {
         frm.set_df_property("quarter_section_title", "hidden", 0);
 
         frm.fields_dict.quarter_section_title.$wrapper.html(`
-            <h1 style="margin-bottom: 14px; font-weight:bold">
+            <h3 style="margin-bottom: 11px; font-weight:bold">
                 Report for this Quarter of ${frm.doc.year} (Check one.)
             </h1>
         `);
