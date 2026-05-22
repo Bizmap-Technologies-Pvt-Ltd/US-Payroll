@@ -1,9 +1,9 @@
 app_name = "us_payroll"
-app_title = "us_payroll"
-app_publisher = "us_payroll"
-app_description = "us_payroll"
+app_title = "US Payroll"
+app_publisher = "Bizmap"
+app_description = "US Payroll management for Frappe and ERPNext"
 app_email = "us_payroll@gmail.com"
-app_license = "mit"
+app_license = "MIT"
 
 # Apps
 # ------------------

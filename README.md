@@ -1,33 +1,55 @@
-### us_payroll
+# US Payroll
 
-us_payroll
+US Payroll management app for Frappe and ERPNext.
 
-### Installation
+## Features
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+- Payroll Processing
+- ACH Generation
+- PTO Management
+- Tax Calculations
+- US Payroll Utilities
+
+## Installation
+
+Install the app using Bench CLI:
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
+bench get-app https://github.com/AdcompSystems/US-Payroll.git --branch version-16
 bench install-app us_payroll
 ```
 
-### Contributing
+## Development
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+This app uses `pre-commit` for code formatting and linting.
+
+Install pre-commit:
+
+```bash
+pip install pre-commit
+```
+
+Enable hooks:
 
 ```bash
 cd apps/us_payroll
 pre-commit install
 ```
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+Configured tools:
 
 - ruff
 - eslint
 - prettier
 - pyupgrade
 
-### License
+## Requirements
 
-mit
+- Frappe v16
+- ERPNext v16
+- Python 3.10+
+
+## License
+
+MIT
