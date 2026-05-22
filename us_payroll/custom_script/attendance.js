@@ -14,7 +14,7 @@ frappe.ui.form.on('Attendance', {
 	set_default_company:function(frm){
     	if (frm.doc.__islocal == 1) {
 	        frappe.call({
-	            method: 'us_payroll.us_payroll.custom_script.attendance.get_global_defaults_values',
+	            method: 'us_payroll.custom_script.attendance.get_global_defaults_values',
 	            args: {
 	                doctype: "Global Defaults",	                
 	            },
