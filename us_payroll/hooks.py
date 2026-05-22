@@ -50,7 +50,7 @@ doctype_js = {
                 "Salary Component" : "custom_script/salary_component.js",
                 "Employee" : "custom_script/employee.js", 
                 "Journal Entry": "custom_script/journal_entry.js",
-                "Attendance": "custom_script/attendance/attendance.js",
+                "Attendance": "custom_script/attendance.js",
                 "Payroll Entry": "custom_script/payroll_entry.js",
             }
 

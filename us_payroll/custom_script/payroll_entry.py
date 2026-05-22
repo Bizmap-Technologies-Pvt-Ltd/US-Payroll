@@ -48,6 +48,7 @@ def validate(doc, method):
 	validate_do_not_include_in_total(doc)
 	get_leave_balance(doc)
 	calculate_holiday_hours(doc)
+	calculate_working_hours(doc)
 
 	for row in doc.employees: 
 		if not row.custom_pto_hours:
@@ -448,6 +449,39 @@ def calculate_holiday_hours(doc):
 			setattr(row, "custom_holiday_hours", total_holiday_hours)
 			setattr(row, "custom_holiday_amount", (row.custom_hourly_rate or 0) * total_holiday_hours)
 	# doc.save(ignore_permissions=True)
+
+			
+# def calculate_working_hours(doc):
+# 	for row in doc.employees:
+# 		if not row.custom_total_working_hours:
+
+# 			total_hours, overtime_hours = frappe.db.sql("""
+# 				SELECT SUM(working_hours), SUM(actual_overtime_duration)
+# 				FROM `tabAttendance`
+# 				WHERE employee = %s
+# 				AND attendance_date BETWEEN %s AND %s
+# 				AND status IN ('Present', 'Half Day', 'Work From Home')
+# 				AND docstatus = 1
+# 			""", (row.employee, doc.start_date, doc.end_date))[0]
+
+# 			row.custom_total_working_hours = total_hours or 0
+# 			row.custom_total_overtime_hours = overtime_hours or 0
+
+def calculate_working_hours(doc):
+	for row in doc.employees:
+		if not row.custom_total_working_hours:
+
+			total_hours, overtime_hours = frappe.db.sql("""
+				SELECT SUM(working_hours - actual_overtime_duration), SUM(actual_overtime_duration)
+				FROM `tabAttendance`
+				WHERE employee = %s
+				AND attendance_date BETWEEN %s AND %s
+				AND status IN ('Present', 'Half Day', 'Work From Home')
+				AND docstatus = 1
+			""", (row.employee, doc.start_date, doc.end_date))[0]
+
+			row.custom_total_working_hours = total_hours or 0
+			row.custom_total_overtime_hours = overtime_hours or 0
 
 @frappe.whitelist()
 def get_account_options():
