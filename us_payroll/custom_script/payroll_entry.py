@@ -840,3 +840,4 @@ def get_frequency_kwargs(frequency_name):
         "bi-weekly": {"days": 14},
 	}
 	return frequency_dict.get(frequency_name)
+	
