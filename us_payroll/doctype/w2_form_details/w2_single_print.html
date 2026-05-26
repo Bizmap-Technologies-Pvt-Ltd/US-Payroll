@@ -1,0 +1,194 @@
+<style>
+    @page {
+        size: A4;
+        margin: 0;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Courier New", Courier, monospace;
+    }
+
+    .w2-canvas {
+        position: relative;
+        width: 7in;
+        height: 5.5in;
+        margin: 0 auto;
+        background: url("") no-repeat;
+        background-size: 7in 10.9in;
+    }
+
+    /* Common value style */
+    .w2-val {
+        position: absolute;
+        font-size: 9px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .w2-left {
+        text-align: left;
+    }
+
+    .w2-center {
+        text-align: center;
+    }
+
+    .w2-right {
+        text-align: right;
+    }
+
+    .checkbox {
+        font-size: 10px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="w2-canvas">
+
+    {% set comp_name = frappe.db.get_value("Company", doc.company, "company_name") %}
+    {% set addr = frappe.db.get_value("Address", {"address_title": comp_name}, [
+    "address_line1","address_line2","city","state","pincode"
+    ], as_dict=True) %}
+    {% set emp = frappe.db.get_value("Employee", doc.employee, [
+    "employee_name", "custom_address_line_1", "custom_address_line_2",
+    "custom_city", "custom_stateprovince", "custom_zip_postal_code"
+    ], as_dict=True) %}
+
+    <!-- Box a – SSN -->
+    <div class="w2-val w2-center" style="top:0.22in; left:1.1in; width:2.8in;">
+        {{ doc.social_security_number }}
+    </div>
+
+    <!-- Box b – EIN -->
+    <div class="w2-val w2-center" style="top:0.56in; left:0.25in; width:3.2in;">
+        {{ doc.employer_identification_number_ein }}
+    </div>
+
+    <!-- Box 1 -->
+    <div class="w2-val w2-right" style="top:0.56in; left:3.59in; width:1.6in;">
+        {{ "{:,.2f}".format(doc.wages_tips_other_compensation | float) }}
+    </div>
+
+    <!-- Box 2 -->
+    <div class="w2-val w2-right" style="top:0.56in; left:5.15in; width:1.6in;">
+        {{ "{:,.2f}".format(doc.federal_income_tax_withheld | float) }}
+    </div>
+
+    <!-- Box c – Employer address -->
+    <div class="w2-val w2-left" style="top:0.86in; left:0.25in; width:3.2in; line-height:1.1;">
+        {{ comp_name }}<br>
+        {{ addr.address_line1 }}<br>
+        {{ addr.city }}, {{ addr.state }} {{ addr.pincode }}
+
+    </div>
+
+    <!-- Box 3 -->
+    <div class="w2-val w2-right" style="top:0.89in; left:3.55in; width:1.6in;">
+        {{ "{:,.2f}".format(doc.social_security_wages | float) }}
+    </div>
+
+    <!-- Box 4 -->
+    <div class="w2-val w2-right" style="top:0.89in; left:5.15in; width:1.6in;">
+        {{ "{:,.2f}".format(doc.social_security_tax_withheld | float) }}
+    </div>
+
+    <!-- Box 5 -->
+    <div class="w2-val w2-right" style="top:1.23in; left:3.59in; width:1.6in;">
+        {{ "{:,.2f}".format(doc.medicare_wages_and_tips | float) }}
+    </div>
+
+    <!-- Box 6 -->
+    <div class="w2-val w2-right" style="top:1.23in; left:5.15in; width:1.6in;">
+        {{ "{:,.2f}".format(doc.medicare_tax_withheld | float) }}
+    </div>
+
+    <!-- Box d – Control number -->
+    <div class="w2-val w2-left" style="top:1.89in; left:0.25in; width:3.2in;">
+        {{ doc.control_number }}
+    </div>
+
+    <!-- Box 7 -->
+    <div class="w2-val w2-right" style="top:2.32in; left:3.55in; width:1.6in;">
+    </div>
+
+    <!-- Box 8 -->
+    <div class="w2-val w2-right" style="top:2.32in; left:5.15in; width:1.6in;">
+    </div>
+
+    <!-- Box e – Employee name -->
+    <div class="w2-val w2-left" style="top:2.16in; left:0.26in; width:3.2in;">
+        <span style="display:inline-block; width:1.68in;">
+            {{ doc.first_name }} {% if doc.middle_initial %}{{ doc.middle_initial }}{% endif %}
+        </span>
+        <span style="display:inline-block; width:1.7in;">
+            {{ doc.last_name }}
+        </span>
+    </div>
+
+    <!-- Box f – Employee address -->
+    <div class="w2-val w2-left" style="top:2.55in; left:0.25in; width:3.2in; line-height:1.1;">
+        {{ emp.custom_address_line_1 }}<br>
+        {{ emp.custom_city }}, {{ emp.custom_stateprovince }} {{ emp.custom_zip_postal_code }}
+    </div>
+
+    <!-- Box 9 -->
+    <div class="w2-val w2-right" style="top:2.75in; left:3.55in; width:1.6in;">
+
+    </div>
+
+    <!-- Box 10 -->
+    <div class="w2-val w2-right" style="top:2.75in; left:5.15in; width:1.6in;">
+    </div>
+
+    <!-- Box 11 -->
+    <div class="w2-val w2-right" style="top:3.35in; left:3.55in; width:1.6in;">
+    </div>
+
+    <!-- Box 12a -->
+    <div class="w2-val w2-left" style="top:2.16in; left:5.8in; width:1.7in;">
+        &nbsp;&nbsp; DD &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ "{:,.2f}".format(doc.medical_insurance | float) }}
+    </div>
+
+    <!-- Box 12b -->
+    <div class="w2-val w2-left" style="top:3.15in; left:5.2in; width:1.7in;">
+    </div>
+
+    <!-- Box 12c -->
+    <div class="w2-val w2-left" style="top:3.45in; left:5.2in; width:1.7in;">
+    </div>
+
+    <!-- Box 12d -->
+    <div class="w2-val w2-left" style="top:3.75in; left:5.2in; width:1.7in;">
+    </div>
+
+    <!-- Box 13 checkboxes -->
+    <div class="w2-val checkbox" style="top:2.79in; left:4.04in;">{% if doc.statutory_employee %}x{% endif %}</div>
+    {% if doc.tmrs %}
+    <div class="w2-val checkbox" style="top:2.55in; left:4.82in">{% if doc.retirement_plan %}x{% endif %}</div>
+    {% endif %}
+    <div class="w2-val checkbox" style="top:3.62in; left:5.58in;">{% if doc.third_party_sick_pay %}x{% endif %}</div>
+
+    <!-- Box 14 -->
+    {% if doc.tmrs %} <div class="w2-val w2-left" style="top:2.85in; left:4.12in; width:3.2in;">
+        TMRS &nbsp;{{ doc.tmrs }}
+    </div> {% endif %}
+
+    <!-- Boxes 15–20 -->
+    <div class="w2-val w2-left" style="top:4.92in; left:0.25in;"></div>
+    <div class="w2-val w2-left" style="top:4.92in; left:1.05in;"></div>
+    <div class="w2-val w2-right" style="top:4.92in; left:2.35in; width:1.15in;">
+    </div>
+    <div class="w2-val w2-right" style="top:4.92in; left:3.65in; width:1.15in;">
+    </div>
+    <div class="w2-val w2-right" style="top:4.92in; left:4.95in; width:1.15in;">
+    </div>
+    <div class="w2-val w2-right" style="top:4.92in; left:6.25in; width:1.15in;">
+    </div>
+    <div class="w2-val w2-left" style="top:5.22in; left:4.95in; width:2.5in;">
+    </div>
+    <br><br>
+</div>
+
+

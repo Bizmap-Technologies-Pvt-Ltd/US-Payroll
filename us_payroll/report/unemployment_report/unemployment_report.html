@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            @top-center {
+                content: "Page " counter(page);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+        }
+
+        th, td {
+            border: none;
+            padding: 8px;
+            text-align: left;
+            line-height: 1.0;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tbody tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+        <div class="header">
+            <!-- <img src="/files/overton logo.PNG" style="width: 300px; height: auto; float: left;"> -->
+            <img src="{{ letterhead_image }}" style="width: 300px; height: auto; float: left;">
+        </div>
+        
+        <div style="text-align: left; margin-left: 320px;">
+            <h1 style="font-size: 28px; margin: 0; white-space: nowrap;"><b>State Quarterly Standard Unemployment Report</b></h1>
+            <div style="font-size: 22px; margin: 0;">Overton, TX</div>
+            <div style="font-size: 22px; margin: 0;">{{ current_datetime }}</div>
+        </div>
+    </div>
+
+    <br><br>
+
+    <table style="width: 100%;">
+        <thead>
+
+            <tr>
+                <th colspan="4" style="font-size: 15px; text-align: left;">General Information</th>
+            </tr>
+
+            <tr  style="width: 100%;">
+                <th style="font-size: 15px; text-align: left; width: 5%; ">Quarter Period Range</th>
+                <th style="font-size: 15px; text-align: left; width: 5%; ">State</th>
+                <th style="font-size: 15px; text-align: left; width: 10%; ">Tax Code</th>
+                <th style="font-size: 15px; text-align: left; width: 10%; ">Reporting ID</th>
+                <th style="font-size: 15px; text-align: left; width: 30%; "></th>
+                <th style="font-size: 15px; text-align: left; width: 40%; "></th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="9" style="border-top: 2px solid black;"></td>
+            </tr>
+            <tr  style="width: 50%;">
+                <!-- <td style="font-size: 15px; text-align: left; width: 20%; ">
+                    {{ "10/01/2024 - 12/31/2024" }}
+                </td> -->
+
+                <td style="font-size: 15px; text-align: left; width: 20%;">
+                    {{ quarter_period_range }}
+                </td>
+
+                <td style="font-size: 15px; text-align: left; width: 10%; ">
+                    {{ "TX" }}
+                </td>
+                <td style="font-size: 15px; text-align: left; width: 10%; ">
+                    {{ "Unemployment" }}
+                </td>
+                <td style="font-size: 15px; text-align: left; width: 10%; ">
+                    {{ "998811503" }}
+                </td>
+                
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <!-- Summary Section -->
+    <div style="font-size: 18px; line-height: 1.6; margin-top: 20px;">
+        <div><b>Summary:</b></div>
+    </div>
+    <table style="font-size: 15px; width: 100%; font-family: monospace;">
+        <tbody>
+            <tr>
+                <td style="width: 20%;">Total Reportable Wages</td>
+                <td style="width: 20%; text-align: right;">{{ "%.2f"|format(grand_totals.reportable_wages) }}</td>
+                <td style="width: 20%;"></td>
+                <td style="width: 20%;">PFMLI Amount</td>
+                <td style="width: 20%; text-align: right;">{{ "0.00" }}</td>
+            </tr>
+
+            <tr>
+                <td style="width: 20%;">Deduct Excess Wages</td>
+                <td style="text-align: right;">
+                    <span style="display: inline-block; border-bottom: 2px solid black; padding-bottom: 2px; width: 80px; text-align: right;">
+                        {{ "%.2f"|format(grand_totals.excess_wages) }}
+                    </span>
+                </td>
+                <td style="width: 20%;"></td>
+                <td style="width: 20%;">Transit Amount</td>
+                <td style="text-align: right;width: 20%;">{{ "0.00" }}</td>
+            </tr>
+
+            <tr>
+                <td style="width: 20%;">Taxable Wages Paid</td>
+                <td style="text-align: right;width: 20%;">{{ "%.2f"|format(grand_totals.taxable_wages) }}</td>
+                <td style="width: 20%;"></td>
+                <td style="width: 20%;">Transit Subject To Amount</td>
+                <td style="text-align: right;width: 20%;">{{ "0.00" }}</td>
+            </tr>
+
+            <tr>
+                <td style="width: 20%;">Contribution Rate</td>
+                <td style="text-align: right;width: 20%;">{{ "1.3000%" }}</td>
+                <td style="width: 20%;"></td>
+                <td style="width: 20%;"></td>
+                <td style="width: 20%;"></td>
+            </tr>
+
+            <tr>
+                <td style="width: 20%;">Contribution Amount</td>
+                <td style="text-align: right;width: 20%;">{{ "%.2f"|format(grand_totals.contribution) }}</td>
+                <td style="width: 20%;"></td>
+                <td style="width: 20%;"></td>
+                <td style="width: 20%;"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <!-- Employee Count Totals Section -->
+    <div style="font-size: 18px; line-height: 1.6; margin-top: 20px;">
+        <div><b>Employee Count Totals:</b></div>
+    </div>
+
+    <table>
+        <thead  style="font-size: 15px; width: 100%;">
+            <tr>
+                <th style="font-size: 15px; text-align: right; width: 30%;"></th>
+                <th style="font-size: 15px; text-align: right; width: 15%;">First Month</th>
+                <th style="font-size: 15px; text-align: right; width: 15%;">Second Month</th>
+                <th style="font-size: 15px; text-align: right; width: 15%;">Third Month</th>
+                <th style="font-size: 15px; text-align: right; width: 15%;"></th>
+                <th style="font-size: 15px; text-align: right; width: 10%;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Number of Employees in Each Month</td>
+                <td style="text-align: right;">{{ employee_counts.first_month.total }}</td>
+                <td style="text-align: right;">{{ employee_counts.second_month.total }}</td>
+                <td style="text-align: right;">{{ employee_counts.third_month.total }}</td>
+            </tr>
+            <tr>
+                <td>Number of Male Employees</td>
+                <td style="text-align: right;">{{ employee_counts.first_month.male }}</td>
+                <td style="text-align: right;">{{ employee_counts.second_month.male }}</td>
+                <td style="text-align: right;">{{ employee_counts.third_month.male }}</td>
+            </tr>
+            <tr>
+                <td>Number of Female Employees</td>
+                <td style="text-align: right;">{{ employee_counts.first_month.female }}</td>
+                <td style="text-align: right;">{{ employee_counts.second_month.female }}</td>
+                <td style="text-align: right;">{{ employee_counts.third_month.female }}</td>
+            </tr>
+            <tr>
+                <td>Number of Unknown</td>
+                <td style="text-align: right;">{{ employee_counts.first_month.unknown }}</td>
+                <td style="text-align: right;">{{ employee_counts.second_month.unknown }}</td>
+                <td style="text-align: right;">{{ employee_counts.third_month.unknown }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="page-break-after: always;"></div>
+    <!-- Second Page Header -->
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+        <div class="header">
+            <img src="{{ letterhead_image }}" style="width: 300px; height: auto; float: left;">
+        </div>
+
+        <div style="text-align: left; margin-left: 320px;">
+            <h1 style="font-size: 28px; margin: 0; white-space: nowrap;"><b>State Quarterly Standard Unemployment Report</b></h1>
+            <div style="font-size: 22px; margin: 0;">Overton, TX</div>
+            <div style="font-size: 22px; margin: 0;">{{ current_datetime }}</div>
+        </div>
+    </div>
+
+    <br><br>
+
+    <table>     
+        <tbody>
+            {% for department in department_data %}
+                <tr>
+                    <td colspan="7" style="font-size: 14px; font-weight: bold; padding-top: 20px;">
+                        Department: {{ department.department_code }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th style="width: 10%;">#</th>
+                    <th style="width: 20%;">Employee Name</th>
+                    <th style="text-align: right; width: 20%;">Social Security #</th>
+                    <th style="text-align: right; width: 20%;">Reportable Wages</th>
+                    <th style="text-align: right; width: 10%;">Excess Wages</th>
+                    <th style="text-align: right; width: 10%;">Taxable Wages</th>
+                    <th style="text-align: right; width: 10%;">Contribution</th>
+                </tr>
+
+                <tr>
+                    <td colspan="7" style="border-top: 2px solid black; padding-top: 5px;"></td>
+                </tr>
+
+                <!-- Employee Rows -->
+                {% for employee in department.employees %}
+                    <tr>
+                        <td style="font-size: 12px; width: 10%;">{{ employee.employee_id }}</td>
+                        <td style="font-size: 12px; width: 20%;">{{ employee.employee }}</td>
+                        <td style="font-size: 12px; text-align: right; width: 20%;">
+                            <b>{{ employee.custom_nomasked_social_security_number }}</b>
+                        </td>
+                        <td style="font-size: 12px; text-align: right; width: 20%;">
+                            {{ "%.2f"|format(employee.reportable_wages) }}
+                        </td>
+                        <td style="font-size: 12px; text-align: right; width: 10%;">
+                            {{ "%.2f"|format(employee.excess_wages) }}
+                        </td>
+                        <td style="font-size: 12px; text-align: right; width: 10%;">
+                            {{ "%.2f"|format(employee.taxable_wages) }}
+                        </td>
+                        <td style="font-size: 12px; text-align: right; width: 10%;">
+                            {{ "%.2f"|format(employee.contribution) }}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                <!-- Department Totals -->
+                <tr>
+                    <td style="width: 10%;"></td>
+                    <td style="width: 20%;"></td>
+
+                    <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">
+                        Department {{ department.department_code }} Total:
+                    </td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold; width: 20%;">
+                        {{ "%.2f"|format(department.reportable_wages) }}
+                    </td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold; width: 10%;">
+                        {{ "%.2f"|format(department.excess_wages) }}
+                    </td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold;" width: 10%;>
+                        {{ "%.2f"|format(department.taxable_wages) }}
+                    </td>
+                    <td style="font-size: 12px; text-align: right; font-weight: bold; width: 10%;">
+                        {{ "%.2f"|format(department.contribution) }}
+                    </td>
+                </tr>
+              
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <!-- Grand Total Section OUTSIDE of the main table -->
+    <table style="width: 100%; margin-top: 30px; border-collapse: collapse;">
+        <tr>
+            <td style="font-size: 14px; font-weight: bold; text-align: left; width: 20%;">
+                Employee Count: {{ grand_totals.employee_count }}
+            </td>
+            <td style="width: 10%;"></td>
+            <td style="font-size: 14px; font-weight: bold; text-align: right; width: 20%;">
+                Grand Total:
+            </td>
+            <td style="font-size: 14px; font-weight: bold; text-align: right; width: 20%;">
+                {{ "%.2f"|format(grand_totals.reportable_wages) }}
+            </td>
+            <td style="font-size: 14px; font-weight: bold; text-align: right; width: 10%;">
+                {{ "%.2f"|format(grand_totals.excess_wages) }}
+            </td>
+            <td style="font-size: 14px; font-weight: bold; text-align: right; width: 10%;">
+                {{ "%.2f"|format(grand_totals.taxable_wages) }}
+            </td>
+            <td style="font-size: 14px; font-weight: bold; text-align: right; width: 10%;">
+                {{ "%.2f"|format(grand_totals.contribution) }}
+            </td>
+        </tr>
+    </table>
+
+    <div style="page-break-after: always;"></div>
+    <!-- Third Page Header -->
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+        <div class="header">
+            <img src="{{ letterhead_image }}" style="width: 300px; height: auto; float: left;">
+        </div>
+
+        <div style="text-align: left; margin-left: 320px;">
+            <h1 style="font-size: 28px; margin: 0; white-space: nowrap;"><b>State Quarterly Standard Unemployment Report</b></h1>
+            <div style="font-size: 22px; margin: 0;">Overton, TX</div>
+            <div style="font-size: 22px; margin: 0;">{{ current_datetime }}</div>
+        </div>
+    </div>
+
+    <div style="font-size: 18px; line-height: 1.6; margin-top: 20px; text-align: center;">
+        <div><b>Location Summary</b></div>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; text-align: center;">
+        <thead>
+            <tr>
+                <th style="border-bottom: 0px solid #fff;; padding: 8px; width: 15%; text-align: right;"></th>
+                <th style="border-bottom: 1px solid #000; padding: 8px; width: 10%; text-align: right;">Code</th>
+                <th style="border-bottom: 1px solid #000; padding: 8px; width: 10%; text-align: right;">1st Month</th>
+                <th style="border-bottom: 1px solid #000; padding: 8px; width: 10%; text-align: right;">2nd Month</th>
+                <th style="border-bottom: 1px solid #000; padding: 8px; width: 10%; text-align: right;">3rd Month</th>
+                <th style="border-bottom: 1px solid #000; padding: 8px; width: 20%; text-align: right;">Reportable Wages</th>
+                <th style="border-bottom: 0px solid #fff;; padding: 8px; width: 15%; text-align: right;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 8px; width: 15%; text-align: right;"></td>
+                <td style="padding: 8px; width: 10%; text-align: right;"></td>
+                <td style="padding: 8px; width: 10%; text-align: right;">{{ employee_counts.first_month.total }}</td>
+                <td style="padding: 8px; width: 10%; text-align: right;">{{ employee_counts.second_month.total }}</td>
+                <td style="padding: 8px; width: 10%; text-align: right;">{{ employee_counts.third_month.total }}</td>
+                <td style="padding: 8px; width: 20%; text-align: right;">{{ "%.2f"|format(grand_totals.reportable_wages) }}`</td>
+                <td style="padding: 8px; width: 15%; text-align: right;"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; width: 15%; text-align: right;"></td>
+                <td style="padding: 8px; text-align: right; font-weight: bold; width: 10%;">Total:</td>
+                <td style="padding: 8px; font-weight: bold; width: 10%; text-align: right;">{{ employee_counts.first_month.total }}</td>
+                <td style="padding: 8px; font-weight: bold; width: 10%; text-align: right;">{{ employee_counts.second_month.total }}</td>
+                <td style="padding: 8px; font-weight: bold; width: 10%; text-align: right;" >{{ employee_counts.third_month.total }}</td>
+                <td style="padding: 8px; font-weight: bold; width: 20%; text-align: right;">{{ "%.2f"|format(grand_totals.reportable_wages) }}</td>
+                <td style="padding: 8px; width: 15%;"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br><br>
+
+</body>
+</html>

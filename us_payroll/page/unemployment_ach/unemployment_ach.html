@@ -1,0 +1,192 @@
+
+ <div class="tmrs-ach-container">
+    <!-- Header Section -->
+    <div class="header-row">
+        101 111923238 111923238 2501131034 A094101Texas Bank & Trust
+        <!-- <span class="company-name">Texas Bank & Trust</span> -->
+        <span class="company-name">Texas Bank & Trust</span>
+    </div>
+    
+    <div class="header-row">
+        5200
+        <span class="company-name">{{ company_details.company_name }}</span>
+        <span class="company-id">{{ company_details.company_id }}</span>
+        <span>{{ company_details.payment_type }}</span>
+        <span class="today-date">{{ company_details.today_date }}{{ company_details.today_date }}</span>
+        <span class="record-number">19000038 0000001</span>
+    </div>
+
+    <!-- Employee Details Section -->
+    {% for row in employee_details %}
+<div class="employee-row">
+    <div class="bank-details">
+        {{ row.custom_routing_number }}{{ row.bank_ac_no }}
+    </div>
+    <div class="employee-net-pay">
+        {{ row.net_pay }}{{row.name}}
+    </div>
+    <div class="employee-name">
+        {{ row.employee_name }}
+    </div>
+    <div class="employee-serial">
+        {{ row.serial }}
+    </div>
+</div>
+{% endfor %}
+
+<!--  Final Summary Row -->
+<div class="summary-row">
+    <div class="bank-details">
+        6271119232389000038
+    </div>
+    <div class="employee-net-pay">
+        {{ total_net_pay }}{{ company_details.company_id }}
+    </div>
+    <div class="employee-name">
+        {{ company_details.company_name }}
+    </div>
+    <div class="employee-serial">
+        09000038 {{ last_serial }}
+    </div>
+</div>
+<div style="font-size: 16px;" >820{{last_serial}}{{total_routing_sum}}{{ total_net_pay }}{{ total_net_pay }}250117250117 <span style="padding-right: 20px;">9000038 0000001</span></div>
+
+
+<div class="last-row ">9000001{{ dynamic_total }}{{ last_serial }}{{ total_routing_sum }}{{ total_net_pay }}{{ total_net_pay }}</div>
+{% for _ in range(remaining) %}
+<div class="last-row">
+   9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+</div>
+{% endfor %}
+<style>
+    .tmrs-ach-container {
+        font-family: "Courier New", Courier, monospace;
+        background-color: #ffffff;
+        padding: 15px;
+        color: #000;
+        white-space: nowrap;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        border: none;
+    }
+
+    h2 {
+        color: #2c5282;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .header-row {
+        display: flex;
+        justify-content: flex-start;
+        padding: 2px 0;
+        font-size: 16px;
+    }
+
+    .employee-row,
+    .summary-row {
+        display: flex;
+        justify-content: flex-start;
+        padding: 2px 0;
+        font-size: 16px;
+    }
+
+    .summary-row {
+        /* font-weight: bold; */
+        background-color: #ffffff;
+        /* border-top: 1px solid #ccc; */
+        /* margin-top: 10px; */
+    }
+
+    .company-name {
+        display: inline-block;
+        min-width: 150px;
+        margin-left: 20px;
+    }
+
+    .company-id {
+        margin-left: 20px;
+        min-width: 100px;
+    }
+
+    .today-date {
+        margin-left: 20px;
+        min-width: 100px;
+    }
+
+    .record-number {
+        margin-left: 40px;
+        min-width: 120px;
+    }
+
+    .bank-details {
+        width: 20%; 
+        text-align: left;
+        padding-right: 10px;
+    }
+
+    .employee-net-pay {
+        width: 15%; 
+        text-align: left;
+        padding-right: 10px;
+        padding-left: 20px;
+    }
+
+    .employee-name {
+        width: 15%; 
+        text-align: left;
+        padding-left: 5px;
+    }
+
+    .employee-serial {
+        width: 10%; 
+        text-align: left;
+        padding-right: 5px;
+    }
+
+    .last-row {
+        width: 10%; 
+        text-align: left;
+        padding-right: 5px;
+        font-size: 16px;
+    }
+
+    table, th, td {
+        border: none !important;
+    }
+
+    @media print {
+        body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .tmrs-ach-container {
+            border: none;
+            box-shadow: none;
+        }
+
+        .employee-row, .summary-row {
+            border-bottom: none;
+        }
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

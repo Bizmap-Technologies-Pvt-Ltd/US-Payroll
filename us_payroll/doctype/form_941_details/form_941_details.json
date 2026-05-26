@@ -1,0 +1,457 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-06 14:47:52.081667",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_aqed",
+  "employer_name",
+  "employer_identification_number_ein",
+  "digit1",
+  "digit2",
+  "digit3",
+  "digit4",
+  "digit5",
+  "digit6",
+  "digit7",
+  "digit8",
+  "digit9",
+  "trade_name_if_any",
+  "column_break_yi4y",
+  "fiscal_year",
+  "year",
+  "year_start_date",
+  "year_end_date",
+  "report_for_this_quarter_of_2024_check_one_section",
+  "quarter_section_title",
+  "january_february_march",
+  "april_may_june",
+  "column_break_f1np",
+  "july_august_september",
+  "october_november_december",
+  "liability_monthwise_amount_section",
+  "first_month",
+  "second_month",
+  "third_month",
+  "section_break_egsl",
+  "address_line_1",
+  "city",
+  "state",
+  "column_break_jwyp",
+  "foreign_country_name",
+  "foreign_provincecounty",
+  "foreign_postal_code",
+  "zip_code",
+  "section_break_ef9e",
+  "number_of_employees",
+  "social_security_wages",
+  "social_security_tips",
+  "medicare_tax_wages_and_tips",
+  "section_3121q_notice_and_demand_tax_due_on_unreported_tips",
+  "total_taxes_before_adjustments",
+  "current_quarter_adjustment_for_sick_pay",
+  "total_taxes_after_adjustments",
+  "total_taxes_after_adjustments_and_nonrefundable_credits",
+  "balance_due",
+  "column_break_bnaz",
+  "wages_tips_other_compensation",
+  "taxable_wages",
+  "taxable_wages_medicare",
+  "federal_income_tax_withheld",
+  "medicare_wages_and_tips",
+  "total_social_security_and_medicare_taxes",
+  "no_wages_tips_and_other_compensation",
+  "current_quarter_adjustment_for_fractions_of_cents",
+  "adjustments_for_tips_and_group_term_life_insurance",
+  "payroll_tax_credit",
+  "total_deposits_for_this_quarter",
+  "overpayment",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_aqed",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "employer_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employer Name",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "employer_identification_number_ein",
+   "fieldtype": "Data",
+   "label": "Employer identification number (EIN)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "digit1",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit1"
+  },
+  {
+   "fieldname": "digit2",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit2"
+  },
+  {
+   "fieldname": "digit3",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit3"
+  },
+  {
+   "fieldname": "digit4",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit4"
+  },
+  {
+   "fieldname": "digit5",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit5"
+  },
+  {
+   "fieldname": "digit6",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit6"
+  },
+  {
+   "fieldname": "digit7",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit7"
+  },
+  {
+   "fieldname": "digit8",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit8"
+  },
+  {
+   "fieldname": "digit9",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Digit9"
+  },
+  {
+   "fieldname": "trade_name_if_any",
+   "fieldtype": "Data",
+   "label": "Trade name (if any)"
+  },
+  {
+   "fieldname": "column_break_yi4y",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Fiscal Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Year",
+   "options": "Year",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.year",
+   "fieldname": "year_start_date",
+   "fieldtype": "Date",
+   "label": "Year Start Date",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.year",
+   "fieldname": "year_end_date",
+   "fieldtype": "Date",
+   "label": "Year End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "report_for_this_quarter_of_2024_check_one_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "quarter_section_title",
+   "fieldtype": "HTML",
+   "label": "quarter_section_title"
+  },
+  {
+   "default": "0",
+   "fieldname": "january_february_march",
+   "fieldtype": "Check",
+   "label": "January, February, March"
+  },
+  {
+   "default": "0",
+   "fieldname": "april_may_june",
+   "fieldtype": "Check",
+   "label": "April, May, June"
+  },
+  {
+   "fieldname": "column_break_f1np",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "july_august_september",
+   "fieldtype": "Check",
+   "label": "July, August, September"
+  },
+  {
+   "default": "0",
+   "fieldname": "october_november_december",
+   "fieldtype": "Check",
+   "label": "October, November, December"
+  },
+  {
+   "fieldname": "liability_monthwise_amount_section",
+   "fieldtype": "Section Break",
+   "label": "Liability monthwise Amount"
+  },
+  {
+   "fieldname": "first_month",
+   "fieldtype": "Currency",
+   "label": "First Month"
+  },
+  {
+   "fieldname": "second_month",
+   "fieldtype": "Currency",
+   "label": "Second Month"
+  },
+  {
+   "fieldname": "third_month",
+   "fieldtype": "Currency",
+   "label": "Third Month"
+  },
+  {
+   "fieldname": "section_break_egsl",
+   "fieldtype": "Section Break",
+   "label": "Address"
+  },
+  {
+   "fieldname": "address_line_1",
+   "fieldtype": "Small Text",
+   "label": "Address Line 1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City",
+   "read_only": 1
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_jwyp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "foreign_country_name",
+   "fieldtype": "Data",
+   "label": "Foreign country name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "foreign_provincecounty",
+   "fieldtype": "Data",
+   "label": "Foreign province/county",
+   "read_only": 1
+  },
+  {
+   "fieldname": "foreign_postal_code",
+   "fieldtype": "Data",
+   "label": "Foreign postal code",
+   "read_only": 1
+  },
+  {
+   "fieldname": "zip_code",
+   "fieldtype": "Data",
+   "label": "ZIP code",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_ef9e",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "including: Mar. 12 (Quarter 1), June 12 (Quarter 2), Sept. 12 (Quarter 3), or Dec. 12 (Quarter 4)",
+   "fieldname": "number_of_employees",
+   "fieldtype": "Int",
+   "label": "Number of employees who received wages, tips, or other compensation for the pay period"
+  },
+  {
+   "fieldname": "social_security_wages",
+   "fieldtype": "Currency",
+   "label": "Taxable social security wages"
+  },
+  {
+   "fieldname": "social_security_tips",
+   "fieldtype": "Currency",
+   "label": "Taxable social security tips"
+  },
+  {
+   "fieldname": "medicare_tax_wages_and_tips",
+   "fieldtype": "Currency",
+   "label": "Taxable wages and tips subject to Additional Medicare Tax withholding"
+  },
+  {
+   "fieldname": "section_3121q_notice_and_demand_tax_due_on_unreported_tips",
+   "fieldtype": "Data",
+   "label": "Section 3121q Notice and Demand Tax due on unreported tips"
+  },
+  {
+   "fieldname": "total_taxes_before_adjustments",
+   "fieldtype": "Currency",
+   "label": "Total taxes before adjustments"
+  },
+  {
+   "fieldname": "current_quarter_adjustment_for_sick_pay",
+   "fieldtype": "Currency",
+   "label": "Current quarter adjustment for sick pay"
+  },
+  {
+   "fieldname": "total_taxes_after_adjustments",
+   "fieldtype": "Currency",
+   "label": "Total taxes after adjustments"
+  },
+  {
+   "fieldname": "total_taxes_after_adjustments_and_nonrefundable_credits",
+   "fieldtype": "Currency",
+   "label": "Total taxes after adjustments and nonrefundable credits"
+  },
+  {
+   "fieldname": "balance_due",
+   "fieldtype": "Currency",
+   "label": "Balance due"
+  },
+  {
+   "fieldname": "column_break_bnaz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "wages_tips_other_compensation",
+   "fieldtype": "Currency",
+   "label": "Wages, tips, and other compensation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "taxable_wages",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Taxable Wages SS"
+  },
+  {
+   "fieldname": "taxable_wages_medicare",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Taxable Wages Medicare"
+  },
+  {
+   "fieldname": "federal_income_tax_withheld",
+   "fieldtype": "Currency",
+   "label": "Federal income tax withheld from wages, tips, and other compensation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "medicare_wages_and_tips",
+   "fieldtype": "Currency",
+   "label": "Taxable Medicare wages and tips"
+  },
+  {
+   "fieldname": "total_social_security_and_medicare_taxes",
+   "fieldtype": "Currency",
+   "label": "Total social security and Medicare taxes"
+  },
+  {
+   "default": "0",
+   "fieldname": "no_wages_tips_and_other_compensation",
+   "fieldtype": "Check",
+   "label": "If no wages, tips, and other compensation are subject to social security or Medicare tax"
+  },
+  {
+   "fieldname": "current_quarter_adjustment_for_fractions_of_cents",
+   "fieldtype": "Currency",
+   "label": "Current quarter adjustment for fractions of cents"
+  },
+  {
+   "fieldname": "adjustments_for_tips_and_group_term_life_insurance",
+   "fieldtype": "Currency",
+   "label": "Current quarter adjustments for tips and group term life insurance"
+  },
+  {
+   "fieldname": "payroll_tax_credit",
+   "fieldtype": "Currency",
+   "label": "Qualified small business payroll tax credit for increasing research activities"
+  },
+  {
+   "description": "including overpayment applied from a prior quarter and\noverpayments applied from Form 941-X, 941-X (PR), or 944-X filed in the current quarter ",
+   "fieldname": "total_deposits_for_this_quarter",
+   "fieldtype": "Currency",
+   "label": "Total deposits for this quarter"
+  },
+  {
+   "fieldname": "overpayment",
+   "fieldtype": "Currency",
+   "label": "Overpayment"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Form 941 Details",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-05-06 14:47:52.081667",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "Form 941 Details",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

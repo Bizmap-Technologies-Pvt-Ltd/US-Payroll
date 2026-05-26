@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            @top-center {
+                content: "Page " counter(page);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+        }
+
+        th, td {
+            border: none;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tbody tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+   <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
+       <div class="header">
+           <img src="{{ letterhead_image }}" alt="City of Overton Logo" style="width: 300px; height: auto; float: left;">
+       </div>
+
+       <div style="text-align: right; float: right;">
+            <h1 style="font-size: 26px; margin: 0; white-space: nowrap; border-bottom: 2px solid black;">
+                <b>Employee Gross Earning</b>
+            </h1>
+        </div>
+    </div>  
+
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">        
+        <div style="float: left;">
+            <div>Employer Name: {{ company_name }}</div>
+            <div>Date Range: {{ formatted_start_end_date }}</div>
+            <div>Generated On: {{ formatted_datetime }} </div>
+        </div>
+    </div>
+
+    <br><br>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th style="text-align: right;">Gross Pay</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                {% if row %}                  
+                    {% if row.get("employee_name") == "Total" %}
+                        <!-- TOTAL ROW -->
+                        <tr style="border-top: 2px solid black; font-weight: bold;">
+                            <td>Total</td>
+                            <td>{{ row.get("department", "") }}</td>
+                            <td style="text-align: right;">${{ "{:,.2f}".format(row.get("gross_pay") or 0) }}</td>
+                            
+                        </tr>
+                    {% else %}
+                        <!-- EMPLOYEE ROW -->
+                        <tr>
+                            <td>{{ row.get("employee_name", "") }}</td>
+                            <td>{{ row.get("department", "") }}</td>
+                            <td style="text-align: right;">${{ "{:,.2f}".format(row.get("gross_pay") or 0) }}</td>
+                            
+                        </tr>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

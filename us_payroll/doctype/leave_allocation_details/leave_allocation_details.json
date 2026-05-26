@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-06 15:25:07.179550",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "department",
+  "department_id",
+  "leave_type",
+  "new_leaves_allocated",
+  "total_leaves_allocated",
+  "balanced_leaves",
+  "allocation_change_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "department_id",
+   "fieldtype": "Link",
+   "label": "Department ID",
+   "options": "Department"
+  },
+  {
+   "fieldname": "leave_type",
+   "fieldtype": "Link",
+   "label": "Leave Type",
+   "options": "Leave Type"
+  },
+  {
+   "fieldname": "new_leaves_allocated",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "New Leaves Allocated"
+  },
+  {
+   "fieldname": "total_leaves_allocated",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Leaves Allocated",
+   "read_only": 1
+  },
+  {
+   "fieldname": "balanced_leaves",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Balanced Leaves",
+   "read_only": 1
+  },
+  {
+   "fieldname": "allocation_change_reason",
+   "fieldtype": "Small Text",
+   "label": "Allocation Change Reason"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-05-06 15:25:07.179550",
+ "modified_by": "Administrator",
+ "module": "us_payroll",
+ "name": "Leave Allocation Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
