@@ -11372,14 +11372,14 @@
   "type": "Workspace"
  },
  {
-  "app": "us_payroll",
+  "app": "",
   "charts": [
    {
     "chart_name": "Outgoing Salary",
     "label": "Outgoing Salary"
    }
   ],
-  "content": "[{\"id\":\"sN-N90hh44\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Salary\",\"col\":12}},{\"id\":\"ORKhwX-uqw\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"gGURwviUAZ\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"PWuecwd6bd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee\",\"col\":3}},{\"id\":\"AWz4SawlG_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Component\",\"col\":3}},{\"id\":\"48X74tGCgW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure\",\"col\":3}},{\"id\":\"OFlZvpWVhS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure Assignment\",\"col\":3}},{\"id\":\"UdLRCjxt7e\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attendance\",\"col\":3}},{\"id\":\"UecXW485Ks\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll Entry\",\"col\":3}},{\"id\":\"g-V4NtB4YG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Check Stubs\",\"col\":3}},{\"id\":\"MkKbhzruhK\",\"type\":\"card\",\"data\":{\"card_name\":\"Payroll Compliance Forms\",\"col\":4}},{\"id\":\"ulG33lqBda\",\"type\":\"card\",\"data\":{\"card_name\":\"Tools\",\"col\":4}},{\"id\":\"IA4MdWCEXH\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+  "content": "[{\"id\":\"sN-N90hh44\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Salary\",\"col\":12}},{\"id\":\"ORKhwX-uqw\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"gGURwviUAZ\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"PWuecwd6bd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee\",\"col\":3}},{\"id\":\"AWz4SawlG_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Component\",\"col\":3}},{\"id\":\"48X74tGCgW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure\",\"col\":3}},{\"id\":\"OFlZvpWVhS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure Assignment\",\"col\":3}},{\"id\":\"UdLRCjxt7e\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attendance\",\"col\":3}},{\"id\":\"UecXW485Ks\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll Entry\",\"col\":3}},{\"id\":\"g-V4NtB4YG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Check Stubs\",\"col\":3}},{\"id\":\"lkO8TQ9lsS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll ACH\",\"col\":3}},{\"id\":\"jVmuFS11Kz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Checkbook Declaration\",\"col\":3}},{\"id\":\"i8uUxIqf0k\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Check\",\"col\":3}},{\"id\":\"nuqgcV13aB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leave Allocation Tool\",\"col\":3}},{\"id\":\"b_dEYqa_Kf\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leave Allocation\",\"col\":3}},{\"id\":\"oWY75-JxoN\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Department\",\"col\":3}},{\"id\":\"lJfNZoXjNv\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"MkKbhzruhK\",\"type\":\"card\",\"data\":{\"card_name\":\"Payroll Compliance Forms\",\"col\":4}},{\"id\":\"ulG33lqBda\",\"type\":\"card\",\"data\":{\"card_name\":\"Tools\",\"col\":4}},{\"id\":\"IA4MdWCEXH\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
   "custom_blocks": [],
   "docstatus": 0,
   "doctype": "Workspace",
@@ -11389,7 +11389,7 @@
   "icon": "accounting",
   "indicator_color": "green",
   "is_hidden": 0,
-  "label": "US Payroll",
+  "label": "USA Payroll",
   "link_to": null,
   "link_type": "DocType",
   "links": [
@@ -11754,9 +11754,9 @@
     "type": "Link"
    }
   ],
-  "modified": "2026-05-12 20:28:02.861951",
-  "module": "us_payroll",
-  "name": "US Payroll",
+  "modified": "2026-05-27 17:43:03.817273",
+  "module": "",
+  "name": "USA Payroll",
   "number_cards": [],
   "parent_page": "",
   "public": 1,
@@ -11785,6 +11785,20 @@
     "format": null,
     "icon": null,
     "kanban_board": null,
+    "label": "Payroll ACH",
+    "link_to": "ach-report",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": null,
+    "type": "Page",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
     "label": "Salary Component",
     "link_to": "Salary Component",
     "report_ref_doctype": null,
@@ -11799,8 +11813,36 @@
     "format": null,
     "icon": null,
     "kanban_board": null,
+    "label": "Checkbook Declaration",
+    "link_to": "Checkbook Declaration",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": null,
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
     "label": "Salary Structure",
     "link_to": "Salary Structure",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Check",
+    "link_to": "Check",
     "report_ref_doctype": null,
     "restrict_to_domain": null,
     "stats_filter": "[]",
@@ -11827,11 +11869,39 @@
     "format": null,
     "icon": null,
     "kanban_board": null,
+    "label": "Department",
+    "link_to": "Department",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
     "label": "Attendance",
     "link_to": "Attendance",
     "report_ref_doctype": null,
     "restrict_to_domain": null,
     "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Leave Allocation Tool",
+    "link_to": "Leave Allocation Tool",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": null,
     "type": "DocType",
     "url": null
    },
@@ -11855,6 +11925,20 @@
     "format": null,
     "icon": null,
     "kanban_board": null,
+    "label": "Leave Allocation",
+    "link_to": "Leave Allocation",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
     "label": "Check Stubs",
     "link_to": "Salary Slip",
     "report_ref_doctype": null,
@@ -11864,7 +11948,7 @@
     "url": null
    }
   ],
-  "title": "US Payroll",
+  "title": "USA Payroll",
   "type": "Workspace"
  }
 ]

@@ -11923,7 +11923,7 @@
     "indent": 0,
     "keep_closed": 0,
     "label": "Home",
-    "link_to": "US Payroll",
+    "link_to": "USA Payroll",
     "link_type": "Workspace",
     "navigate_to_tab": null,
     "route_options": null,
@@ -12459,12 +12459,12 @@
     "url": null
    }
   ],
-  "modified": "2026-05-12 20:08:50.238818",
-  "module": "Payroll",
+  "modified": "2026-05-27 17:36:33.515594",
+  "module": "us_payroll",
   "module_onboarding": null,
-  "name": "US Payroll",
+  "name": "USA Payroll",
   "standard": 0,
-  "title": "US Payroll"
+  "title": "USA Payroll"
  },
  {
   "app": "erpnext",
