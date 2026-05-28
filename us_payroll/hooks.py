@@ -52,6 +52,7 @@ doctype_js = {
                 "Journal Entry": "custom_script/journal_entry.js",
                 "Attendance": "custom_script/attendance.js",
                 "Payroll Entry": "custom_script/payroll_entry.js",
+                "Company": "custom_script/company.js",
             }
 
 
