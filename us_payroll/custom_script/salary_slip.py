@@ -181,6 +181,9 @@ def reflect_do_not_include(doc):
 			):
 				deduction_row.do_not_include_in_total = assign_row.do_not_include_in_total
 
+				deduction_row.do_not_include_in_accounts = assign_row.do_not_include_in_accounts
+
+
 
 
 def calculate_leaves_taken(doc):

@@ -109,6 +109,7 @@ frappe.ui.form.on('Salary Structure Assignment', {
 								row.is_flexible_benefit = earning.is_flexible_benefit;
 								row.variable_based_on_taxable_salary = earning.variable_based_on_taxable_salary;
 								row.do_not_include_in_total = earning.do_not_include_in_total;
+								row.do_not_include_in_accounts = earning.do_not_include_in_accounts;
 								row.deduct_full_tax_on_selected_payroll_date = earning.deduct_full_tax_on_selected_payroll_date;
 								row.condition = earning.condition;
 								row.amount_based_on_formula = earning.amount_based_on_formula;
@@ -137,6 +138,7 @@ frappe.ui.form.on('Salary Structure Assignment', {
 								row.is_flexible_benefit = deduction.is_flexible_benefit;
 								row.variable_based_on_taxable_salary = deduction.variable_based_on_taxable_salary;
 								row.do_not_include_in_total = deduction.do_not_include_in_total;
+								row.do_not_include_in_accounts = deduction.do_not_include_in_accounts;
 								row.deduct_full_tax_on_selected_payroll_date = deduction.deduct_full_tax_on_selected_payroll_date;
 								row.condition = deduction.condition;
 								row.amount_based_on_formula = deduction.amount_based_on_formula;
@@ -174,6 +176,7 @@ frappe.ui.form.on('Employee Insurance Deduction', {   // child doctype
 			[
 				"custom_is_employer_component",
 				"do_not_include_in_total",
+				"do_not_include_in_accounts",
 				"custom_is_this_insurance_component",
 				"custom_is_this_employers_insurance_component",
 				"custom_insurance_component",
@@ -190,6 +193,7 @@ frappe.ui.form.on('Employee Insurance Deduction', {   // child doctype
 			const field_map = {
 				custom_is_employer_component: "is_employer_component",
 				do_not_include_in_total: "do_not_include_in_total",
+				do_not_include_in_accounts: "do_not_include_in_accounts",
 				custom_is_this_insurance_component: "is_this_employees_insurance_component",
 				custom_is_this_employers_insurance_component: "is_this_employers_insurance_component",
 				custom_insurance_component: "insurance_component",
