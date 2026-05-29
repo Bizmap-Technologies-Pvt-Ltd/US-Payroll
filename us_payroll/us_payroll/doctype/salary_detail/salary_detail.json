@@ -22,6 +22,7 @@
   "is_flexible_benefit",
   "variable_based_on_taxable_salary",
   "do_not_include_in_total",
+  "do_not_include_in_accounts",
   "deduct_full_tax_on_selected_payroll_date",
   "section_break_2",
   "condition",
@@ -260,11 +261,18 @@
    "label": "Tax on additional salary",
    "options": "currency",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "description": "If enabled, the amount will be excluded from accounting entries during Journal Entry creation.",
+   "fieldname": "do_not_include_in_accounts",
+   "fieldtype": "Check",
+   "label": "Do Not Include in Accounting Entries"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2026-02-23 20:40:53.898357",
+ "modified": "2026-05-29 10:58:56.502744",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Salary Detail",
