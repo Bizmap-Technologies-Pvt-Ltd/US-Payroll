@@ -11,7 +11,7 @@ frappe.ui.form.on('Company', {
                 frm.set_value('tax_id', ein);
             } else {
                 frm.set_value('tax_id', "");
-                frappe.throw(__('EIN No. should be 9 digits.'));
+                frappe.msgprint(__('EIN No. should be 9 digits.'));
             }
         }
     },
