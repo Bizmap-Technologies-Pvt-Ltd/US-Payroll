@@ -26,6 +26,7 @@ def after_insert(doc, method):
 	doc.save()
 	set_fit_add_flag(doc)
 	tax_calulations_for_fit(doc)
+	set_do_not_include_in_accounts(doc)
 	frappe.db.commit()	
 
 def on_cancel(doc,method):
@@ -41,6 +42,7 @@ def validate(doc, method):
 	set_standard_deduction(doc)
 	# set_fit_add_flag(doc)
 	# tax_calulations_for_fit(doc) 
+	set_do_not_include_in_accounts(doc)
 
 
 def set_fit_add_flag(doc):	
@@ -184,6 +186,14 @@ def reflect_do_not_include(doc):
 				deduction_row.do_not_include_in_accounts = assign_row.do_not_include_in_accounts
 
 
+def set_do_not_include_in_accounts(doc):
+	sal_structure = doc.salary_structure
+	sal_doc = frappe.get_doc("Salary Structure", sal_structure)
+
+	for deduction_row in doc.deductions:
+		for sal_row in sal_doc.deductions:
+			if (deduction_row.salary_component == sal_row.salary_component):
+				deduction_row.do_not_include_in_accounts = sal_row.do_not_include_in_accounts
 
 
 def calculate_leaves_taken(doc):
