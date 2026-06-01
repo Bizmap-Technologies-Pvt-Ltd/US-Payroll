@@ -60,3 +60,4 @@ def setup_wizard_complete(args=None):
 
 	# frappe.db.set_value("System Settings", "System Settings", "setup_wizard_completed", 1)
 	# frappe.db.commit()
+
