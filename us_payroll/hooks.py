@@ -9,6 +9,12 @@ app_license = "MIT"
 # ------------------
 
 # required_apps = []
+required_apps = ["hrms"]
+
+# ---------------custom wizard for salary structure template----------
+setup_wizard_complete = "us_payroll.custom_script.setup_wizard.setup_wizard.setup_wizard_complete"
+
+
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -315,5 +321,7 @@ fixtures = [
     },
     "Translation",
     "Workspace",
-    "Workspace Sidebar"
+    "Workspace Sidebar",
+    "Salary Component",
+    "Salary Structure"
 ]

@@ -50,5 +50,18 @@
   "name": "j0e0d9qj5n",
   "source_text": "Cost Center",
   "translated_text": "Department Name"
+ },
+ {
+  "context": null,
+  "contributed": 0,
+  "contribution_docname": null,
+  "contribution_status": "",
+  "docstatus": 0,
+  "doctype": "Translation",
+  "language": "en",
+  "modified": "2026-06-01 18:52:59.263500",
+  "name": "j802aokl4g",
+  "source_text": "Fortnightly",
+  "translated_text": "Bi-Weekly"
  }
 ]
