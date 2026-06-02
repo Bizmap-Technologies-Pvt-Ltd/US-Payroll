@@ -56,7 +56,6 @@ frappe.ui.form.on('Journal Entry', {
 	            args: {
 	                doctype: "Global Defaults",	                
 	            },
-
 	            callback: function(r) {
 	                if (r.message) {	                    
 	                    default_company = r.message.company
@@ -95,7 +94,6 @@ frappe.ui.form.on('Journal Entry', {
 					}
 				};
 			}
-
 			return d;
 		};
 	},
@@ -108,11 +106,9 @@ frappe.ui.form.on('Journal Entry', {
     },
 
     set_cheque_date:function(frm){
-    	console.log("call======")
     	const today = frappe.datetime.get_today();
 		frm.set_value('cheque_date', today);  
     },
-
 
 	set_accounts_entries:function(frm){
 		var debit = 0
@@ -120,7 +116,6 @@ frappe.ui.form.on('Journal Entry', {
 		var total_debit = 0
 		var total_credit = 0
 		var fund_wise = {}
-
 		$.each(frm.doc.accounts,function(idx,row){
 			var fund_name = row.fund
 			if (!fund_wise[fund_name]){
@@ -146,5 +141,4 @@ frappe.ui.form.on('Journal Entry', {
 			}
 		});		
 	},
-
 });

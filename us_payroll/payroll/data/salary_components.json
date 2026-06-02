@@ -7,10 +7,7 @@
     "salary_component_abbr": "Hrly",
     "amount_based_on_formula": 1,
     "formula": "custom_total_amount",
-    "is_tax_applicable": 1,
-    "accounts": [
-      { "company": "Default Company", "account": "Salary - DC" }
-    ]
+    "is_tax_applicable": 1
   },
   {
     "doctype": "Salary Component",
@@ -20,10 +17,7 @@
     "salary_component_abbr": "OT",
     "amount_based_on_formula": 1,
     "formula": "custom_total_overtime_amount",
-    "is_tax_applicable": 1,
-    "accounts": [
-      { "company": "Default Company", "account": "Salary - DC" }
-    ]
+    "is_tax_applicable": 1
   },
   {
     "doctype": "Salary Component",
@@ -33,10 +27,7 @@
     "salary_component_abbr": "Salary",
     "amount_based_on_formula": 1,
     "formula": "custom_base_amount",
-    "is_tax_applicable": 1,
-    "accounts": [
-      { "company": "Default Company", "account": "Salary - DC" }
-    ]
+    "is_tax_applicable": 1
   },
  
   {
@@ -46,10 +37,7 @@
     "type": "Deduction",
     "salary_component_abbr": "Dental",
     "amount_based_on_formula": 1,
-    "formula": "custom_formula",
-    "accounts": [
-      { "company": "Default Company", "account": "Tax Payable - DC" }
-    ]
+    "formula": "custom_formula"
   },
   {
     "doctype": "Salary Component",
@@ -60,10 +48,7 @@
     "amount_based_on_formula": 0,
     "formula": "",
     "custom_is_this_fit_component": 1,
-    "custom_federal_income_tax_and_additional_withholdings": 1,
-    "accounts": [
-      { "company": "Default Company", "account": "Tax Payable - DC" }
-    ]
+    "custom_federal_income_tax_and_additional_withholdings": 1
   },
   {
     "doctype": "Salary Component",
@@ -72,10 +57,7 @@
     "type": "Deduction",
     "salary_component_abbr": "SST-EE",
     "amount_based_on_formula": 1,
-    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.062",
-    "accounts": [
-      { "company": "Default Company", "account": "Social Security Payable - DC" }
-    ]
+    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.062"
   },
   {
     "doctype": "Salary Component",
@@ -85,10 +67,7 @@
     "salary_component_abbr": "SST-ER",
     "do_not_include_in_total": 1,
     "amount_based_on_formula": 1,
-    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.062",
-    "accounts": [
-      { "company": "Default Company", "account": "Social Security Expense - DC" }
-    ]
+    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.062"
   },
   {
     "doctype": "Salary Component",
@@ -97,10 +76,7 @@
     "type": "Deduction",
     "salary_component_abbr": "MC-EE",
     "amount_based_on_formula": 1,
-    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.0145",
-    "accounts": [
-      { "company": "Default Company", "account": "Medicare Payable - DC" }
-    ]
+    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.0145"
   },
   {
     "doctype": "Salary Component",
@@ -110,10 +86,7 @@
     "salary_component_abbr": "MC-ER",
     "do_not_include_in_total": 1,
     "amount_based_on_formula": 1,
-    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.0145",
-    "accounts": [
-      { "company": "Default Company", "account": "Medicare Expense - DC" }
-    ]
+    "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.0145"
   },
   {
     "doctype": "Salary Component",
@@ -122,10 +95,7 @@
     "type": "Deduction",
     "salary_component_abbr": "TMRS (EE)",
     "amount_based_on_formula": 1,
-    "formula": "gross_pay*0.06",
-    "accounts": [
-      { "company": "Default Company", "account": "Retirement Payable - DC" }
-    ]
+    "formula": "gross_pay*0.06"
   },
   {
     "doctype": "Salary Component",
@@ -135,9 +105,6 @@
     "salary_component_abbr": "TMRS (ER)",
     "do_not_include_in_total": 1,
     "amount_based_on_formula": 1,
-    "formula": "gross_pay*0.0446",
-    "accounts": [
-      { "company": "Default Company", "account": "Retirement Expense - DC" }
-    ]
+    "formula": "gross_pay*0.0446"
   }
 ]

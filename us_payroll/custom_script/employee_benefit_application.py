@@ -1,11 +1,8 @@
 import frappe
-
 from hrms.payroll.doctype.payroll_period.payroll_period import (
 	get_payroll_period_days,
 	get_period_factor,
 )
-
-
 
 def get_benefit_component_amount(
 	employee, start_date, end_date, salary_component, sal_struct, payroll_frequency, payroll_period

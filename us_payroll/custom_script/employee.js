@@ -28,8 +28,6 @@ frappe.ui.form.on('Employee', {
                         let doj = frappe.datetime.str_to_obj(frm.doc.date_of_joining);
                         let today = frappe.datetime.now_date(true);
                         let today_obj = frappe.datetime.str_to_obj(today);
-
-                        // Calculate difference in days
                         let diff_days = frappe.datetime.get_diff(today_obj, doj);
                         if (diff_days >= 90) {
                             frm.set_df_property('custom_pto_hours', 'hidden', 0);
@@ -47,11 +45,9 @@ frappe.ui.form.on('Employee', {
         let cell_number = frm.doc.cell_number;
         let cell_number_pattern = /^\(\d{3}\)\d{3}-\d{4}$/;
         if (cell_number) {
-            // Remove all non-numeric characters
             let digits = cell_number.replace(/\D/g, '');
             if (digits.length < 10) {
                 frappe.msgprint(__('Mobile Number should be 10 digits.'));
-                // frm.set_value('cell_number', '');
             }
         }
            
@@ -64,10 +60,7 @@ frappe.ui.form.on('Employee', {
     format_cell_number: function(frm) {
         let cell_number = frm.doc.cell_number;
         if (cell_number) {
-            // Remove all non-numeric characters
             let digits = cell_number.replace(/\D/g, '');
-
-            // Format the number to (xxx)xxx-xxxx
             if (digits.length === 10) {
                 let formatted = `(${digits.substring(0, 3)})${digits.substring(3, 6)}-${digits.substring(6, 10)}`;
                 frm.set_value('cell_number', formatted);
@@ -75,7 +68,6 @@ frappe.ui.form.on('Employee', {
 
             if (digits.length > 10) {
                 frappe.msgprint(__('Mobile Number should be 10 digits.'));
-                // frm.set_value('cell_number', '');
             }
         }
     },
@@ -83,14 +75,12 @@ frappe.ui.form.on('Employee', {
     custom_social_security_number: function(frm) {
         let ssn = frm.doc.custom_social_security_number;
         if (ssn) {
-            ssn = ssn.replace(/\D/g, ''); // Remove all non-numeric characters
-            // if (ssn.length <= 9) {
+            ssn = ssn.replace(/\D/g, ''); 
             if (ssn.length === 9) {
                 ssn = ssn.replace(/^(\d{3})(\d{2})(\d{4})$/, '$1-$2-$3');
                 frm.set_value('custom_social_security_number', ssn);
             } else {
                 frappe.msgprint(__('Social Security Number should be 9 digits.'));
-                // frm.set_value('custom_social_security_number', '');
             }
         }
     },
@@ -98,22 +88,16 @@ frappe.ui.form.on('Employee', {
     before_save: function(frm) {
         let ssn = frm.doc.custom_social_security_number;
         if (ssn) {
-            // Check if the SSN is already masked (starts with 'XXX-XX-')
             if (ssn.startsWith('XXX-XX-')) {
                 return;
             }
-
-            // Remove any non-digit characters (e.g., dashes)
             let raw_ssn = ssn.replace(/\D/g, '');          
             if (raw_ssn.length === 9) {
-                // Store the raw value in custom_nomasked_social_security_number
                 frm.set_value('custom_nomasked_social_security_number', raw_ssn);
                 
-                // Mask the value for display purposes
                 let masked_ssn = 'XXX-XX-' + raw_ssn.slice(-4);
                 frm.set_value('custom_social_security_number', masked_ssn);
             } else {
-                // Show an error message if the SSN is not 9 digits
                 frappe.msgprint(__('Social Security Number should be 9 digits.'));
                 frm.set_value('custom_social_security_number', '');
                 frm.set_value('custom_nomasked_social_security_number', '');
@@ -190,14 +174,13 @@ frappe.ui.form.on('Employee', {
 
     custom_filing_method: function(frm) {
         if (!frm.doc.custom_filing_method || !frm.doc.name) return;
-        // get the latest submitted SSA for this employee
         frappe.db.get_list('Salary Structure Assignment', {
             filters: {
                 employee: frm.doc.name,
                 docstatus: 1
             },
             fields: ['name'],
-            order_by: 'from_date desc', // adjust if you want latest
+            order_by: 'from_date desc', 
             limit: 1
         }).then(ssa_list => {
             if (ssa_list.length > 0) {
@@ -212,7 +195,6 @@ frappe.ui.form.on('Employee', {
                     },
                     callback: function() {
                         console.log("Updated Income Tax Slab in Salary Structure Assignment " + ssa.name);
-                        // frappe.msgprint("Updated Income Tax Slab in Salary Structure Assignment " + ssa.name);
                     }
                 });
             }

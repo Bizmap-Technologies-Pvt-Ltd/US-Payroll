@@ -10,18 +10,6 @@ def validate(self,method):
 
 def on_submit(self,method):
 	pass
-	# if self.overtime_amount:
-	# 	additional_salary(self,self.overtime_amount,component = "Overtime")
-	# if self.misc_ded_amount:
-	# 	additional_salary(self,self.misc_ded_amount,component = "MISC_DED")
-	# if self.penalty_amount:
-	# 	additional_salary(self,self.penalty_amount,component = "PENALTY")
-	# if self.salary_advance_amount:
-	# 	additional_salary(self,self.salary_advance_amount,component = "SAL_ADV")
-	# if self.other_allowance_amount:
-	# 	additional_salary(self,self.other_allowance_amount,component = "OTHER ALLOWANCE")
-	# if self.tds_amount:
-	#	additional_salary(self,self.tds_amount,component = "TDS")
 
 def additional_salary(self,amount,component):
 	additional = frappe.new_doc("Additional Salary")

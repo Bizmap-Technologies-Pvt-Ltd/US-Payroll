@@ -4,7 +4,6 @@
 cur_frm.page.sidebar.toggle();
 
 frappe.ui.form.on('Payroll Entry', {
-	
 	refresh: function (frm) {
 		// Remove core Submit Salary Slips button
 		frm.remove_custom_button(__("Submit Salary Slip"));
@@ -16,13 +15,11 @@ frappe.ui.form.on('Payroll Entry', {
 				() => submit_salary_slip_no_freeze(frm)
 			).addClass("btn-primary");
 		}
-		
 
 		frm.trigger("set_default_company");
 		frm.trigger("set_total_amount");	
 		frm.trigger("change_button_label");
 		frm.trigger("payment_account_adjustment");
-		// frm.trigger("make_check_entry");
 		frm.trigger('hide_add_row_btn'); 
 		frm.trigger("make_dashboard")
 		frm.trigger('void_check');
@@ -38,7 +35,6 @@ frappe.ui.form.on('Payroll Entry', {
        	frm.trigger("set_total_amount");
        	frm.trigger("change_button_label");
        	frm.trigger("payment_account_adjustment");
-       	// frm.trigger("make_check_entry");
        	frm.trigger('hide_add_row_btn');
 		frm.trigger('void_check');
 
@@ -75,14 +71,12 @@ frappe.ui.form.on('Payroll Entry', {
 				start_date: frm.doc.start_date,
 			},
 			callback: function (r) {
-				console.log(frm.doc.payroll_frequency,"========")
 				if (r.message) {
 					frm.set_value("end_date", r.message.end_date);
 				}
 			},
 		});
 	},
-
 
     set_default_company:function(frm){
     	if (frm.doc.__islocal == 1) {
@@ -193,7 +187,6 @@ frappe.ui.form.on('Payroll Entry', {
 	
 	end_date:function(frm){
 		frm.trigger("make_dashboard")
-		// calculate_holiday_hours(frm)
 	},
 
 	add_payroll_ach_button: function (frm) {
