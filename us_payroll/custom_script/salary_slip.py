@@ -2,6 +2,7 @@ import frappe
 from frappe.utils import flt
 from frappe.utils import get_url
 
+
 def after_insert(doc, method): 
 	calculate_leaves_taken(doc)
 	set_insurance_component_name(doc)
@@ -45,7 +46,7 @@ def set_fit_add_flag(doc):
 		if row.salary_component == "FIT" and row.amount == 0:
 			doc.custom_fit_added_in_total_deduction = False
 			break
-	
+
 def before_save(doc, method):
 	reflect_do_not_include(doc)
 	set_insurance_componence_amount_to_zero(doc)
@@ -67,7 +68,7 @@ def set_insurance_component_name(doc):
 	for deduction_row in doc.deductions:
 		for row in sal_assignment_doc.custom_employee_insurance_deduction:
 			if (row.salary_component == deduction_row.salary_component
-				and row.insurance_component 
+				and row.insurance_component  # <-- this is child table field
 			):
 				if row.tax_type == "Before Tax":
 					deduction_row.component_name = f"{row.insurance_company}-{row.salary_component}-BT"
@@ -82,7 +83,6 @@ def get_insurance_flags_from_assignment(employee, salary_component):
 		{"employee": employee, "docstatus": 1},
 		"name"
 	)
-
 	if not sal_assignment_name:
 		return {}
 
@@ -90,11 +90,10 @@ def get_insurance_flags_from_assignment(employee, salary_component):
 		"Salary Structure Assignment",
 		sal_assignment_name
 	)
-
 	for row in sal_assignment_doc.custom_employee_insurance_deduction:
 		if (
 			row.salary_component == salary_component
-			and row.is_this_employees_insurance_component  # <-- this is child table field
+			and row.is_this_employees_insurance_component
 		):
 			return {
 				"is_pretax": row.is_this_pre_tax_component,
@@ -104,25 +103,49 @@ def get_insurance_flags_from_assignment(employee, salary_component):
 
 	return {}
 
-
 def set_insurance_componence_amount_to_zero(doc):
-	salary_components = frappe.get_all("Salary Component", filters={"custom_is_this_insurance_component": True, "do_not_include_in_total": True}, fields=["name"])
-	for sc in salary_components:
-		for row in doc.deductions:
-			if row.salary_component == sc.name: 
-				row.amount = 0
+    sal_assignment_name = frappe.get_value(
+        "Salary Structure Assignment",
+        {"employee": doc.employee, "docstatus": 1},
+        "name"
+    )
+    if not sal_assignment_name:
+        return
+
+    sal_assignment_doc = frappe.get_doc(
+        "Salary Structure Assignment",
+        sal_assignment_name
+    )
+    for deduction_row in doc.deductions:
+        for assign_row in sal_assignment_doc.custom_employee_insurance_deduction:
+            if (
+                deduction_row.salary_component == assign_row.salary_component
+                and assign_row.is_this_employees_insurance_component
+                and assign_row.do_not_include_in_total
+            ):
+                deduction_row.amount = 0
 
 def reflect_do_not_include(doc):
-	salary_components = frappe.get_all(
-			"Salary Component",
-			filters={"custom_is_this_insurance_component": True},
-					fields=["name", "do_not_include_in_total"]
-		)
-	for sc in salary_components:
-		for row in doc.deductions:
-			if row.salary_component == sc.name: 
-				row.do_not_include_in_total = sc.do_not_include_in_total
-				row.do_not_include_in_accounts = sc.do_not_include_in_accounts
+	sal_assignment_name = frappe.get_value(
+		"Salary Structure Assignment",
+		{"employee": doc.employee, "docstatus": 1},
+		"name"
+	)
+	if not sal_assignment_name:
+		return
+
+	sal_assignment_doc = frappe.get_doc(
+		"Salary Structure Assignment",
+		sal_assignment_name
+	)
+	for deduction_row in doc.deductions:
+		for assign_row in sal_assignment_doc.custom_employee_insurance_deduction:
+			if (
+				deduction_row.salary_component == assign_row.salary_component
+				and assign_row.is_this_employees_insurance_component
+			):
+				deduction_row.do_not_include_in_total = assign_row.do_not_include_in_total
+				deduction_row.do_not_include_in_accounts = assign_row.do_not_include_in_accounts
 
 def set_do_not_include_in_accounts(doc):
 	sal_structure = doc.salary_structure
@@ -175,7 +198,7 @@ def salary_calulations_for_fit(doc):
 	# --- 1. Non-taxable earnings (from Earnings table) ---
 	total_non_taxable_earnings = 0
 	for row in doc.earnings:
-		if not row.is_tax_applicable:  # is_tax_applicable == 0
+		if not row.is_tax_applicable: 
 			total_non_taxable_earnings += flt(row.amount)
 
 	doc.custom_total_non_taxable_earnings = total_non_taxable_earnings
@@ -184,8 +207,8 @@ def salary_calulations_for_fit(doc):
 	total_pretax = 0
 	for row in doc.deductions:
 		if row.salary_component:
-			comp_doc = frappe.get_cached_doc("Salary Component", row.salary_component)
-			if comp_doc.custom_is_this_pretax_component and not comp_doc.do_not_include_in_total:
+			flags = get_insurance_flags_from_assignment(doc.employee, row.salary_component)
+			if flags.get("is_pretax") and not flags.get("do_not_include"):
 				total_pretax += flt(row.amount)
 	doc.custom_total_pretax = total_pretax
 
@@ -209,11 +232,11 @@ def salary_calulations_for_fit(doc):
 	doc.custom_ss_taxable_wages = taxable_wages +(doc.gross_pay*0.06)
 	doc.custom_mc_taxable_wages = taxable_wages +(doc.gross_pay*0.06)
 
+
 @frappe.whitelist()
 def tax_calulations_for_fit(doc):
 	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
 	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
-
 	sal_structure = doc.salary_structure
 	sal_doc = frappe.get_doc("Salary Structure", sal_structure)
 
@@ -229,10 +252,8 @@ def tax_calulations_for_fit(doc):
 		{"employee": doc.employee, "docstatus": 1},
 		"name"
 	)
-
 	if not sal_assignment_name:
 		frappe.throw(f"No active Salary Structure Assignment found for employee {doc.employee}")
-
 
 	sal_assignment_doc = frappe.get_doc("Salary Structure Assignment", sal_assignment_name)
 	income_tax_slab = sal_assignment_doc.income_tax_slab
@@ -245,7 +266,6 @@ def tax_calulations_for_fit(doc):
 
 		fit_amount = 0
 		last_to_amount = 0
-
 		for row in it_slab_doc.get("slabs"):			
 			from_amount = row.get("from_amount")
 			to_amount = row.get("to_amount")
@@ -271,8 +291,8 @@ def tax_calulations_for_fit(doc):
 		{"employee": doc.employee, "status": "Active"},
 		 "custom_total_credit"
 	)
-	doc.custom_total_of_income_tax = fit_amount - total_credit
 
+	doc.custom_total_of_income_tax = fit_amount - total_credit
 	if total_weeks_of_the_year:
 		fit = (fit_amount - total_credit)/ total_weeks_of_the_year
 		if fit >= 0:
@@ -297,13 +317,11 @@ def tax_calulations_for_fit(doc):
 			doc.total_deduction = doc.total_deduction + fit
 			doc.net_pay = doc.gross_pay - doc.total_deduction
 			doc.custom_fit_added_in_total_deduction = True
-
 	else:
 		site_url = get_url()
 		fund_settings_url = f"{site_url}/desk/client-setup"
 		frappe.throw(f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>")
 	doc.save()
-
 
 def set_standard_deduction(doc):
 	sal_assignment_name = frappe.get_value(
@@ -316,33 +334,34 @@ def set_standard_deduction(doc):
 
 	sal_assignment_doc = frappe.get_doc("Salary Structure Assignment", sal_assignment_name)
 	income_tax_slab = sal_assignment_doc.income_tax_slab
-
 	it_slab_doc = frappe.get_doc("Income Tax Slab", income_tax_slab)
 	it_filing_jointly = it_slab_doc.custom_married_filing_jointly
-
 	if not it_filing_jointly:
 		doc.custom_standard_deduction = 8600
-
 	else:
 		doc.custom_standard_deduction = 12900
 
-
 def set_check_no(doc):
+	# Step 1: Get previous value of custom_check_no
 	previous_doc = frappe.get_doc(doc.doctype, doc.name) if frappe.db.exists(doc.doctype, doc.name) else None
+
+	# Step 2: If previous check exists and is different from current check, reset status to "Available"
 	if previous_doc and previous_doc.custom_check_no and previous_doc.custom_check_no != doc.custom_check_no:
 		check_doc = frappe.get_doc("Check", previous_doc.custom_check_no)
 		if check_doc.status != 'Available':
 			check_doc.status = 'Available'
-			check_doc.reference = None 
+			check_doc.reference = None
 			check_doc.save()
 
+	# Step 3: If new check is set, mark it as "Issued"
 	if doc.custom_check_no:
 		check_doc = frappe.get_doc("Check", doc.custom_check_no)
 		if check_doc.status != 'Issued':
 			check_doc.status = 'Issued'
-			check_doc.reference = doc.name
+			check_doc.reference = doc.name  # Set reference to the Salary Slip name
 			check_doc.save()
 
+	# Step 4: If no check is set, payroll_entry exists, and employee wants payment by check → Assign available check
 	if not doc.custom_check_no and doc.payroll_entry:
 		employee_payment_method = frappe.db.get_value("Employee", doc.employee, "custom_payment_method")
 
@@ -354,10 +373,13 @@ def set_check_no(doc):
 				order_by="check_number ASC",
 				limit_page_length=1
 			)
-
 			if latest_check:
 				latest_check_name = latest_check[0].get("name")
+
+				# Assign latest available check
 				doc.custom_check_no = latest_check_name
+
+				# Update the check status and reference
 				check_doc = frappe.get_doc("Check", latest_check_name)
 				check_doc.status = 'Issued'
 				check_doc.reference = doc.name

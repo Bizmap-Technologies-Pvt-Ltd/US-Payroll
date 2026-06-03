@@ -23,19 +23,19 @@ from frappe.desk.reportview import get_match_cond
 from frappe.model.document import Document
 from frappe.query_builder.functions import Coalesce, Count
 from frappe.utils import (
-    DATE_FORMAT,
-    add_days,
-    add_to_date,
-    cint,
-    comma_and,
-    date_diff,
-    flt,
-    get_link_to_form,
-    getdate,
+	DATE_FORMAT,
+	add_days,
+	add_to_date,
+	cint,
+	comma_and,
+	date_diff,
+	flt,
+	get_link_to_form,
+	getdate,
 )
 import erpnext
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
-    get_accounting_dimensions,
+	get_accounting_dimensions,
 )
 from erpnext.accounts.utils import get_fiscal_year
 from hrms.payroll.doctype.payroll_entry.payroll_entry import get_month_details
@@ -45,6 +45,7 @@ from hrms.hr.doctype.leave_application.leave_application import get_leave_detail
 def validate(doc, method):
 	insurance_deduction_limitation(doc)
 	validate_do_not_include_in_total(doc)
+	validate_ssa_do_not_include_in_total(doc)
 	get_leave_balance(doc)
 	calculate_holiday_hours(doc)
 	calculate_working_hours(doc)
@@ -129,6 +130,28 @@ def validate_do_not_include_in_total(doc):
 		if doc.custom_deduct_insurance and sal_doc.custom_is_this_insurance_component and sal_doc.do_not_include_in_total: 
 			sal_doc.do_not_include_in_total = False
 			frappe.db.set_value("Salary Component", sc.name, "do_not_include_in_total", 0)
+
+def validate_ssa_do_not_include_in_total(doc):
+	for emp_row in doc.employees:
+		ssa_name = frappe.db.get_value(
+			"Salary Structure Assignment",
+			{"employee": emp_row.employee},
+			"name"
+		)
+		if not ssa_name:
+			frappe.throw(f"No Salary Structure Assignment found for employee {emp_row.employee}")
+
+		ssa_doc = frappe.get_doc("Salary Structure Assignment", ssa_name)
+		for ins_row in ssa_doc.custom_employee_insurance_deduction:
+			if doc.custom_deduct_insurance and ins_row.is_this_employees_insurance_component and ins_row.do_not_include_in_total:
+				ins_row.do_not_include_in_total = 0
+				frappe.db.set_value(
+					"Employee Insurance Deduction",  
+					ins_row.name,
+					"do_not_include_in_total",
+					0
+				)
+		ssa_doc.save(ignore_permissions=True)
 
 
 def get_leave_balance(payroll_doc):  
@@ -606,59 +629,59 @@ def get_check_to_void(doctype, txt, searchfield, start, page_len, filters):
 
 @frappe.whitelist()
 def assign_new_check_no(source_name, payroll_entry, new_check_required=None, reason=None, target_doc=None):
-    new_check_required = int(new_check_required) if isinstance(new_check_required, str) else False
-    payroll_entry_doc = frappe.get_doc("Payroll Entry", payroll_entry)
+	new_check_required = int(new_check_required) if isinstance(new_check_required, str) else False
+	payroll_entry_doc = frappe.get_doc("Payroll Entry", payroll_entry)
 
-    if new_check_required:
-        frappe.db.set_value("Payroll Entry", payroll_entry_doc, 'custom_new_check_required', True)
-        frappe.db.commit()
+	if new_check_required:
+		frappe.db.set_value("Payroll Entry", payroll_entry_doc, 'custom_new_check_required', True)
+		frappe.db.commit()
 
-    all_checks = frappe.get_all(
-        "Check",
-        filters={"status": "Available"},
-        fields=["name", "check_number", "status"],
-        order_by="name"
-    )
+	all_checks = frappe.get_all(
+		"Check",
+		filters={"status": "Available"},
+		fields=["name", "check_number", "status"],
+		order_by="name"
+	)
 
-    # If no new check required, just void the existing one
-    if not new_check_required:
-        cheque_no = frappe.db.get_value("Salary Slip", {"name": source_name}, "custom_check_no")
-        frappe.db.set_value("Check", cheque_no, "status", "Void/Cancelled")
-        return {'check_voided': True}
+	# If no new check required, just void the existing one
+	if not new_check_required:
+		cheque_no = frappe.db.get_value("Salary Slip", {"name": source_name}, "custom_check_no")
+		frappe.db.set_value("Check", cheque_no, "status", "Void/Cancelled")
+		return {'check_voided': True}
 
-    if not all_checks and new_check_required:
-        frappe.throw("No check available.")
+	if not all_checks and new_check_required:
+		frappe.throw("No check available.")
 
-    # Pick the first available check
-    new_check_no = all_checks[0].get('name')
+	# Pick the first available check
+	new_check_no = all_checks[0].get('name')
 
-    # Get the old check number from the slip
-    old_check_no = frappe.db.get_value("Salary Slip", {"name": source_name}, "custom_check_no")
+	# Get the old check number from the slip
+	old_check_no = frappe.db.get_value("Salary Slip", {"name": source_name}, "custom_check_no")
 
-    # Void the old check
-    if old_check_no:
-        frappe.db.set_value("Check", old_check_no, "status", "Void/Cancelled")
-        frappe.db.set_value("Check", old_check_no, "reference", source_name)
-        frappe.db.set_value("Check", old_check_no, "reason_for_cancellation", reason)
+	# Void the old check
+	if old_check_no:
+		frappe.db.set_value("Check", old_check_no, "status", "Void/Cancelled")
+		frappe.db.set_value("Check", old_check_no, "reference", source_name)
+		frappe.db.set_value("Check", old_check_no, "reason_for_cancellation", reason)
 
-    # Assign new check to the existing slip
-    frappe.db.set_value("Salary Slip", source_name, "custom_check_no", new_check_no)
+	# Assign new check to the existing slip
+	frappe.db.set_value("Salary Slip", source_name, "custom_check_no", new_check_no)
 
-    from frappe.utils import get_url
+	from frappe.utils import get_url
 
-    site_url = get_url()
-    check_url = f"{site_url}/app/check/{old_check_no}"
+	site_url = get_url()
+	check_url = f"{site_url}/app/check/{old_check_no}"
 
-    reason_of_new_check_no = f"New check {new_check_no} assigned, old check <a href= '{check_url}'><b>{old_check_no}</b></a> voided."
+	reason_of_new_check_no = f"New check {new_check_no} assigned, old check <a href= '{check_url}'><b>{old_check_no}</b></a> voided."
 
-    emp_name = frappe.db.get_value("Salary Slip", {"name": source_name}, "employee_name")
-    # Mark the new check as issued
-    frappe.db.set_value("Check", new_check_no, "status", "Issued")
-    frappe.db.set_value("Check", new_check_no, "reference", source_name)
-    frappe.db.set_value("Check", new_check_no, "reason", reason_of_new_check_no)
+	emp_name = frappe.db.get_value("Salary Slip", {"name": source_name}, "employee_name")
+	# Mark the new check as issued
+	frappe.db.set_value("Check", new_check_no, "status", "Issued")
+	frappe.db.set_value("Check", new_check_no, "reference", source_name)
+	frappe.db.set_value("Check", new_check_no, "reason", reason_of_new_check_no)
 
-    frappe.db.commit()
-    return {"updated_slip": source_name, "new_check_no": new_check_no, "emp_name": emp_name}
+	frappe.db.commit()
+	return {"updated_slip": source_name, "new_check_no": new_check_no, "emp_name": emp_name}
 
 @frappe.whitelist()
 def get_department_working_hours(employee):
@@ -692,37 +715,37 @@ def get_department_working_hours(employee):
 
 @frappe.whitelist()
 def get_start_end_dates(payroll_frequency, start_date=None, company=None):
-    """Returns dict of start and end dates for given payroll frequency based on start_date"""
+	"""Returns dict of start and end dates for given payroll frequency based on start_date"""
 
-    if payroll_frequency == "Monthly" or payroll_frequency == "Bimonthly" or payroll_frequency == "":
-        fiscal_year = get_fiscal_year(start_date, company=company)[0]
-        month = "%02d" % getdate(start_date).month
-        m = get_month_details(fiscal_year, month)
-        if payroll_frequency == "Bimonthly":
-            if getdate(start_date).day <= 15:
-                start_date = m["month_start_date"]
-                end_date = m["month_mid_end_date"]
-            else:
-                start_date = m["month_mid_start_date"]
-                end_date = m["month_end_date"]
-        else:
-            start_date = m["month_start_date"]
-            end_date = m["month_end_date"]
+	if payroll_frequency == "Monthly" or payroll_frequency == "Bimonthly" or payroll_frequency == "":
+		fiscal_year = get_fiscal_year(start_date, company=company)[0]
+		month = "%02d" % getdate(start_date).month
+		m = get_month_details(fiscal_year, month)
+		if payroll_frequency == "Bimonthly":
+			if getdate(start_date).day <= 15:
+				start_date = m["month_start_date"]
+				end_date = m["month_mid_end_date"]
+			else:
+				start_date = m["month_mid_start_date"]
+				end_date = m["month_end_date"]
+		else:
+			start_date = m["month_start_date"]
+			end_date = m["month_end_date"]
 
-    if payroll_frequency == "Weekly":
-        end_date = add_days(start_date, 6)
-        
-    if payroll_frequency == "Bi-Weekly":
-        end_date = add_days(start_date, 13)
-    
-        
-    if payroll_frequency == "Fortnightly":
-        end_date = add_days(start_date, 13)
+	if payroll_frequency == "Weekly":
+		end_date = add_days(start_date, 6)
+		
+	if payroll_frequency == "Bi-Weekly":
+		end_date = add_days(start_date, 13)
+	
+		
+	if payroll_frequency == "Fortnightly":
+		end_date = add_days(start_date, 13)
 
-    if payroll_frequency == "Daily":
-        end_date = start_date
+	if payroll_frequency == "Daily":
+		end_date = start_date
 
-    return frappe._dict({"start_date": start_date, "end_date": end_date})
+	return frappe._dict({"start_date": start_date, "end_date": end_date})
 
 
 
@@ -746,7 +769,7 @@ def get_frequency_kwargs(frequency_name):
 		"fortnightly": {"days": 14},
 		"weekly": {"days": 7},
 		"daily": {"days": 1},
-        "bi-weekly": {"days": 14},
+		"bi-weekly": {"days": 14},
 	}
 	return frequency_dict.get(frequency_name)
 	
