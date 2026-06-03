@@ -1,4 +1,3 @@
-
 frappe.ui.form.on('Salary Structure Assignment', {
 	
 	setup: function(frm) {
@@ -153,7 +152,6 @@ frappe.ui.form.on('Salary Structure Assignment', {
 				}
 			});
 		} else {
-			// Clear the child tables if no salary structure is selected
 			frm.clear_table('custom_earnings');
 			frm.clear_table('custom_deductions');
 			frm.refresh_field('custom_earnings');
@@ -163,7 +161,7 @@ frappe.ui.form.on('Salary Structure Assignment', {
 
 });
 
-frappe.ui.form.on('Employee Insurance Deduction', {   // child doctype
+frappe.ui.form.on('Employee Insurance Deduction', {
 	salary_component(frm, cdt, cdn) {
 		const row = locals[cdt][cdn];
 		if (!row.salary_component) return;
@@ -185,8 +183,6 @@ frappe.ui.form.on('Employee Insurance Deduction', {   // child doctype
 			if (!r || !r.message) return;
 
 			const data = r.message;
-
-			// Explicit mapping: Salary Component → Child Table
 			const field_map = {
 				custom_is_employer_component: "is_employer_component",
 				do_not_include_in_total: "do_not_include_in_total",
@@ -212,11 +208,10 @@ frappe.ui.form.on('Employee Insurance Deduction', {   // child doctype
 
 	tax_type: function(frm, cdt, cdn) {
 		let row = locals[cdt][cdn];
-		
 		if (row.tax_type === "Before Tax") {
-			row.is_this_pre_tax_component = 1;   // check
+			row.is_this_pre_tax_component = 1; 
 		} else if (row.tax_type === "After Tax") {
-			row.is_this_pre_tax_component = 0;   // uncheck
+			row.is_this_pre_tax_component = 0; 
 		}
 		frm.refresh_field("custom_employee_insurance_deduction");
 	}

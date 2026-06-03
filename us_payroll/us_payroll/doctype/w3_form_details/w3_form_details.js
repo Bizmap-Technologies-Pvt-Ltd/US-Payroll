@@ -4,14 +4,14 @@
 frappe.ui.form.on("W3 Form Details", {
 	refresh: function(frm) {
 		frm.trigger("set_employer_name");
-        frm.trigger("set_default_year");
+        // frm.trigger("set_default_year");
         frm.trigger('set_ein');
         frm.trigger("set_address_and_contact_details");
 	},
 
 	onload:function(frm){
 		frm.trigger("set_employer_name");
-        frm.trigger("set_default_year");
+        // frm.trigger("set_default_year");
         frm.trigger('set_ein');
         frm.trigger("set_address_and_contact_details");
 	},

@@ -2,7 +2,6 @@ import frappe
 from frappe.utils import flt
 from frappe.utils import get_url
 
-
 def after_insert(doc, method): 
 	calculate_leaves_taken(doc)
 	set_insurance_component_name(doc)
@@ -13,7 +12,6 @@ def after_insert(doc, method):
 			if employee.employee == doc.employee:				
 				doc.custom_total_amount = employee.custom_total_amount
 				doc.custom_total_overtime_amount = employee.custom_total_overtime_amount
-				# doc.custom_grand_total_amount = employee.custom_total_amount + employee.custom_total_overtime_amount
 				doc.custom_total_comp_time_amount = employee.custom_total_comp_time_amount
 				doc.custom_total_pto_amount = employee.custom_pto_amount
 				doc.custom_holiday_amount = employee.custom_holiday_amount
@@ -39,16 +37,12 @@ def validate(doc, method):
 	set_check_no(doc)
 	salary_calulations_for_fit(doc)
 	set_standard_deduction(doc)
-	# set_fit_add_flag(doc)
-	# tax_calulations_for_fit(doc) 
-
 
 def set_fit_add_flag(doc):	
 	for row in doc.deductions:
 		if row.salary_component == "FIT" and row.amount == 0:
 			doc.custom_fit_added_in_total_deduction = False
 			break
-	
 
 def before_save(doc, method):
 	reflect_do_not_include(doc)
@@ -71,7 +65,7 @@ def set_insurance_component_name(doc):
 	for deduction_row in doc.deductions:
 		for row in sal_assignment_doc.custom_employee_insurance_deduction:
 			if (row.salary_component == deduction_row.salary_component
-				and row.insurance_component  # <-- this is child table field
+				and row.insurance_component
 			):
 				if row.tax_type == "Before Tax":
 					deduction_row.component_name = f"{row.insurance_company}-{row.salary_component}-BT"
@@ -81,18 +75,11 @@ def set_insurance_component_name(doc):
 	
 
 def get_insurance_flags_from_assignment(employee, salary_component):
-	"""
-	Get checkbox flags from Salary Structure Assignment child table
-	instead of Salary Component doctype.
-	Only return values if custom_insurance_component is checked.
-	"""
-
 	sal_assignment_name = frappe.get_value(
 		"Salary Structure Assignment",
 		{"employee": employee, "docstatus": 1},
 		"name"
 	)
-
 	if not sal_assignment_name:
 		return {}
 
@@ -100,7 +87,6 @@ def get_insurance_flags_from_assignment(employee, salary_component):
 		"Salary Structure Assignment",
 		sal_assignment_name
 	)
-
 	for row in sal_assignment_doc.custom_employee_insurance_deduction:
 		if (
 			row.salary_component == salary_component
@@ -115,21 +101,12 @@ def get_insurance_flags_from_assignment(employee, salary_component):
 	return {}
 
 
-# def set_insurance_componence_amount_to_zero(doc):
-# 	salary_components = frappe.get_all("Salary Component", filters={"custom_is_this_insurance_component": True, "do_not_include_in_total": True}, fields=["name"])
-# 	for sc in salary_components:
-# 		for row in doc.deductions:
-# 			if row.salary_component == sc.name: 
-# 				row.amount = 0
-
-
 def set_insurance_componence_amount_to_zero(doc):
     sal_assignment_name = frappe.get_value(
         "Salary Structure Assignment",
         {"employee": doc.employee, "docstatus": 1},
         "name"
     )
-
     if not sal_assignment_name:
         return
 
@@ -137,7 +114,6 @@ def set_insurance_componence_amount_to_zero(doc):
         "Salary Structure Assignment",
         sal_assignment_name
     )
-
     for deduction_row in doc.deductions:
         for assign_row in sal_assignment_doc.custom_employee_insurance_deduction:
             if (
@@ -146,19 +122,6 @@ def set_insurance_componence_amount_to_zero(doc):
                 and assign_row.do_not_include_in_total
             ):
                 deduction_row.amount = 0
-
-
-# def reflect_do_not_include(doc):
-# 	salary_components = frappe.get_all(
-# 			"Salary Component",
-# 			filters={"custom_is_this_insurance_component": True},
-# 					fields=["name", "do_not_include_in_total"]
-# 		)
-# 	for sc in salary_components:
-# 		for row in doc.deductions:
-# 			if row.salary_component == sc.name: 
-# 				row.do_not_include_in_total = sc.do_not_include_in_total
-
 
 def reflect_do_not_include(doc):
 	sal_assignment_name = frappe.get_value(
@@ -180,7 +143,6 @@ def reflect_do_not_include(doc):
 				and assign_row.is_this_employees_insurance_component
 			):
 				deduction_row.do_not_include_in_total = assign_row.do_not_include_in_total
-
 
 
 def calculate_leaves_taken(doc):
@@ -245,7 +207,6 @@ def salary_calulations_for_fit(doc):
 	taxable_wages = flt(doc.gross_pay) - non_taxable_deductions
 
 	if total_weeks_of_the_year:
-		# annualized_wages = taxable_wages * 26  # total weeks of the year
 		annualized_wages = taxable_wages * total_weeks_of_the_year
 	else:
 		site_url = get_url()
@@ -253,7 +214,6 @@ def salary_calulations_for_fit(doc):
 		frappe.throw(f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>")
 	
 	doc.custom_annualized_wages = annualized_wages
-	# adjusted_annual_wages = flt(doc.custom_standard_deduction) - flt(doc.custom_annualized_wages)
 	adjusted_annual_wages = flt(doc.custom_annualized_wages) - flt(doc.custom_standard_deduction)
 
 	doc.custom_non_taxable_deductions = non_taxable_deductions
@@ -262,9 +222,7 @@ def salary_calulations_for_fit(doc):
 	doc.custom_ss_taxable_wages = taxable_wages +(doc.gross_pay*0.06)
 	doc.custom_mc_taxable_wages = taxable_wages +(doc.gross_pay*0.06)
 
-
-			
-
+		
 @frappe.whitelist()
 def tax_calulations_for_fit(doc):
 	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
@@ -294,12 +252,8 @@ def tax_calulations_for_fit(doc):
 	income_tax_slab = sal_assignment_doc.income_tax_slab
 	it_slab_doc = frappe.get_doc("Income Tax Slab", income_tax_slab)
 
-	# fit_amount = 0  #extra=================
-	print(fit_component, "call before if fit_component 111111111111111111111")
-
 	fit_amount = 0
 	if fit_component and it_slab_doc:	
-		print(fit_component, "call in if fit_component 2222222222222222222222")
 		custom_annualized_wages = doc.custom_annualized_wages
 		custom_adjusted_annual_wages = doc.custom_adjusted_annual_wages
 
@@ -331,8 +285,6 @@ def tax_calulations_for_fit(doc):
 		{"employee": doc.employee, "status": "Active"},
 		 "custom_total_credit"
 	)
-
-	print(fit_component, fit_amount, total_weeks_of_the_year, "call out of if fit_component , fit_amount ,total_weeks_of_the_year 333333333333333333")
 	doc.custom_total_of_income_tax = fit_amount - total_credit
 
 	if total_weeks_of_the_year:
@@ -341,9 +293,6 @@ def tax_calulations_for_fit(doc):
 			doc.custom_income_tax_of_current_month = fit
 		else:
 			doc.custom_income_tax_of_current_month = 0
-
-		print(fit, "fit 44444444444444444444")
-
 		for row in doc.deductions:
 			if row.get("salary_component"):
 				comp_doc = frappe.get_doc("Salary Component", row.get("salary_component"))
@@ -437,49 +386,6 @@ def set_check_no(doc):
 				check_doc.status = 'Issued'
 				check_doc.reference = doc.name
 				check_doc.save()
-			# else:
-			#     frappe.throw("No available checks to assign.")
-
-
-
-@frappe.whitelist()
-def update_pretax():
-	salary_slips = frappe.get_all("Salary Slip", filters={"docstatus": 1}, fields=["name"])
-	# salary_slips = [{"name": "Sal Slip/5969/00028"}]
-	for ss in salary_slips:
-		# ss_doc = frappe.get_doc("Salary Slip", ss["name"])
-		ss_doc = frappe.get_doc("Salary Slip", ss.name)
-
-		# --- 1. Non-taxable earnings (from Earnings table) ---
-		total_non_taxable_earnings = 0
-		for row in ss_doc.earnings:
-			if not row.is_tax_applicable:  # is_tax_applicable == 0
-				total_non_taxable_earnings += flt(row.amount)
-
-		if total_non_taxable_earnings:
-			ss_doc.custom_total_non_taxable_earnings = total_non_taxable_earnings
-			frappe.db.set_value("Salary Slip", ss.name, "custom_total_non_taxable_earnings", total_non_taxable_earnings)
-
-		# ---2. Pre-tax deductions (from Deductions table) ---
-		total_pretax = 0
-		for row in ss_doc.deductions:
-			if row.salary_component:
-				comp_doc = frappe.get_cached_doc("Salary Component", row.salary_component)
-				if comp_doc.custom_is_this_pretax_component:
-					total_pretax += flt(row.amount)
-
-		
-		if total_pretax:
-			ss_doc.custom_total_pretax = total_pretax
-			frappe.db.set_value("Salary Slip", ss.name, "custom_total_pretax", total_pretax)
-
-	frappe.db.commit()
-
-
-# # bench console
-# # from overtonfa.overtonfa.custom_script.salary_slip import update_pretax
-# # update_pretax()
-
 
 def get_year_to_date_period(slip_doc):
 	if slip_doc.payroll_period:
@@ -491,34 +397,3 @@ def get_year_to_date_period(slip_doc):
 		period_end_date = fiscal_year.year_end_date
 
 	return period_start_date, period_end_date
-
-
-@frappe.whitelist()
-def update_ytd_deduction():	
-	salary_slips = frappe.get_all("Salary Slip", filters={"docstatus": 1}, fields=["name"])
-
-	# salary_slips = [{"name": "Sal Slip/HR-EMP-00012/00001"}]
-	for ss in salary_slips:
-		ss_doc = frappe.get_doc("Salary Slip", ss["name"])
-		# ss_doc = frappe.get_doc("Salary Slip", ss.name)
-		period_start_date, period_end_date = get_year_to_date_period(ss_doc)
-		salary_slip_sum = frappe.get_list(
-			"Salary Slip",
-			fields=["sum(net_pay) as net_sum", "sum(gross_pay) as gross_sum", "sum(total_deduction) as total_deduction_sum"],
-			filters={
-				"employee": ss_doc.employee,
-				"start_date": [">=", period_start_date],
-				"end_date": ["<", ss_doc.end_date],
-				"name": ["!=", ss_doc.name],
-				"docstatus": 1,
-			},
-		)
-
-		deduction_year_to_date = flt(salary_slip_sum[0].total_deduction_sum) if salary_slip_sum else 0.0
-		deduction_year_to_date += ss_doc.total_deduction
-
-		if deduction_year_to_date:
-			ss_doc.custom_deduction_year_to_date = deduction_year_to_date
-			frappe.db.set_value("Salary Slip", ss["name"], "custom_deduction_year_to_date", deduction_year_to_date)
-
-	frappe.db.commit()

@@ -16,13 +16,11 @@ frappe.ui.form.on('Payroll Entry', {
 				() => submit_salary_slip_no_freeze(frm)
 			).addClass("btn-primary");
 		}
-		
 
 		frm.trigger("set_default_company");
 		frm.trigger("set_total_amount");	
 		frm.trigger("change_button_label");
 		frm.trigger("payment_account_adjustment");
-		// frm.trigger("make_check_entry");
 		frm.trigger('hide_add_row_btn'); 
 		frm.trigger("make_dashboard")
 		frm.trigger('void_check');
@@ -38,7 +36,6 @@ frappe.ui.form.on('Payroll Entry', {
        	frm.trigger("set_total_amount");
        	frm.trigger("change_button_label");
        	frm.trigger("payment_account_adjustment");
-       	// frm.trigger("make_check_entry");
        	frm.trigger('hide_add_row_btn');
 		frm.trigger('void_check');
 
@@ -61,7 +58,6 @@ frappe.ui.form.on('Payroll Entry', {
 		if (!in_progress && frm.doc.start_date) {
 			frm.trigger("set_end_date");
 		} else {
-			// reset flag
 			in_progress = false;
 		}
 		frm.events.clear_employee_table(frm);
@@ -75,7 +71,6 @@ frappe.ui.form.on('Payroll Entry', {
 				start_date: frm.doc.start_date,
 			},
 			callback: function (r) {
-				console.log(frm.doc.payroll_frequency,"========")
 				if (r.message) {
 					frm.set_value("end_date", r.message.end_date);
 				}
@@ -193,7 +188,6 @@ frappe.ui.form.on('Payroll Entry', {
 	
 	end_date:function(frm){
 		frm.trigger("make_dashboard")
-		// calculate_holiday_hours(frm)
 	},
 
 	add_payroll_ach_button: function (frm) {
@@ -384,7 +378,6 @@ frappe.ui.form.on('Payroll Entry', {
 									<tbody>
 						`;
 
-						// Loop through the holiday list and add rows
 						leave_details.forEach(holiday => {
 							holiday_html += `
 								<tr>
@@ -400,7 +393,6 @@ frappe.ui.form.on('Payroll Entry', {
 							</div>
 						`;
 
-						// Add the section to the dashboard
 						frm.dashboard.add_section(holiday_html, __("Holidays"));
 						frm.dashboard.show();
 					} else {
@@ -418,7 +410,7 @@ frappe.ui.form.on('Payroll Entry', {
 				args: {
 					filters:{
 						"payroll_entry": frm.doc.name,
-						"docstatus": ["in", [0, 1]],   // allow both 0 and 1
+						"docstatus": ["in", [0, 1]], 
 						"custom_check_no": ["!=", ""]
 					}
 				},
@@ -505,7 +497,6 @@ function voidCheck(frm) {
 
 function calculate_holiday_hours(frm) {
 	let total_holiday_hours = 0;
-
 	if (!frm.doc.start_date || !frm.doc.end_date) {
 		frappe.msgprint("Please select both Start Date and End Date.");
 		return;
@@ -522,9 +513,6 @@ function calculate_holiday_hours(frm) {
 				let leave_details = r.message.holidays;
 				total_holiday_hours = leave_details.length * 8; // Each holiday = 8 hours
 
-				console.log(`Total Holiday Hours: ${total_holiday_hours}`);
-
-				
 				if (frm.doc.employees && frm.doc.employees.length > 0) {
 					frm.doc.employees.forEach(row => {
 						row.custom_holiday_hours = total_holiday_hours;
@@ -546,13 +534,11 @@ function calculate_holiday_hours(frm) {
 
 	if (frm.doc.employees && frm.doc.employees.length > 0) {
 		frm.doc.employees.forEach(row => {
-			// row.custom_holiday_hours = total_holiday_hours;
 			row.custom_holiday_amount = row.custom_hourly_rate * total_holiday_hours
 		});
 		frm.refresh_field("employees"); 
 	}
 }
-
 
 let check_entry = function (frm) {
 	var doc = frm.doc;
@@ -678,11 +664,6 @@ frappe.ui.form.on('Payroll Employee Detail', {
 						frappe.msgprint(__(response.message.error));
 						return;
 					}
-
-					// let max_working_hours = response.message.working_hours;
-					// if (max_working_hours === 0) {
-					// 	max_working_hours = 40;
-					// }
 
 					frappe.db.get_single_value('Client Setup', 'default_working_hours')
 					.then(default_hours => {

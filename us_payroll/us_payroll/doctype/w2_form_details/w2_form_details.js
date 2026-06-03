@@ -3,7 +3,7 @@
 
 frappe.ui.form.on("W2 Form Details", {
 	refresh: function(frm) {
-		frm.trigger("set_default_year");
+		// frm.trigger("set_default_year");
 		frm.trigger('set_ein');
 
 		if (frm.doc.__islocal == 1) {
@@ -12,7 +12,7 @@ frappe.ui.form.on("W2 Form Details", {
 	},
 
 	onload: function(frm) {
-		frm.trigger("set_default_year");
+		// frm.trigger("set_default_year");
 		frm.trigger('set_ein');
 		if (frm.doc.__islocal == 1) {
 			frm.trigger("set_company_address");

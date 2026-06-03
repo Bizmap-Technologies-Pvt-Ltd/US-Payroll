@@ -12,8 +12,8 @@ class W3FormDetails(Document):
 def calculate_totals(doc):
 	import json
 	doc = json.loads(doc)
-	if not (doc.get("year_start_date") and doc.get("year_end_date")):
-		frappe.throw("Please make sure Year Start Date and Year End Date are set.")
+	# if not (doc.get("year_start_date") and doc.get("year_end_date")):
+	# 	frappe.throw("Please make sure Year Start Date and Year End Date are set.")
 
 	year_start_date = doc.get("year_start_date")
 	year_end_date = doc.get("year_end_date")

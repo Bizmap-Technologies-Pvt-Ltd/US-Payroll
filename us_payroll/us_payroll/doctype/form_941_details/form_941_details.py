@@ -14,8 +14,8 @@ def calculate_totals(doc):
 	doc = json.loads(doc)
 	if doc.get("year"):
 		doc["year"] = int(doc["year"])
-	if not (doc.get("year_start_date") and doc.get("year_end_date")):
-		frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
+	# if not (doc.get("year_start_date") and doc.get("year_end_date")):
+	# 	frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
  
 	start_date = doc.get("year_start_date")
 	end_date = doc.get("year_end_date")

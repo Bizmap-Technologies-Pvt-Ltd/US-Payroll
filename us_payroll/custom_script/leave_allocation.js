@@ -1,4 +1,3 @@
-
 frappe.ui.form.on("Leave Allocation", {	
 	onload: function(frm) {
 		frm.trigger("set_fiscal_year_dates");
@@ -81,6 +80,5 @@ function show_popup_for_reason(frm, existing_amount, new_amount) {
             });
         }
     });
-
     dialog.show();
 }

@@ -10,6 +10,8 @@ app_license = "MIT"
 
 # required_apps = []
 
+setup_wizard_complete = "us_payroll.custom_script.setup_wizard.setup_wizard.setup_wizard_complete"
+
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
 # 	{

@@ -6,13 +6,13 @@ cur_frm.page.sidebar.toggle();
 frappe.ui.form.on("W2 Form Tool", {
 
 	onload: function(frm) {
-        frm.trigger("set_default_year");
+        // frm.trigger("set_default_year");
         frm.trigger("set_ein");
     },
 
     refresh: function(frm) {
     	frm.disable_save();
-        frm.trigger("set_default_year");
+        // frm.trigger("set_default_year");
         frm.trigger("set_ein");
         frm.trigger('hide_add_row_btn');
 

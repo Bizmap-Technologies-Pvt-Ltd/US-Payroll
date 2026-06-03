@@ -13,8 +13,8 @@ class W2FormDetails(Document):
 @frappe.whitelist()
 def calculate_totals(doc):
 	doc = json.loads(doc)
-	if not (doc.get("year_start_date") and doc.get("year_end_date")):
-		frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
+	# if not (doc.get("year_start_date") and doc.get("year_end_date")):
+	# 	frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
 
 	employee = doc.get("employee")
 	year_start_date = doc.get("year_start_date")

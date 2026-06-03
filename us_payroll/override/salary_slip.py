@@ -1,10 +1,8 @@
 # Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # License: GNU General Public License v3. See license.txt
 
-
 import unicodedata
 from datetime import date
-
 import frappe
 from frappe import _, msgprint
 from frappe.model.naming import make_autoname
@@ -1161,7 +1159,6 @@ class OverrideSalarySlip(SalarySlip):
 		return frappe.cache().get_value(SALARY_COMPONENT_VALUES, generator=_fetch_component_values)
 
 	def eval_condition_and_formula(self, struct_row, data):
-		print("eval_condition_and_formula custom_formula ==========")
 		try:
 			condition = sanitize_expression(struct_row.condition)
 			if condition:
@@ -1181,18 +1178,13 @@ class OverrideSalarySlip(SalarySlip):
 															"name"
 														)
 					if sal_assignment_name:
-						print(sal_assignment_name,"sal_assignment_name =============================")
 						sal_assignment_doc = frappe.get_doc("Salary Structure Assignment",sal_assignment_name)
 						for r in sal_assignment_doc.custom_employee_insurance_deduction:
-							print(r.salary_component, struct_row.salary_component,"r.salary_component,struct_row.salary_component111111111111111111111111111111111111")
 							if r.salary_component == struct_row.salary_component:
-								print(r,struct_row,"r struct_row")
 								return r.amount
 
 						for r in sal_assignment_doc.custom_employee_earnings:
-							print(r.earning_component, struct_row.salary_component,"r.salary_component,struct_row.salary_component222222222222222222222222222222222")
 							if r.earning_component == struct_row.salary_component:
-								print(r.amount, "r.amount if earning match=========")
 								return r.amount
 								
 					return 0.0

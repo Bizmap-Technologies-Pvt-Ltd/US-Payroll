@@ -84,10 +84,7 @@ frappe.ui.form.on('Journal Entry', {
 			d.$body.append(`<p class="frappe-confirm-message">${message}</p>`);
 			d.show();
 
-			// flag, used to bind "okay" on enter
 			d.confirm_dialog = true;
-
-			// no if closed without primary action
 			if (reject_action) {
 				d.onhide = () => {
 					if (!d.primary_action_fulfilled) {
@@ -95,7 +92,6 @@ frappe.ui.form.on('Journal Entry', {
 					}
 				};
 			}
-
 			return d;
 		};
 	},
@@ -108,11 +104,9 @@ frappe.ui.form.on('Journal Entry', {
     },
 
     set_cheque_date:function(frm){
-    	console.log("call======")
     	const today = frappe.datetime.get_today();
 		frm.set_value('cheque_date', today);  
     },
-
 
 	set_accounts_entries:function(frm){
 		var debit = 0
@@ -146,5 +140,4 @@ frappe.ui.form.on('Journal Entry', {
 			}
 		});		
 	},
-
 });

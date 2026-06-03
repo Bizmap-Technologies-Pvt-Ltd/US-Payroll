@@ -221,7 +221,7 @@
    "fetch_if_empty": 0,
    "fieldname": "custom_overtime_hours",
    "fieldtype": "Float",
-   "hidden": 1,
+   "hidden": 0,
    "hide_border": 0,
    "hide_days": 0,
    "hide_seconds": 0,

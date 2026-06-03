@@ -11,8 +11,8 @@ class W2FormTool(Document):
 def get_employees(doc):
 	doc = frappe.parse_json(doc)
 
-	if not doc.get("year_start_date") or not doc.get("year_end_date"):
-		frappe.throw("Year Start Date and Year End Date are required")
+	# if not doc.get("year_start_date") or not doc.get("year_end_date"):
+	# 	frappe.throw("Year Start Date and Year End Date are required")
 
 	salary_slips = frappe.get_all(
 		"Salary Slip",

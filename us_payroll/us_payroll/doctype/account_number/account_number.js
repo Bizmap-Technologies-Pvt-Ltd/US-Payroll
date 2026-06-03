@@ -21,7 +21,7 @@ frappe.ui.form.on("Account Number", {
 	set_default_company:function(frm){
     	if (frm.doc.__islocal == 1) {
 	        frappe.call({
-	            method: 'fund_accounting.fund_accounting.doctype.account_number.account_number.get_global_defaults_values',
+	            method: 'us_payroll.us_payroll.doctype.account_number.account_number.get_global_defaults_values',
 	            args: {
 	                doctype: "Global Defaults",   
 	            },

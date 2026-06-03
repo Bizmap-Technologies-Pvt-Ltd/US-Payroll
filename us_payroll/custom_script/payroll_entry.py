@@ -17,7 +17,6 @@ from frappe.utils import (
 	today,
 )
 
-
 from dateutil.relativedelta import relativedelta
 from frappe.desk.reportview import get_match_cond
 from frappe.model.document import Document
@@ -38,7 +37,6 @@ from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
     get_accounting_dimensions,
 )
 from erpnext.accounts.utils import get_fiscal_year
-# from hrms.payroll.doctype.salary_withholding.salary_withholding import link_bank_entry_in_salary_withholdings
 from hrms.payroll.doctype.payroll_entry.payroll_entry import get_month_details
 from hrms.hr.doctype.leave_application.leave_application import get_leave_details
 
@@ -52,13 +50,11 @@ def validate(doc, method):
 
 	for row in doc.employees: 
 		if not row.custom_pto_hours:
-			# get_pto_leave_balance(doc)
 			process_pto_leave_balance_and_carry_forward(doc)
 
 
 def on_submit(doc, method):
 	pass
-
 
 def before_submit(doc,method):
 	warning_msg(doc)
@@ -79,7 +75,6 @@ def before_save(doc, method):
 
 def warning_msg(doc):
 	for row in doc.employees:
-		# Normalize values to float (handles "0" string vs 0 int)
 		total_hours = float(row.custom_total_working_hours or 0)
 		overtime = float(row.custom_total_overtime_hours or 0)
 		comp_time = float(row.custom_comp_time or 0)
@@ -136,7 +131,7 @@ def validate_do_not_include_in_total(doc):
 
 def get_leave_balance(payroll_doc):  
 	for row in payroll_doc.employees:
-		# --------------------------Comp time calculation----------------------------------------------------------------------------		
+		# --------------------------Comp time calculation-------------------------
 		leave_allocation_data= frappe.db.get_values("Leave Allocation", {'employee' : row.employee,
 																			'leave_type':'Comp Time',
 																			'docstatus':1},  
@@ -173,7 +168,6 @@ def get_leave_balance(payroll_doc):
 				
 		if row.custom_comp_time and total_comp_leaves_allocated:
 			custom_comp_time = row.custom_comp_time
-			# total_cmp_leaves_without_current_doc = total_cmp_leaves_from_payroll
 			total_cmp_leaves = custom_comp_time + total_cmp_leaves_from_payroll
 			leave_application_comp_leaves_taken = leave_application_leave_details["leave_allocation"]['Comp Time']["leaves_taken"]		
 			total_ct_available_leaves = total_comp_leaves_allocated - total_cmp_leaves + leave_application_comp_leaves_taken
@@ -191,63 +185,6 @@ def get_leave_balance(payroll_doc):
 
 		else:
 			pass
-			# row.custom_available_ct = total_comp_leaves_allocated - total_cmp_leaves_from_payroll
-
-
-#-----------------below is the working code, without carry forward logic--------------------------------------------------------
-@frappe.whitelist()
-def get_pto_leave_balance(payroll_doc):
-	for row in payroll_doc.employees:
-		employee = row.employee
-		row_name = row.name
-
-		# Current active leave allocation
-		leave_alloc = frappe.db.get_value(
-			"Leave Allocation",
-			{"employee": employee, "leave_type": "PTO", "docstatus": 1},
-			["name", "from_date", "total_leaves_allocated", "modified"],
-			as_dict=True
-		)
-		total_leaves_allocated_pto = flt(leave_alloc.total_leaves_allocated) if leave_alloc else 0
-
-		# Employee's PTO accrual rate
-		emp = frappe.db.get_value("Employee", employee, ["custom_pto_hours"], as_dict=True)
-		pto_rate = flt(emp.custom_pto_hours) if emp else 0
-
-		# Latest previous Payroll Entry for this employee
-		past_pto = frappe.db.sql("""
-			SELECT pe.name AS payroll_entry, ped.custom_available_pto, ped.custom_pto_leaves_allocated
-			FROM `tabPayroll Entry` pe
-			INNER JOIN `tabPayroll Employee Detail` ped ON ped.parent = pe.name
-			WHERE ped.employee = %s AND pe.docstatus = 1
-			ORDER BY pe.modified DESC
-			LIMIT 1
-		""", (employee,), as_dict=True)
-
-		cumulative_pto = flt(past_pto[0].custom_available_pto) if past_pto else 0
-		past_alloc_used = flt(past_pto[0].custom_pto_leaves_allocated) if past_pto and past_pto[0].custom_pto_leaves_allocated else 0
-
-		new_pto_balance = cumulative_pto + pto_rate
-
-		# Compare past allocation with current allocation
-		delta_allocation = 0
-		if leave_alloc:
-			delta_allocation = total_leaves_allocated_pto - past_alloc_used
-
-		row.custom_available_pto = new_pto_balance + delta_allocation
-		row.custom_pto_leaves_allocated = total_leaves_allocated_pto  # Store this to compare next time
-
-		print({
-			"Employee": employee,
-			"Previous PTO": cumulative_pto,
-			"PTO Rate": pto_rate,
-			"Old Allocation": past_alloc_used,
-			"New Allocation": total_leaves_allocated_pto,
-			"Delta": delta_allocation,
-			"Final PTO Balance": row.custom_available_pto
-		})
-
-	return payroll_doc
 
 
 @frappe.whitelist()
@@ -282,11 +219,6 @@ def process_pto_leave_balance_and_carry_forward(payroll_doc):
 	fiscal_year_start = fy_current["fiscal_year_start"]
 	fiscal_year_end = fy_current["fiscal_year_end"]
 	
-	#hardcoded below dates for testing-------------
-	# fiscal_year_start = datetime.date(2024, 10, 1)
-	# fiscal_year_end = datetime.date(2025, 9, 30)
-	# #----------------------------------------------
-
 	next_fy_start = add_days(fiscal_year_end, 1)
 	fy_next = get_us_fiscal_year(today=next_fy_start)
 	next_fiscal_year = fy_next["fiscal_year"]
@@ -451,28 +383,12 @@ def calculate_holiday_hours(doc):
 	# doc.save(ignore_permissions=True)
 
 			
-# def calculate_working_hours(doc):
-# 	for row in doc.employees:
-# 		if not row.custom_total_working_hours:
-
-# 			total_hours, overtime_hours = frappe.db.sql("""
-# 				SELECT SUM(working_hours), SUM(actual_overtime_duration)
-# 				FROM `tabAttendance`
-# 				WHERE employee = %s
-# 				AND attendance_date BETWEEN %s AND %s
-# 				AND status IN ('Present', 'Half Day', 'Work From Home')
-# 				AND docstatus = 1
-# 			""", (row.employee, doc.start_date, doc.end_date))[0]
-
-# 			row.custom_total_working_hours = total_hours or 0
-# 			row.custom_total_overtime_hours = overtime_hours or 0
-
 def calculate_working_hours(doc):
 	for row in doc.employees:
 		if not row.custom_total_working_hours:
 
 			total_hours, overtime_hours = frappe.db.sql("""
-				SELECT SUM(working_hours - actual_overtime_duration), SUM(actual_overtime_duration)
+				SELECT SUM(working_hours), SUM(custom_overtime_hours)
 				FROM `tabAttendance`
 				WHERE employee = %s
 				AND attendance_date BETWEEN %s AND %s
@@ -586,7 +502,7 @@ def get_submitted_check_stubs(doc_id):
 			submitted_entries.append(slip.get("name"))
 
 		except Exception as e:
-			print(e, "eeeeeeeee get_submitted_check_stubs ======")
+			print(e, "e get_submitted_check_stubs")
 			
 	return {"submitted_entries": submitted_entries}
 
@@ -649,7 +565,6 @@ def get_salary_to_print_for_bank(doc_id):
 @frappe.whitelist()
 def get_check_stubs_for_void_condition(filters):
 	filters = json.loads(filters)
-
 	all_slips = frappe.db.get_all("Salary Slip", {"payroll_entry": filters.get("payroll_entry"),"docstatus": ["in", [1]],},
 								["name", "custom_check_no"])
 	
@@ -739,9 +654,7 @@ def assign_new_check_no(source_name, payroll_entry, new_check_required=None, rea
     site_url = get_url()
     check_url = f"{site_url}/app/check/{old_check_no}"
 
-    # reason_of_new_check_no = f"This is the new check no assigned to {source_name} by cancelling old check no <a href= '{check_url}'><b>{old_check_no}</b></a>."
     reason_of_new_check_no = f"New check {new_check_no} assigned, old check <a href= '{check_url}'><b>{old_check_no}</b></a> voided."
-
     emp_name = frappe.db.get_value("Salary Slip", {"name": source_name}, "employee_name")
     # Mark the new check as issued
     frappe.db.set_value("Check", new_check_no, "status", "Issued")
