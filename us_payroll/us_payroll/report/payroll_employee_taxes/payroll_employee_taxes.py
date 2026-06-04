@@ -25,7 +25,7 @@ def get_data(filters):
 
 	results = frappe.db.sql(
 		f"""
-		SELECT 
+		SELECT
 			agg.employee,
 			agg.employee_name,
 			agg.department AS department,
@@ -67,7 +67,7 @@ def get_data(filters):
 			SUM(agg.medicare_employee_total) AS medicare_emp,
 			SUM(agg.medicare_employer_total) AS medicare_er
 		FROM (
-			SELECT 
+			SELECT
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,

@@ -42,7 +42,7 @@ def calculate_totals(doc):
 
 	results = frappe.db.sql(
 		f"""
-		SELECT 
+		SELECT
 			agg.employee,
 			agg.employee_name,
 			agg.department,
@@ -56,7 +56,7 @@ def calculate_totals(doc):
 			SUM(agg.medicare_employee_total) AS medicare_emp,
 			SUM(agg.medicare_employer_total) AS medicare_er
 		FROM (
-			SELECT 
+			SELECT
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
@@ -72,7 +72,7 @@ def calculate_totals(doc):
 					WHERE ded.parent = cs.name
 					AND sc.custom_federal_income_tax_and_additional_withholdings = 1
 				), 0) AS federal_withholding,
- 
+
 				COALESCE((
 					SELECT SUM(ded.amount)
 					FROM `tabSalary Detail` ded
@@ -80,7 +80,7 @@ def calculate_totals(doc):
 					WHERE ded.parent = cs.name
 					AND sc.name = 'Social Security Tax - Employee'
 				), 0) AS ss_employee_total,
- 
+
 				COALESCE((
 					SELECT SUM(ded.amount)
 					FROM `tabSalary Detail` ded
@@ -88,7 +88,7 @@ def calculate_totals(doc):
 					WHERE ded.parent = cs.name
 					AND sc.name = 'Social Security Tax - Employer'
 				), 0) AS ss_employer_total,
- 
+
 				COALESCE((
 					SELECT SUM(ded.amount)
 					FROM `tabSalary Detail` ded
@@ -96,7 +96,7 @@ def calculate_totals(doc):
 					WHERE ded.parent = cs.name
 					AND sc.name = 'Medicare Tax EE'
 				), 0) AS medicare_employee_total,
- 
+
 				COALESCE((
 					SELECT SUM(ded.amount)
 					FROM `tabSalary Detail` ded
@@ -104,7 +104,7 @@ def calculate_totals(doc):
 					WHERE ded.parent = cs.name
 					AND sc.name = 'Medicare Tax ER'
 				), 0) AS medicare_employer_total
- 
+
 			FROM `tabSalary Slip` cs
 			WHERE {condition_sql}
 		) agg
@@ -156,7 +156,7 @@ def calculate_totals(doc):
 @frappe.whitelist()
 def fetch_address_details(is_your_company_address, link_doctype, link_name):
 	address = frappe.db.sql(
-		""" 
+		"""
 			SELECT a.address_line1, a.address_line2, a.city, a.state, a.county, a.country, a.pincode, a.email_id,a.phone
 			FROM `tabAddress` a
 			JOIN `tabDynamic Link` l ON l.parent = a.name

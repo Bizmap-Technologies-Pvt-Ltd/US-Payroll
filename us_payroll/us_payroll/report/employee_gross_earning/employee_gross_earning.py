@@ -27,14 +27,14 @@ def get_data(filters):
 
 	results = frappe.db.sql(
 		"""
-		SELECT 
+		SELECT
 			agg.employee,
 			agg.employee_name,
 			agg.department AS department,
 			SUM(agg.gross_pay) AS gross_pay
-			
+
 		FROM (
-			SELECT 
+			SELECT
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
@@ -45,7 +45,7 @@ def get_data(filters):
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
 			WHERE cs.docstatus = 1
 			AND cs.start_date BETWEEN %(from_date)s AND %(to_date)s
-			
+
 		) agg
 		GROUP BY agg.employee, agg.employee_name
 		ORDER BY agg.employee_name

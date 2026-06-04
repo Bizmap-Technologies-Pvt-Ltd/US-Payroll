@@ -4,11 +4,11 @@
 frappe.query_reports["Payroll Leave Balance Report"] = {
 	filters: [
 		{
-			"fieldname": "as_of_date",
-			"label": __("Date"),
-			"fieldtype": "Date",
-			"default": frappe.datetime.now_date(),
-			"width": 80,
+			fieldname: "as_of_date",
+			label: __("Date"),
+			fieldtype: "Date",
+			default: frappe.datetime.now_date(),
+			width: 80,
 		},
 		{
 			fieldname: "consolidate_leave_types",
@@ -16,11 +16,10 @@ frappe.query_reports["Payroll Leave Balance Report"] = {
 			fieldtype: "Check",
 			default: 1,
 			// depends_on: "eval: !doc.employee",
-			hidden: 1
-		}
+			hidden: 1,
+		},
 	],
 	onload: () => {
 		const today = frappe.datetime.now_date();
-
-	}
-}
+	},
+};

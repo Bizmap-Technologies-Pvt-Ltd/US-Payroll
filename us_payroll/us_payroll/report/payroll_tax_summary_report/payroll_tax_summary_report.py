@@ -55,7 +55,7 @@ def get_data(filters):
 
 	data = frappe.db.sql(
 		"""
-		SELECT 
+		SELECT
 			pe.name AS payroll_entry,
 			ped.employee,
 			ped.employee_name,
@@ -63,32 +63,32 @@ def get_data(filters):
 			emp.middle_name,
 			emp.last_name,
 			gp.gross_pay,
-			
-			-- COALESCE(SUM(CASE 
-			-- 	WHEN sd.salary_component = 'FIT Withholdings' THEN sd.amount 
+
+			-- COALESCE(SUM(CASE
+			-- 	WHEN sd.salary_component = 'FIT Withholdings' THEN sd.amount
 			-- 	ELSE 0 END), 0) AS fit_withholdings,
 
 			COALESCE(SUM(
-				CASE 
-					WHEN sd.salary_component IN ('FIT Withholdings', 'FIT') THEN sd.amount 
-					ELSE 0 
+				CASE
+					WHEN sd.salary_component IN ('FIT Withholdings', 'FIT') THEN sd.amount
+					ELSE 0
 				END
 			), 0) AS fit_withholdings,
 
-			COALESCE(SUM(CASE 
-				WHEN sd.salary_component = 'Social Security Tax - Employee' THEN sd.amount 
+			COALESCE(SUM(CASE
+				WHEN sd.salary_component = 'Social Security Tax - Employee' THEN sd.amount
 				ELSE 0 END), 0) AS social_security_wages,
-			COALESCE(SUM(CASE 
-				WHEN sd.salary_component = 'Medicare Tax EE' THEN sd.amount 
+			COALESCE(SUM(CASE
+				WHEN sd.salary_component = 'Medicare Tax EE' THEN sd.amount
 				ELSE 0 END), 0) AS medicare_wages
-		 
-		FROM 
+
+		FROM
 			`tabPayroll Entry` pe
-		JOIN 
+		JOIN
 			`tabPayroll Employee Detail` ped ON ped.parent = pe.name
-		LEFT JOIN 
+		LEFT JOIN
 			`tabEmployee` emp ON emp.name = ped.employee
-		 
+
 		-- Subquery: gross pay per employee (avoids duplication)
 		LEFT JOIN (
 			SELECT employee, SUM(gross_pay) AS gross_pay
@@ -97,19 +97,19 @@ def get_data(filters):
 			  AND docstatus != 2
 			GROUP BY employee
 		) gp ON gp.employee = ped.employee
-		 
+
 		-- Salary components join
-		LEFT JOIN 
+		LEFT JOIN
 			`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
-		LEFT JOIN 
+		LEFT JOIN
 			`tabSalary Detail` sd ON sd.parent = cst.name
-		 
-		WHERE 
+
+		WHERE
 			cst.posting_date BETWEEN %(from_date)s AND %(to_date)s
 			AND cst.docstatus != 2
 			AND sd.salary_component IN ('FIT Withholdings', 'Social Security Tax - Employee', 'Medicare Tax EE', 'FIT')
-		 
-		GROUP BY 
+
+		GROUP BY
 			ped.employee, gp.gross_pay
 
 	""",

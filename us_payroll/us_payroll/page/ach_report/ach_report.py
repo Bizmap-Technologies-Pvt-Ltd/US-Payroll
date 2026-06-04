@@ -29,7 +29,7 @@ def generate_ach_file(payroll_entry):
 
 	salary_slips = frappe.db.sql(
 		"""
-		SELECT 
+		SELECT
 			ss.name AS salary_slip,
 			ss.employee AS employee_id,
 			e.employee_name,
@@ -170,7 +170,7 @@ def generate_ach_filess(payroll_entry):
 		# Fetch salary slips from the database
 		salary_slips = frappe.db.sql(
 			"""
-			SELECT 
+			SELECT
 				ss.name AS salary_slip,
 				ss.employee AS employee_id,
 				e.employee_name,
@@ -180,11 +180,11 @@ def generate_ach_filess(payroll_entry):
 				e.custom_type_of_account,
 				e.custom_payment_method,
 				e.custom_routing_number
-			FROM 
+			FROM
 				`tabSalary Slip` ss
-			LEFT JOIN 
+			LEFT JOIN
 				`tabEmployee` e ON ss.employee = e.name
-			WHERE 
+			WHERE
 				ss.payroll_entry = %s AND e.custom_payment_method = 'Bank'
 		""",
 			(payroll_entry),

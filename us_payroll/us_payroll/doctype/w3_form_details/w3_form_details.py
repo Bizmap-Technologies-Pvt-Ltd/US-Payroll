@@ -106,7 +106,7 @@ def calculate_totals(doc):
 @frappe.whitelist()
 def fetch_address_details(is_your_company_address, link_doctype, link_name):
 	address = frappe.db.sql(
-		""" 
+		"""
 			SELECT a.address_line1, a.address_line2, a.city, a.state, a.country, a.pincode, a.email_id,a.phone, a.fax
 			FROM `tabAddress` a
 			JOIN `tabDynamic Link` l ON l.parent = a.name

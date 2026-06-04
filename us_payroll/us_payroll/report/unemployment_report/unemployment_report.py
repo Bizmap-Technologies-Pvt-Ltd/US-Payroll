@@ -86,12 +86,12 @@ def execute(filters=None):
 			cst.posting_date,
 			emp.gender
 		FROM `tabSalary Slip` cst
-		JOIN `tabEmployee` emp 
+		JOIN `tabEmployee` emp
 			ON cst.employee = emp.name
 		WHERE YEAR(cst.posting_date) = %(year)s
 		AND MONTH(cst.posting_date) IN %(months)s
 		AND cst.docstatus != 2
-		GROUP BY 
+		GROUP BY
 			MONTH(cst.posting_date),
 			cst.employee,
 			emp.gender
@@ -158,7 +158,7 @@ def get_data(filters):
 
 	data = frappe.db.sql(
 		"""
-		SELECT 
+		SELECT
 			pe.name AS payroll_entry,
 			ped.employee,
 			ped.employee_name,
@@ -177,20 +177,20 @@ def get_data(filters):
 			-- ct.cost_center_name as custom_department_name,
 			CEIL(MONTH(pe.posting_date)/3) AS quarter
 
-		FROM 
+		FROM
 			`tabPayroll Entry` pe
-		JOIN 
+		JOIN
 			`tabPayroll Employee Detail` ped ON ped.parent = pe.name
-		LEFT JOIN 
+		LEFT JOIN
 			`tabEmployee` emp ON emp.name = ped.employee
-		LEFT JOIN 
+		LEFT JOIN
 			`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
-		LEFT JOIN 
+		LEFT JOIN
 			`tabSalary Detail` sd ON sd.parent = cst.name
-		LEFT JOIN 
+		LEFT JOIN
 			`tabCost Center` ct ON ct.name = emp.department
 
-		WHERE 
+		WHERE
 			YEAR(pe.posting_date) = %(year)s
 			AND MONTH(pe.posting_date) IN %(months)s
 			AND MONTH(cst.posting_date) IN %(months)s

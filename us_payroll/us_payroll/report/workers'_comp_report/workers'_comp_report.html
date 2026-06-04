@@ -14,9 +14,9 @@
             border: none;
         }
 
-        h3, h4, table { 
-            page-break-inside: avoid; 
-            page-break-after: avoid; 
+        h3, h4, table {
+            page-break-inside: avoid;
+            page-break-after: avoid;
         }
 
         /*th, td {
@@ -35,7 +35,7 @@
         }
 
 /*        .totals { font-weight: bold; background-color: #e6e6e6; }
-*/        
+*/
     </style>
 
 </head>
@@ -92,11 +92,11 @@
                                 <td style="text-align:right">{{ emp.ot_hours | round(2) }}</td>
                                 <td style="text-align:right">${{"{:,.2f}".format(emp.gross_amount or 0) }}</td>
                             </tr>
-                        
+
                         {% else %}
 
-                        
-                        {% endif %}     
+
+                        {% endif %}
                     {% endfor %}
                     <tr>
                         <td colspan="7" style="border-top: 1x solid black; padding-top: 5px;"></td>

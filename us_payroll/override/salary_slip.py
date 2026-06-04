@@ -170,11 +170,11 @@ class OverrideSalarySlip(SalarySlip):
 		# Query to count 'Insurance' occurrences in the deductions table for the current month
 		existing_insurance_count = frappe.db.sql(
 			"""
-			SELECT COUNT(sd.name) 
+			SELECT COUNT(sd.name)
 			FROM `tabSalary Slip` ss
 			JOIN `tabSalary Detail` sd ON sd.parent = ss.name
 			WHERE ss.employee = %s
-			
+
 			AND MONTH(ss.start_date) = %s
 			AND YEAR(ss.start_date) = %s
 			AND sd.salary_component = 'Insurance'

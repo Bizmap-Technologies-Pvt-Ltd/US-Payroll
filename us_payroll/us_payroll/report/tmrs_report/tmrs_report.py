@@ -57,7 +57,7 @@ def get_data(filters):
 
 	data = frappe.db.sql(
 		"""
-			SELECT 
+			SELECT
 				pe.name AS payroll_entry,
 				ped.employee,
 				ped.employee_name,
@@ -70,30 +70,30 @@ def get_data(filters):
 				cst.name AS salary_slip,
 				sd.salary_component,
 				sd.amount AS salary_component_amount,
-				(CASE 
-				WHEN sd.salary_component = 'TMRS (Employee)' THEN sd.amount 
-				ELSE 0 
+				(CASE
+				WHEN sd.salary_component = 'TMRS (Employee)' THEN sd.amount
+				ELSE 0
 			END) AS tmrs_employee_total,
-			(CASE 
-				WHEN sd.salary_component = 'TMRS (Employer)' THEN sd.amount 
-				ELSE 0 
+			(CASE
+				WHEN sd.salary_component = 'TMRS (Employer)' THEN sd.amount
+				ELSE 0
 			END) AS tmrs_employer_total,
 			dept.name as department
 
-			FROM 
+			FROM
 				`tabPayroll Entry` pe
-			JOIN 
+			JOIN
 				`tabPayroll Employee Detail` ped ON ped.parent = pe.name
-			LEFT JOIN 
+			LEFT JOIN
 				`tabEmployee` emp ON emp.name = ped.employee
-			LEFT JOIN 
+			LEFT JOIN
 				`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
-			LEFT JOIN 
+			LEFT JOIN
 				`tabSalary Detail` sd ON sd.parent = cst.name
-			LEFT JOIN 
+			LEFT JOIN
 				`tabDepartment` dept ON dept.name = emp.department
 
-			WHERE 
+			WHERE
 				YEAR(pe.posting_date) = %(year)s
 				AND MONTH(pe.posting_date) = %(selected_month)s
 				AND MONTH(cst.posting_date) = %(selected_month)s

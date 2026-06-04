@@ -153,8 +153,8 @@ def calculate_leaves_taken(doc):
 		start_date = doc.start_date
 
 		query = f"""
-				SELECT pe.name AS payroll_entry, 
-				ped.custom_available_pto, 
+				SELECT pe.name AS payroll_entry,
+				ped.custom_available_pto,
 				ped.custom_available_ct,
 				ped.custom_comp_time,
 				ped.custom_pto_hours
@@ -164,7 +164,7 @@ def calculate_leaves_taken(doc):
 				WHERE ped.employee = '{employee}'
 				  AND pe.docstatus = 1
 				  AND pe.status != 'Failed'
-				  AND pe.posting_date <= '{start_date}'                 
+				  AND pe.posting_date <= '{start_date}'
 				"""
 
 		past_data = frappe.db.sql(query, as_dict=True)

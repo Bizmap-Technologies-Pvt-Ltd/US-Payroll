@@ -11,14 +11,14 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            border: none; 
+            border: none;
         }
 
         th, td {
-            border: none; 
+            border: none;
             padding: 8px;
             text-align: left;
-            line-height: 1.5px; 
+            line-height: 1.5px;
         }
 
         th {
@@ -38,7 +38,7 @@
 
 
    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
-       <div class="header"> 
+       <div class="header">
        		<!-- <img src="/files/overton logo.PNG" style="width: 200px; height: auto; float: left;">  -->
        		<img src="{{ letterhead_image }}" style="width: 200px; height: auto; float: left;">
 
@@ -50,10 +50,10 @@
 
     </div>
 
-    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">      
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
         <div style="float: left;">
             <div>{{ formatted_date_range }}</div>
-            <div>{{ current_datetime }}</div>          
+            <div>{{ current_datetime }}</div>
         </div>
     </div>
 
@@ -70,7 +70,7 @@
                     <th rowspan="3" style="font-size: 13px; text-align: right;">Medicare Wages</th>
                     <th rowspan="3" style="font-size: 13px; text-align: right;">Unemployment insurance</th>
                     <th rowspan="3" style="font-size: 13px; text-align: right;">Workers comp</th>
-                    
+
                 </tr>
             </thead>
             <tbody>
@@ -146,10 +146,10 @@
 				            <td style="font-size: 13px; text-align: right; font-weight: bold;">
 				                ${{ "%.2f"|format(row.unemployment_insurance or 0) }}
 				            </td>
-		                
+
 		                </tr>
 
-                    {% endif %}                          
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

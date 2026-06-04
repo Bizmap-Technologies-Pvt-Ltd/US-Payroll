@@ -520,10 +520,10 @@ def calculate_employee_totals(doc, start_date, end_date):
 def get_bank_entry_against_payroll(doc_id):
 	bank_entry_jv = frappe.db.sql(
 		"""
-		SELECT jv.name 
-		FROM `tabJournal Entry` jv 
-		JOIN `tabJournal Entry Account` acc ON jv.name = acc.parent 
-		WHERE jv.voucher_type = 'Bank Entry' 
+		SELECT jv.name
+		FROM `tabJournal Entry` jv
+		JOIN `tabJournal Entry Account` acc ON jv.name = acc.parent
+		WHERE jv.voucher_type = 'Bank Entry'
 		AND acc.reference_type = 'Payroll Entry'
 		AND acc.reference_name = %s
 	""",
@@ -533,10 +533,10 @@ def get_bank_entry_against_payroll(doc_id):
 
 	check_entry_jv = frappe.db.sql(
 		"""
-		SELECT jv.name 
-		FROM `tabJournal Entry` jv 
-		JOIN `tabJournal Entry Account` acc ON jv.name = acc.parent 
-		WHERE jv.voucher_type = 'Bank Entry' 
+		SELECT jv.name
+		FROM `tabJournal Entry` jv
+		JOIN `tabJournal Entry Account` acc ON jv.name = acc.parent
+		WHERE jv.voucher_type = 'Bank Entry'
 		AND jv.custom_check_entry = 1
 		AND acc.reference_type = 'Payroll Entry'
 		AND acc.reference_name = %s
@@ -627,19 +627,19 @@ def get_employees_with_bank_payment(doc_id):
 def get_salary_to_print(doc_id):
 	salary_slip_list = frappe.db.sql(
 		"""
-		SELECT 
+		SELECT
 			ss.name AS name,
 			ss.employee AS employee_id,
 			e.employee_name,
 			e.custom_payment_method,
 			ss.custom_check_no
-		FROM 
+		FROM
 			`tabSalary Slip` ss
-		LEFT JOIN 
+		LEFT JOIN
 			`tabEmployee` e ON ss.employee = e.name
-		WHERE 
+		WHERE
 			ss.payroll_entry = %s AND e.custom_payment_method = 'Check'
-			ORDER BY 
+			ORDER BY
 			ss.custom_check_no DESC
 	""",
 		(doc_id,),
@@ -653,16 +653,16 @@ def get_salary_to_print(doc_id):
 def get_salary_to_print_for_bank(doc_id):
 	salary_slip_list = frappe.db.sql(
 		"""
-		SELECT 
+		SELECT
 			ss.name AS name,
 			ss.employee AS employee_id,
 			e.employee_name,
 			e.custom_payment_method
-		FROM 
+		FROM
 			`tabSalary Slip` ss
-		LEFT JOIN 
+		LEFT JOIN
 			`tabEmployee` e ON ss.employee = e.name
-		WHERE 
+		WHERE
 			ss.payroll_entry = %s AND e.custom_payment_method = 'Bank'
 	""",
 		(doc_id,),
