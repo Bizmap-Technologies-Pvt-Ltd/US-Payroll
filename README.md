@@ -16,7 +16,7 @@ Install the app using Bench CLI:
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app https://github.com/AdcompSystems/US-Payroll.git --branch version-16
+bench get-app https://github.com/Bizmap-Technologies-Pvt-Ltd/US-Payroll.git --branch version-16
 bench install-app us_payroll
 ```
 
