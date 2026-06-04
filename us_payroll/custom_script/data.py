@@ -14,12 +14,11 @@ from enum import Enum
 from typing import Any, Literal, Optional, TypeVar, Union
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlparse, urlunparse
 
+import frappe
 from click import secho
 from dateutil import parser
 from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
-
-import frappe
 from frappe.desk.utils import slug
 
 DateTimeLikeObject = Union[str, datetime.date, datetime.datetime]
@@ -181,8 +180,7 @@ def add_to_date(
 	seconds=0,
 	as_string: Literal[False] = False,
 	as_datetime: Literal[False] = False,
-) -> datetime.date:
-	...
+) -> datetime.date: ...
 
 
 @typing.overload
@@ -197,8 +195,7 @@ def add_to_date(
 	seconds=0,
 	as_string: Literal[False] = False,
 	as_datetime: Literal[True] = True,
-) -> datetime.datetime:
-	...
+) -> datetime.datetime: ...
 
 
 @typing.overload
@@ -213,8 +210,7 @@ def add_to_date(
 	seconds=0,
 	as_string: Literal[True] = True,
 	as_datetime: bool = False,
-) -> str:
-	...
+) -> str: ...
 
 
 def add_to_date(
@@ -374,13 +370,11 @@ def nowtime() -> str:
 
 
 @typing.overload
-def get_first_day(dt, d_years=0, d_months=0, as_str: Literal[False] = False) -> datetime.date:
-	...
+def get_first_day(dt, d_years=0, d_months=0, as_str: Literal[False] = False) -> datetime.date: ...
 
 
 @typing.overload
-def get_first_day(dt, d_years=0, d_months=0, as_str: Literal[True] = False) -> str:
-	...
+def get_first_day(dt, d_years=0, d_months=0, as_str: Literal[True] = False) -> str: ...
 
 
 # TODO: first arg
@@ -403,13 +397,11 @@ def get_first_day(dt, d_years: int = 0, d_months: int = 0, as_str: bool = False)
 
 
 @typing.overload
-def get_quarter_start(dt, as_str: Literal[False] = False) -> datetime.date:
-	...
+def get_quarter_start(dt, as_str: Literal[False] = False) -> datetime.date: ...
 
 
 @typing.overload
-def get_quarter_start(dt, as_str: Literal[True] = False) -> str:
-	...
+def get_quarter_start(dt, as_str: Literal[True] = False) -> str: ...
 
 
 def get_quarter_start(dt, as_str: bool = False) -> str | datetime.date:
@@ -888,13 +880,11 @@ def cast(fieldtype, value=None):
 
 
 @typing.overload
-def flt(s: NumericType | str, precision: Literal[0]) -> int:
-	...
+def flt(s: NumericType | str, precision: Literal[0]) -> int: ...
 
 
 @typing.overload
-def flt(s: NumericType | str, precision: int | None = None) -> float:
-	...
+def flt(s: NumericType | str, precision: int | None = None) -> float: ...
 
 
 def flt(s: NumericType | str, precision: int | None = None, rounding_method: str | None = None) -> float:
@@ -1240,7 +1230,7 @@ def fmt_money(
 		parts.append(amount[-3:])
 		amount = amount[:-3]
 
-		val = number_format == "#,##,###.##" and 2 or 3
+		val = (number_format == "#,##,###.##" and 2) or 3
 
 		while len(amount) > val:
 			parts.append(amount[-val:])
@@ -1250,7 +1240,7 @@ def fmt_money(
 
 	parts.reverse()
 
-	amount = comma_str.join(parts) + ((precision and decimal_str) and (decimal_str + decimals) or "")
+	amount = comma_str.join(parts) + (((precision and decimal_str) and (decimal_str + decimals)) or "")
 	if amount != "0":
 		amount = minus + amount
 
@@ -1342,7 +1332,7 @@ def money_in_words(
 	# 0.00
 	if main == "0" and fraction in ["00", "000"]:
 		out = _(main_currency, context="Currency") + " " + _("Zero")
-		
+
 	# 0.XX
 	elif main == "0":
 		out = in_words(fraction, in_million).title() + " " + fraction_currency
@@ -1395,10 +1385,9 @@ def is_image(filepath: str) -> bool:
 def get_thumbnail_base64_for_image(src):
 	from os.path import exists as file_exists
 
-	from PIL import Image
-
 	from frappe import cache, safe_decode
 	from frappe.core.doctype.file.utils import get_local_image
+	from PIL import Image
 
 	if not src:
 		frappe.throw(f"Invalid source for image: {src}")
@@ -1644,8 +1633,8 @@ def get_link_to_report(
 
 		filters = "&".join(conditions)
 
-		return """<a href='{}'>{}</a>""".format(
-			get_url_to_report_with_filters(name, filters, report_type, doctype), label
+		return (
+			f"""<a href='{get_url_to_report_with_filters(name, filters, report_type, doctype)}'>{label}</a>"""
 		)
 	else:
 		return f"""<a href='{get_url_to_report(name, report_type, doctype)}'>{label}</a>"""
@@ -1842,7 +1831,6 @@ def make_filter_dict(filters):
 
 def sanitize_column(column_name: str) -> None:
 	import sqlparse
-
 	from frappe import _
 
 	column_name = sqlparse.format(column_name, strip_comments=True, keyword_case="lower")

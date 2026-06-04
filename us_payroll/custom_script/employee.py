@@ -1,7 +1,9 @@
-import frappe
 import json
+
+import frappe
 from frappe import _
-from frappe.utils import getdate, today,flt
+from frappe.utils import flt, getdate, today
+
 
 def validate(doc, method):
 	primary_pct = float(doc.custom_account_allocation_ or 100)
@@ -10,8 +12,9 @@ def validate(doc, method):
 	if round(total_pct, 2) != 100:
 		frappe.throw(f"Total allocation percentage must equal 100%, but got {total_pct}%.")
 
+
 @frappe.whitelist()
 def get_global_defaults_values(doctype):
 	global_defaults_doc = frappe.get_doc("Global Defaults", doctype)
 	company = global_defaults_doc.default_company
-	return {"company":company}
+	return {"company": company}

@@ -4,8 +4,10 @@
 import frappe
 from frappe.model.document import Document
 
+
 class W2FormTool(Document):
 	pass
+
 
 @frappe.whitelist()
 def get_employees(doc):
@@ -16,12 +18,17 @@ def get_employees(doc):
 
 	salary_slips = frappe.get_all(
 		"Salary Slip",
-		filters={
-			"posting_date": ["between", [doc["year_start_date"], doc["year_end_date"]]],
-			"docstatus": 1
-		},
-		fields=["name", "employee", "employee_name", "gross_pay", 'custom_taxable_wages',
-				'custom_total_non_taxable_earnings', 'custom_ss_taxable_wages', 'custom_mc_taxable_wages']
+		filters={"posting_date": ["between", [doc["year_start_date"], doc["year_end_date"]]], "docstatus": 1},
+		fields=[
+			"name",
+			"employee",
+			"employee_name",
+			"gross_pay",
+			"custom_taxable_wages",
+			"custom_total_non_taxable_earnings",
+			"custom_ss_taxable_wages",
+			"custom_mc_taxable_wages",
+		],
 	)
 
 	employee_map = {}
@@ -52,7 +59,7 @@ def get_employees(doc):
 				"medical_insurance": 0,
 				"social_security_wages": 0,
 				"medicare_wages_and_tips": 0,
-				"retirement_plan": False
+				"retirement_plan": False,
 			}
 
 		# --- Wages, tips, other compensation ---
@@ -88,7 +95,8 @@ def get_employees(doc):
 			employee_map[slip.employee]["social_security_wages"] += slip.custom_ss_taxable_wages
 		else:
 			ss_emp = sum(
-				d.amount for d in slip_doc.deductions
+				d.amount
+				for d in slip_doc.deductions
 				if d.salary_component == "Social Security Tax - Employee"
 			)
 			if ss_emp:
@@ -98,10 +106,7 @@ def get_employees(doc):
 		if slip.custom_mc_taxable_wages and slip.custom_mc_taxable_wages > 0:
 			employee_map[slip.employee]["medicare_wages_and_tips"] += slip.custom_mc_taxable_wages
 		else:
-			mc_emp = sum(
-				d.amount for d in slip_doc.deductions
-				if d.salary_component == "Medicare Tax EE"
-			)
+			mc_emp = sum(d.amount for d in slip_doc.deductions if d.salary_component == "Medicare Tax EE")
 			if mc_emp:
 				employee_map[slip.employee]["medicare_wages_and_tips"] += mc_emp / 0.0145
 
@@ -116,16 +121,10 @@ def generate_w2_form_records(doc):
 	skipped = []
 
 	for row in doc.get("w2_form_details", []):
-
-		if frappe.db.exists(
-			"W2 Form Details",
-			{"employee": row["employee"], "year": doc["year"]}
-		):
-			skipped.append({
-				"employee": row["employee"],
-				"employee_name": row["employee_name"],
-				"year": doc["year"]
-			})
+		if frappe.db.exists("W2 Form Details", {"employee": row["employee"], "year": doc["year"]}):
+			skipped.append(
+				{"employee": row["employee"], "employee_name": row["employee_name"], "year": doc["year"]}
+			)
 			continue
 
 		company = frappe.defaults.get_global_default("company")
@@ -134,7 +133,7 @@ def generate_w2_form_records(doc):
 
 		w2 = frappe.new_doc("W2 Form Details")
 		w2.employee = row["employee"]
-		w2.control_number =  row["control_number"]
+		w2.control_number = row["control_number"]
 		w2.employee_name = row["employee_name"]
 		w2.first_name = row["first_name"]
 		w2.last_name = row["last_name"]
@@ -161,34 +160,24 @@ def generate_w2_form_records(doc):
 		w2.insert()
 		w2.submit()
 
-		created.append({
-			"name": w2.name,
-			"employee": row["employee"],
-			"employee_name": row["employee_name"],
-			"year": doc["year"]
-		})
+		created.append(
+			{
+				"name": w2.name,
+				"employee": row["employee"],
+				"employee_name": row["employee_name"],
+				"year": doc["year"],
+			}
+		)
 
-	return {
-		"created": created,
-		"skipped": skipped
-	}
+	return {"created": created, "skipped": skipped}
 
 
 def get_company_address_text():
 	address = frappe.db.get_value(
 		"Address",
-		{
-			"is_your_company_address": 1
-		},
-		[
-			"address_line1",
-			"address_line2",
-			"city",
-			"state",
-			"pincode",
-			"country"
-		],
-		as_dict=True
+		{"is_your_company_address": 1},
+		["address_line1", "address_line2", "city", "state", "pincode", "country"],
+		as_dict=True,
 	)
 
 	if not address:

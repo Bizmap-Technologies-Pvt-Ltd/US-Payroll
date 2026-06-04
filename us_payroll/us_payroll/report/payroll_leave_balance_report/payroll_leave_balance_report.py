@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 from itertools import groupby
+
 import frappe
 from frappe import _
 from frappe.utils import add_days, cint, flt, getdate
@@ -10,6 +11,7 @@ from hrms.hr.doctype.leave_application.leave_application import (
 	get_leave_balance_on,
 	get_leaves_for_period,
 )
+
 Filters = frappe._dict
 
 
@@ -47,10 +49,11 @@ def get_columns() -> list[dict]:
 			"fieldtype": "float",
 			"fieldname": "leaves_taken",
 			"width": 200,
-		}		
+		},
 	]
 
-def update_leave_data_from_payrol(data,filters):	
+
+def update_leave_data_from_payrol(data, filters):
 	as_of_date = filters.get("as_of_date")
 	_data = []
 
@@ -75,7 +78,7 @@ def update_leave_data_from_payrol(data,filters):
 			condition = " AND 1=1 "
 
 			query += condition + order_by
-			past_data = frappe.db.sql(query,as_dict=True)
+			past_data = frappe.db.sql(query, as_dict=True)
 
 			if not past_data:
 				continue
@@ -87,16 +90,16 @@ def update_leave_data_from_payrol(data,filters):
 				if len(past_data) > 0:
 					row["balance_leaves"] = past_data[0].get("custom_available_ct")
 
-					row["leaves_taken"] = sum([_["custom_comp_time"] for _ in past_data ])
+					row["leaves_taken"] = sum([_["custom_comp_time"] for _ in past_data])
 
 			if row["leave_type"] == "PTO":
 				if len(past_data) > 0:
 					row["balance_leaves"] = past_data[0].get("custom_available_pto")
-					row["leaves_taken"] = sum([_["custom_pto_hours"] for _ in past_data ])
+					row["leaves_taken"] = sum([_["custom_pto_hours"] for _ in past_data])
 
 			_data.append(row)
 		else:
-			_data.append(row)			
+			_data.append(row)
 
 	return _data
 
@@ -104,9 +107,9 @@ def update_leave_data_from_payrol(data,filters):
 def get_data(filters: Filters) -> list:
 	# leave_types = get_leave_types()
 
-	leave_types = ['Comp Time',  'PTO']
+	leave_types = ["Comp Time", "PTO"]
 	active_employees = get_employees(filters)
-	
+
 	precision = cint(frappe.db.get_single_value("System Settings", "float_precision"))
 	consolidate_leave_types = len(active_employees) > 1 and filters.consolidate_leave_types
 	row = None
@@ -144,26 +147,22 @@ def get_data(filters: Filters) -> list:
 			closing = new_allocation + opening - (row.leaves_expired + leaves_taken)
 			row.closing_balance = flt(closing, precision)
 			row.indent = 1
-			row.update({"leave_type":leave_type})
+			row.update({"leave_type": leave_type})
 			data.append(row)
-	
-	data = update_leave_data_from_payrol(data,filters)
+
+	data = update_leave_data_from_payrol(data, filters)
 
 	return data
 
 
 def get_leave_types() -> list[str]:
 	LeaveType = frappe.qb.DocType("Leave Type")
-	return (frappe.qb.from_(LeaveType).select(LeaveType.name).orderby(LeaveType.name)).run(
-		pluck="name"
-	)
+	return (frappe.qb.from_(LeaveType).select(LeaveType.name).orderby(LeaveType.name)).run(pluck="name")
 
 
 def get_employees(filters: Filters) -> list[dict]:
 	Employee = frappe.qb.DocType("Employee")
-	query = frappe.qb.from_(Employee).select(
-		Employee.name,
-		Employee.employee_name	)
+	query = frappe.qb.from_(Employee).select(Employee.name, Employee.employee_name)
 
 	if filters.get("employee_status"):
 		query = query.where(Employee.status == "Active")
@@ -216,9 +215,7 @@ def get_allocated_and_expired_leaves(
 			# leave allocations ending before to_date, reduce leaves taken within that period
 			# since they are already used, they won't expire
 			expired_leaves += record.leaves
-			leaves_for_period = get_leaves_for_period(
-				employee, leave_type, record.from_date, record.to_date
-			)
+			leaves_for_period = get_leaves_for_period(employee, leave_type, record.from_date, record.to_date)
 			expired_leaves -= min(abs(leaves_for_period), record.leaves)
 
 		if record.from_date >= getdate(from_date):
@@ -230,9 +227,7 @@ def get_allocated_and_expired_leaves(
 	return new_allocation, expired_leaves, carry_forwarded_leaves
 
 
-def get_leave_ledger_entries(
-	from_date: str, to_date: str, employee: str, leave_type: str
-) -> list[dict]:
+def get_leave_ledger_entries(from_date: str, to_date: str, employee: str, leave_type: str) -> list[dict]:
 	ledger = frappe.qb.DocType("Leave Ledger Entry")
 	return (
 		frappe.qb.from_(ledger)

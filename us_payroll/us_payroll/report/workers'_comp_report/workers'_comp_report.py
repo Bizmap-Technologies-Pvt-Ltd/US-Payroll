@@ -1,12 +1,14 @@
 # Copyright (c) 2026, bizmap and contributors
 # For license information, please see license.txt
 
-import frappe
 import json
+from collections import defaultdict
+from datetime import datetime
+
+import frappe
 from frappe.utils import getdate
 from frappe.utils.pdf import get_pdf
-from datetime import datetime 
-from collections import defaultdict
+
 
 def execute(filters=None):
 	if not filters:
@@ -17,12 +19,25 @@ def execute(filters=None):
 
 	return columns, data
 
+
 def get_columns():
 	return [
 		# {"label": "Employee ID", "fieldname": "employee", "fieldtype": "Link", "options": "Employee", "width": 120},
 		{"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 180},
-		{"label": "Comp Code", "fieldname": "custom_comp_code", "fieldtype": "Link", "options": "Comp Code", "width": 120},
-		{"label": "Department", "fieldname": "department", "fieldtype": "Link", "options": "Department", "width": 150},
+		{
+			"label": "Comp Code",
+			"fieldname": "custom_comp_code",
+			"fieldtype": "Link",
+			"options": "Comp Code",
+			"width": 120,
+		},
+		{
+			"label": "Department",
+			"fieldname": "department",
+			"fieldtype": "Link",
+			"options": "Department",
+			"width": 150,
+		},
 		# {'label': 'Department Name', 'fieldname': 'department_name', 'fieldtype': 'Data','align': 'center','width': 150},
 		{"label": "Earnings", "fieldname": "earnings", "fieldtype": "Currency", "width": 150},
 		{"label": "Hours", "fieldname": "hours", "fieldtype": "Float", "width": 120},
@@ -32,6 +47,7 @@ def get_columns():
 		{"label": "Gross Amount", "fieldname": "gross_amount", "fieldtype": "Currency", "width": 150},
 	]
 
+
 def get_data(filters):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -39,12 +55,10 @@ def get_data(filters):
 	if not from_date or not to_date:
 		frappe.throw("Please set From Date and To Date filters")
 
-	conditions = [
-		"cs.docstatus = 1",
-		"cs.start_date BETWEEN %(from_date)s AND %(to_date)s"
-	]
+	conditions = ["cs.docstatus = 1", "cs.start_date BETWEEN %(from_date)s AND %(to_date)s"]
 	condition_sql = " AND ".join(conditions)
-	results = frappe.db.sql(f"""
+	results = frappe.db.sql(
+		"""
 		SELECT
 			agg.employee,
 			agg.employee_name,
@@ -79,19 +93,19 @@ def get_data(filters):
 		) agg
 		GROUP BY agg.employee, agg.employee_name
 		ORDER BY agg.employee_name
-	""", filters, as_dict=True)
+	""",
+		filters,
+		as_dict=True,
+	)
 
 	return results
 
 
 @frappe.whitelist()
-def get_print(report_data):    
+def get_print(report_data):
 	report_data = json.loads(report_data)
 	filters = report_data.get("filter")
-	report_data = {
-		'filter': filters,
-		'data': report_data.get("data")
-	}
+	report_data = {"filter": filters, "data": report_data.get("data")}
 	return generate_pdf(report_data)
 
 
@@ -113,36 +127,39 @@ def generate_pdf(data):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	data = data.get('data')   
+	data = data.get("data")
 
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M:%S %p")
-	company_name = frappe.defaults.get_global_default('company').replace("City of ", "")
+	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 	department_data, comp_code_summary, department_summary, grand_totals = get_department_summary(data)
 
-	html = frappe.render_template(template_path, {
-		"data": data,
-		"department_data": department_data,
-		"comp_code_summary": comp_code_summary,
-		"department_summary": department_summary,
-		"grand_totals": grand_totals,
-		"filter": filters,
-		"formatted_date_range": formatted_date_range,
-		"current_datetime": formatted_datetime,
-		"company_name": company_name,
-		"letterhead_image": letterhead_image
-	})
+	html = frappe.render_template(
+		template_path,
+		{
+			"data": data,
+			"department_data": department_data,
+			"comp_code_summary": comp_code_summary,
+			"department_summary": department_summary,
+			"grand_totals": grand_totals,
+			"filter": filters,
+			"formatted_date_range": formatted_date_range,
+			"current_datetime": formatted_datetime,
+			"company_name": company_name,
+			"letterhead_image": letterhead_image,
+		},
+	)
 
 	options = {
-		'page-width': '2000px',
-		'page-height': '1500px',
-		'orientation': 'Landscape',
-		'margin-right': '20mm',
-		'margin-left': '20mm',
+		"page-width": "2000px",
+		"page-height": "1500px",
+		"orientation": "Landscape",
+		"margin-right": "20mm",
+		"margin-left": "20mm",
 	}
 
-	print(html,"html-----------------")
+	print(html, "html-----------------")
 
 	pdf_file = get_pdf(html, options=options)
 
@@ -152,25 +169,30 @@ def generate_pdf(data):
 		"comp_code_summary": comp_code_summary,
 		"department_summary": department_summary,
 		"grand_totals": grand_totals,
-		'html': html,
-		'pdf_file': pdf_file
+		"html": html,
+		"pdf_file": pdf_file,
 	}
 
+
 def get_department_summary(data):
-	department_summary = defaultdict(lambda: {
-		"department_code": "",
-		# "department_description": "",
-		"comp_codes": defaultdict(lambda: {
-			"comp_code": "",
-			"employees": [],
-			"employee_count": 0,
-			"earnings": 0.0,
-			"hours": 0.0,
-			"ot_amount": 0.0,
-			"ot_hours": 0.0,
-			"gross_amount": 0.0
-		})
-	})
+	department_summary = defaultdict(
+		lambda: {
+			"department_code": "",
+			# "department_description": "",
+			"comp_codes": defaultdict(
+				lambda: {
+					"comp_code": "",
+					"employees": [],
+					"employee_count": 0,
+					"earnings": 0.0,
+					"hours": 0.0,
+					"ot_amount": 0.0,
+					"ot_hours": 0.0,
+					"gross_amount": 0.0,
+				}
+			),
+		}
+	)
 
 	# --- Build department + comp code structure ---
 	for row in data:
@@ -188,15 +210,17 @@ def get_department_summary(data):
 		comp_summary = summary["comp_codes"][comp_code]
 		comp_summary["comp_code"] = comp_code
 
-		comp_summary["employees"].append({
-			"employee_id": row.get("employee"),
-			"employee_name": row.get("employee_name"),
-			"earnings": float(row.get("earnings") or 0),
-			"hours": float(row.get("hours") or 0),
-			"ot_amount": float(row.get("ot_amount") or 0),
-			"ot_hours": float(row.get("ot_hours") or 0),
-			"gross_amount": float(row.get("gross_amount") or 0)
-		})
+		comp_summary["employees"].append(
+			{
+				"employee_id": row.get("employee"),
+				"employee_name": row.get("employee_name"),
+				"earnings": float(row.get("earnings") or 0),
+				"hours": float(row.get("hours") or 0),
+				"ot_amount": float(row.get("ot_amount") or 0),
+				"ot_hours": float(row.get("ot_hours") or 0),
+				"gross_amount": float(row.get("gross_amount") or 0),
+			}
+		)
 
 		comp_summary["employee_count"] += 1
 		comp_summary["earnings"] += float(row.get("earnings") or 0)
@@ -208,15 +232,17 @@ def get_department_summary(data):
 	department_list = list(department_summary.values())
 
 	# --- Build Comp Code Summary (merged across all departments) ---
-	comp_code_summary = defaultdict(lambda: {
-		"comp_code": "",
-		"employee_count": 0,
-		"earnings": 0.0,
-		"hours": 0.0,
-		"ot_amount": 0.0,
-		"ot_hours": 0.0,
-		"gross_amount": 0.0
-	})
+	comp_code_summary = defaultdict(
+		lambda: {
+			"comp_code": "",
+			"employee_count": 0,
+			"earnings": 0.0,
+			"hours": 0.0,
+			"ot_amount": 0.0,
+			"ot_hours": 0.0,
+			"gross_amount": 0.0,
+		}
+	)
 
 	for dept in department_list:
 		for comp in dept["comp_codes"].values():
@@ -242,7 +268,7 @@ def get_department_summary(data):
 			"hours": sum(comp["hours"] for comp in dept["comp_codes"].values()),
 			"ot_amount": sum(comp["ot_amount"] for comp in dept["comp_codes"].values()),
 			"ot_hours": sum(comp["ot_hours"] for comp in dept["comp_codes"].values()),
-			"gross_amount": sum(comp["gross_amount"] for comp in dept["comp_codes"].values())
+			"gross_amount": sum(comp["gross_amount"] for comp in dept["comp_codes"].values()),
 		}
 		department_summary_list.append(totals)
 
@@ -253,7 +279,7 @@ def get_department_summary(data):
 		"hours": sum(d["hours"] for d in department_summary_list),
 		"ot_amount": sum(d["ot_amount"] for d in department_summary_list),
 		"ot_hours": sum(d["ot_hours"] for d in department_summary_list),
-		"gross_amount": sum(d["gross_amount"] for d in department_summary_list)
+		"gross_amount": sum(d["gross_amount"] for d in department_summary_list),
 	}
 
 	return department_list, comp_code_summary_list, department_summary_list, grand_totals

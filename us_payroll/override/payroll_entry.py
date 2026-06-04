@@ -3,8 +3,14 @@
 # For license information, please see license.txt
 
 import json
-from dateutil.relativedelta import relativedelta
+
+import erpnext
 import frappe
+from dateutil.relativedelta import relativedelta
+from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
+	get_accounting_dimensions,
+)
+from erpnext.accounts.utils import get_fiscal_year
 from frappe import _
 from frappe.desk.reportview import get_match_cond
 from frappe.model.document import Document
@@ -20,15 +26,10 @@ from frappe.utils import (
 	get_link_to_form,
 	getdate,
 )
-
-import erpnext
-from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
-	get_accounting_dimensions,
-)
-from erpnext.accounts.utils import get_fiscal_year
+from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
 from hrms.payroll.doctype.salary_slip.salary_slip_loan_utils import if_lending_app_installed
 from hrms.payroll.doctype.salary_withholding.salary_withholding import link_bank_entry_in_salary_withholdings
-from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
+
 
 class OverridePayrollEntry(PayrollEntry):
 	def onload(self):
@@ -264,11 +265,11 @@ class OverridePayrollEntry(PayrollEntry):
 				add_check_employees.append(row.employee)
 
 		available_check = frappe.get_all(
-				"Check",
-				filters={"status": "Available"},
-				fields=["name", "check_number"],
-				order_by="check_number ASC",
-			)
+			"Check",
+			filters={"status": "Available"},
+			fields=["name", "check_number"],
+			order_by="check_number ASC",
+		)
 
 		available_check = available_check[::-1]
 
@@ -276,7 +277,6 @@ class OverridePayrollEntry(PayrollEntry):
 			frappe.throw("Number of available checks are less than the required.")
 
 		else:
-
 			self.check_permission("write")
 			employees = [emp.employee for emp in self.employees]
 
@@ -364,26 +364,18 @@ class OverridePayrollEntry(PayrollEntry):
 
 	def get_insurance_details_from_ssa(self, employee, salary_component):
 		ssa = frappe.db.get_value(
-			"Salary Structure Assignment",
-			{
-				"employee": employee,
-				"docstatus": 1
-			},
-			"name"
+			"Salary Structure Assignment", {"employee": employee, "docstatus": 1}, "name"
 		)
 		if not ssa:
-			return None, None  
+			return None, None
 
 		result = frappe.db.get_value(
 			"Employee Insurance Deduction",
-			{
-				"parent": ssa,
-				"salary_component": salary_component
-			},
-			["insurance_company", "salary_component"]
+			{"parent": ssa, "salary_component": salary_component},
+			["insurance_company", "salary_component"],
 		)
 		if not result:
-			return None, None   # ✅ ALWAYS return tuple
+			return None, None  # ✅ ALWAYS return tuple
 
 		return result
 
@@ -394,11 +386,7 @@ class OverridePayrollEntry(PayrollEntry):
 			if row.account:
 				return row.account
 
-		frappe.throw(
-			_("Please set proper Insurance account in Insurance Provider {0}")
-			.format(provider)
-		)
-
+		frappe.throw(_("Please set proper Insurance account in Insurance Provider {0}").format(provider))
 
 	def get_salary_component_account(self, salary_component, employee=None):
 		comp_doc = frappe.get_cached_doc("Salary Component", salary_component)
@@ -747,11 +735,7 @@ class OverridePayrollEntry(PayrollEntry):
 
 		for row in accounts:
 			employee = row.get("party")
-			if (
-				employee_check_map
-				and employee
-				and employee in employee_check_map
-			):
+			if employee_check_map and employee and employee in employee_check_map:
 				row["user_remark"] = employee_check_map[employee]
 
 		journal_entry.set("accounts", accounts)

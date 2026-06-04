@@ -1,12 +1,14 @@
 # Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
-import frappe
 import calendar
-from datetime import datetime
-from collections import defaultdict
 import json
+from collections import defaultdict
+from datetime import datetime
+
+import frappe
 from frappe.utils.pdf import get_pdf
+
 
 def execute(filters=None):
 	if not filters:
@@ -16,17 +18,34 @@ def execute(filters=None):
 	data = get_data(filters)
 	return columns, data
 
+
 def get_columns():
 	columns = [
-		{'label': 'Employee name', 'fieldname': 'employee_name', 'fieldtype': 'Data', 'width': 150},
-		{'label': 'Gross Wages', 'fieldname': 'gross_pay', 'fieldtype': 'Currency','width': 150},
-		{'label': 'FIT withholdings', 'fieldname': 'fit_withholdings', 'fieldtype': 'Currency','width': 150},
-		{'label': 'Social Security Wages', 'fieldname': 'social_security_wages', 'fieldtype': 'Currency','width': 150},
-		{'label': 'Medicare Wages', 'fieldname': 'medicare_wages', 'fieldtype': 'Currency','width': 150},
-		{'label': 'Unemployment insurance', 'fieldname': 'workers_comp', 'fieldtype': 'Currency','width': 150},
-		{'label': 'Workers comp', 'fieldname': 'unemployment_insurance', 'fieldtype': 'Currency','width': 150}
+		{"label": "Employee name", "fieldname": "employee_name", "fieldtype": "Data", "width": 150},
+		{"label": "Gross Wages", "fieldname": "gross_pay", "fieldtype": "Currency", "width": 150},
+		{"label": "FIT withholdings", "fieldname": "fit_withholdings", "fieldtype": "Currency", "width": 150},
+		{
+			"label": "Social Security Wages",
+			"fieldname": "social_security_wages",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{"label": "Medicare Wages", "fieldname": "medicare_wages", "fieldtype": "Currency", "width": 150},
+		{
+			"label": "Unemployment insurance",
+			"fieldname": "workers_comp",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": "Workers comp",
+			"fieldname": "unemployment_insurance",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
 	]
 	return columns
+
 
 def get_data(filters):
 	from_date = filters.get("from_date")
@@ -34,7 +53,8 @@ def get_data(filters):
 	if not from_date or not to_date:
 		frappe.throw("Please select both From Date and To Date.")
 
-	data = frappe.db.sql("""
+	data = frappe.db.sql(
+		"""
 		SELECT 
 			pe.name AS payroll_entry,
 			ped.employee,
@@ -92,11 +112,10 @@ def get_data(filters):
 		GROUP BY 
 			ped.employee, gp.gross_pay
 
-	""", {
-		"from_date": from_date,
-		"to_date": to_date
-	}, as_dict=True)
-
+	""",
+		{"from_date": from_date, "to_date": to_date},
+		as_dict=True,
+	)
 
 	for row in data:
 		row["workers_comp"] = (row.get("gross_pay") or 0) * 0.007
@@ -106,13 +125,10 @@ def get_data(filters):
 
 
 @frappe.whitelist()
-def get_print(report_data):	
+def get_print(report_data):
 	report_data = json.loads(report_data)
 	filters = report_data.get("filter")
-	report_data = {
-		'filter': report_data['filter'],
-		'data': report_data
-	}
+	report_data = {"filter": report_data["filter"], "data": report_data}
 	return generate_pdf(report_data)
 
 
@@ -132,24 +148,32 @@ def generate_pdf(data):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = 'us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html'
+	template_path = "us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html"
 
-	data = data.get('data')["data"]
+	data = data.get("data")["data"]
 
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M%p").lower()
 
-	html = frappe.render_template(template_path, {"data": data, "current_datetime":formatted_datetime, "formatted_date_range":formatted_date_range,"letterhead_image": letterhead_image})
-	modified_html = f'{html}'
+	html = frappe.render_template(
+		template_path,
+		{
+			"data": data,
+			"current_datetime": formatted_datetime,
+			"formatted_date_range": formatted_date_range,
+			"letterhead_image": letterhead_image,
+		},
+	)
+	modified_html = f"{html}"
 
-	options = { 
-	'page-width': '2000px',
-	'page-height': '1500px',
-	'orientation': 'Landscape',
-	'margin-right': '20mm',
-	'margin-left': '20mm',
+	options = {
+		"page-width": "2000px",
+		"page-height": "1500px",
+		"orientation": "Landscape",
+		"margin-right": "20mm",
+		"margin-left": "20mm",
 	}
-	
-	pdf_file = get_pdf(html, options=options)	
 
-	return {'data': data, 'html': html, 'pdf_file': pdf_file}
+	pdf_file = get_pdf(html, options=options)
+
+	return {"data": data, "html": html, "pdf_file": pdf_file}

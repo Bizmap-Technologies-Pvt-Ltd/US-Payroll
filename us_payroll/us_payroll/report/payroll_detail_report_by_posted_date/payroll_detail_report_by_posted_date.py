@@ -1,11 +1,12 @@
 # Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
-import frappe
 import calendar
-from datetime import datetime
-from collections import defaultdict
 import json
+from collections import defaultdict
+from datetime import datetime
+
+import frappe
 from frappe.utils.pdf import get_pdf
 
 
@@ -20,7 +21,7 @@ def execute(filters=None):
 		return [], []
 
 	columns = get_columns()
-	all_data = get_data(filters)	
+	all_data = get_data(filters)
 	return columns, all_data
 
 
@@ -36,7 +37,8 @@ def get_data(filters):
 	if department:
 		department_condition = " AND emp.department = %(department)s"
 
-	data = frappe.db.sql(f"""
+	data = frappe.db.sql(
+		f"""
 		SELECT
 			cst.payroll_entry AS payroll_entry,
 			cst.employee,
@@ -56,11 +58,10 @@ def get_data(filters):
 		  AND cst.docstatus = 1
 		  {department_condition}
 		GROUP BY cst.employee
-	""".format(department_condition=department_condition), {
-		"from_date": from_date,
-		"to_date": to_date,
-		"department": department
-	}, as_dict=True)
+	""".format(department_condition=department_condition),
+		{"from_date": from_date, "to_date": to_date, "department": department},
+		as_dict=True,
+	)
 
 	for row in data:
 		row["rate"] = float(row.get("rate") or 0)
@@ -72,28 +73,31 @@ def get_data(filters):
 
 def get_columns():
 	columns = [
-		{'label': 'Employee Name', 'fieldname': 'employee_name', 'fieldtype': 'Data', 'width': 150},
-		{'label': 'Department', 'fieldname': 'department', 'fieldtype': 'Data','align': 'center','width': 150},
-		{'label': 'Rate', 'fieldname': 'rate', 'fieldtype': 'Float','align': 'center','width': 150},
-		{'label': 'Net Pay', 'fieldname': 'net_pay', 'fieldtype': 'Currency','width': 150},
-		{'label': 'Gross Pay', 'fieldname': 'gross_pay', 'fieldtype': 'Currency','width': 150},
+		{"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 150},
+		{
+			"label": "Department",
+			"fieldname": "department",
+			"fieldtype": "Data",
+			"align": "center",
+			"width": 150,
+		},
+		{"label": "Rate", "fieldname": "rate", "fieldtype": "Float", "align": "center", "width": 150},
+		{"label": "Net Pay", "fieldname": "net_pay", "fieldtype": "Currency", "width": 150},
+		{"label": "Gross Pay", "fieldname": "gross_pay", "fieldtype": "Currency", "width": 150},
 		# {'label': 'Total', 'fieldname': 'total_net_pay', 'fieldtype': 'Currency','width': 150},
-	]	
+	]
 
 	return columns
 
 
 @frappe.whitelist()
-def get_print(report_data):	
+def get_print(report_data):
 	report_data = json.loads(report_data)
 	filters = report_data.get("filter")
-	report_data = {
-		'filter': report_data['filter'],
-		'data': report_data
-	}
-	
+	report_data = {"filter": report_data["filter"], "data": report_data}
+
 	return generate_pdf(report_data)
-	
+
 
 @frappe.whitelist()
 def generate_pdf(data):
@@ -112,58 +116,63 @@ def generate_pdf(data):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = 'us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html'
+	template_path = "us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
 
-	data = data.get('data')["data"]
+	data = data.get("data")["data"]
 
 	department_data, department_grand_totals = get_department_summary(data)
 
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M:%S %p")
-	company_name = frappe.defaults.get_global_default('company').replace("City of ", "")
+	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	html = frappe.render_template(template_path, {
-		"data": data,
-		"department_data": department_data,
-		'grand_totals': department_grand_totals,
-		"filter": filters,
-		"formatted_date_range": formatted_date_range,
-		"current_datetime": formatted_datetime,
-		"company_name": company_name,
-		"from_date": from_date,
-		"to_date": to_date,
-		"letterhead_image": letterhead_image
-	})
+	html = frappe.render_template(
+		template_path,
+		{
+			"data": data,
+			"department_data": department_data,
+			"grand_totals": department_grand_totals,
+			"filter": filters,
+			"formatted_date_range": formatted_date_range,
+			"current_datetime": formatted_datetime,
+			"company_name": company_name,
+			"from_date": from_date,
+			"to_date": to_date,
+			"letterhead_image": letterhead_image,
+		},
+	)
 
 	options = {
-		'page-width': '2000px',
-		'page-height': '1500px',
-		'orientation': 'Landscape',
-		'margin-right': '20mm',
-		'margin-left': '20mm',
+		"page-width": "2000px",
+		"page-height": "1500px",
+		"orientation": "Landscape",
+		"margin-right": "20mm",
+		"margin-left": "20mm",
 	}
 
 	pdf_file = get_pdf(html, options=options)
 	return {
-		'data': data,
+		"data": data,
 		"department_data": department_data,
-		'grand_totals': department_grand_totals,
-		'html': html,
-		'pdf_file': pdf_file
+		"grand_totals": department_grand_totals,
+		"html": html,
+		"pdf_file": pdf_file,
 	}
 
 
 def get_department_summary(data):
-	department_summary = defaultdict(lambda: {
-		"department_code": "",
-		"department_description": "",
-		"employee_count": 0,
-		"rate": 0.0,
-		"net_pay": 0.0,
-		"gross_pay": 0.0,
-		"employees": []
-	})
+	department_summary = defaultdict(
+		lambda: {
+			"department_code": "",
+			"department_description": "",
+			"employee_count": 0,
+			"rate": 0.0,
+			"net_pay": 0.0,
+			"gross_pay": 0.0,
+			"employees": [],
+		}
+	)
 
 	for row in data:
 		department_code = row.get("department") or "Unknown"
@@ -178,21 +187,25 @@ def get_department_summary(data):
 			summary["department_code"] = department_code
 
 		summary["employee_count"] += 1
-		summary["rate"] += float(row.get('rate') or 0)
-		summary["net_pay"] += float(row.get('net_pay') or 0)
-		summary["gross_pay"] += float(row.get('gross_pay') or 0)
+		summary["rate"] += float(row.get("rate") or 0)
+		summary["net_pay"] += float(row.get("net_pay") or 0)
+		summary["gross_pay"] += float(row.get("gross_pay") or 0)
 
-		summary["employees"].append({
-			"employee_id": row.get("employee"),
-			"employee_name": row.get("employee_name"),
-			"rate": float(row.get("rate") or 0),
-			"net_pay": float(row.get("net_pay") or 0),
-			"gross_pay": float(row.get("gross_pay") or 0),
-			"department_code_name": department_code_name
-		})
+		summary["employees"].append(
+			{
+				"employee_id": row.get("employee"),
+				"employee_name": row.get("employee_name"),
+				"rate": float(row.get("rate") or 0),
+				"net_pay": float(row.get("net_pay") or 0),
+				"gross_pay": float(row.get("gross_pay") or 0),
+				"department_code_name": department_code_name,
+			}
+		)
 
 	department_list = list(department_summary.values())
-	department_list.sort(key=lambda x: (x["department_code"].zfill(5)) if x["department_code"].isdigit() else "99999")
+	department_list.sort(
+		key=lambda x: (x["department_code"].zfill(5)) if x["department_code"].isdigit() else "99999"
+	)
 
 	grand_totals = {
 		"employee_count": sum(d["employee_count"] for d in department_list),
