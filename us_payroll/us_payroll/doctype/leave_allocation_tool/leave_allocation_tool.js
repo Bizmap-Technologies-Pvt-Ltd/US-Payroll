@@ -1,6 +1,8 @@
 // Copyright (c) 2026, us_payroll and contributors
 // For license information, please see license.txt
 
+/* global erpnext */
+
 frappe.ui.form.on("Leave Allocation Tool", {
 	onload: function (frm) {
 		frm.trigger("hide_add_row_btn");
@@ -46,7 +48,7 @@ frappe.ui.form.on("Leave Allocation Tool", {
 
 	get_departmentwise_employees: function (frm) {
 		if (!frm.doc.leave_type) {
-			frappe.throw("Please select leave type.");
+			frappe.throw(__("Please select leave type."));
 		}
 
 		frappe.call({
@@ -127,7 +129,7 @@ frappe.ui.form.on("Leave Allocation Details", {
 	new_leaves_allocated: function (frm, cdt, cdn) {
 		const row = locals[cdt][cdn];
 		if (row.new_leaves_allocated) {
-			updated_allocated_leaves = row.new_leaves_allocated + row.total_leaves_allocated;
+			let updated_allocated_leaves = row.new_leaves_allocated + row.total_leaves_allocated;
 			console.log(updated_allocated_leaves, "updated_allocated_leaves");
 			frappe.model.set_value(cdt, cdn, "total_leaves_allocated", updated_allocated_leaves);
 		}

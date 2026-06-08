@@ -1,4 +1,3 @@
-import datetime
 import io
 import math
 from calendar import monthrange
@@ -11,8 +10,7 @@ from us_payroll.us_payroll.report.tmrs_report import tmrs_report
 
 
 @frappe.whitelist()
-def get_tmrs_report_data(year, month):
-	# Convert input
+def get_tmrs_report_data(year: str, month: str):
 	year = int(year)
 	month_names = [
 		"January",
@@ -39,7 +37,6 @@ def get_tmrs_report_data(year, month):
 		prev_year = year
 
 	start_date = datetime.date(prev_year, prev_month, 1)
-	end_date = datetime.date(prev_year, prev_month, monthrange(prev_year, prev_month)[1])
 
 	filters = {"year": year, "month": month}
 

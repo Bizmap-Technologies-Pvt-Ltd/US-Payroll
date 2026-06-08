@@ -220,7 +220,7 @@ frappe.ui.form.on("Employee", {
 				},
 				callback: function (r) {
 					if (r.message) {
-						default_company = r.message.company;
+						let default_company = r.message.company;
 						frm.set_value("company", default_company);
 					}
 				},

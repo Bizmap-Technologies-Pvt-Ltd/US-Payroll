@@ -62,15 +62,16 @@ frappe.ui.form.on("W2 Form Details", {
 				doc: frm.doc,
 			},
 			callback: function (r) {
-				total_gross_pay = r.message.total_gross_pay;
-				total_federal_income_tax_withheld = r.message.total_federal_income_tax_withheld;
-				social_security_tax_withheld = r.message.social_security_tax_withheld;
-				medicare_tax_withheld = r.message.medicare_tax_withheld;
-				tmrs = r.message.tmrs;
-				medical_insurance = r.message.medical_insurance;
-				retirement_plan = r.message.retirement_plan;
-				social_security_wages = r.message.social_security_wages;
-				medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+				let total_gross_pay = r.message.total_gross_pay;
+				let total_federal_income_tax_withheld =
+					r.message.total_federal_income_tax_withheld;
+				let social_security_tax_withheld = r.message.social_security_tax_withheld;
+				let medicare_tax_withheld = r.message.medicare_tax_withheld;
+				let tmrs = r.message.tmrs;
+				let medical_insurance = r.message.medical_insurance;
+				let retirement_plan = r.message.retirement_plan;
+				let social_security_wages = r.message.social_security_wages;
+				let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
 
 				if (r.message) {
 					frm.set_value("wages_tips_other_compensation", total_gross_pay);
@@ -172,15 +173,16 @@ frappe.ui.form.on("W2 Form Details", {
 				doc: frm.doc,
 			},
 			callback: function (r) {
-				total_gross_pay = r.message.total_gross_pay;
-				total_federal_income_tax_withheld = r.message.total_federal_income_tax_withheld;
-				social_security_tax_withheld = r.message.social_security_tax_withheld;
-				medicare_tax_withheld = r.message.medicare_tax_withheld;
-				tmrs = r.message.tmrs;
-				medical_insurance = r.message.medical_insurance;
-				retirement_plan = r.message.retirement_plan;
-				social_security_wages = r.message.social_security_wages;
-				medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+				let total_gross_pay = r.message.total_gross_pay;
+				let total_federal_income_tax_withheld =
+					r.message.total_federal_income_tax_withheld;
+				let social_security_tax_withheld = r.message.social_security_tax_withheld;
+				let medicare_tax_withheld = r.message.medicare_tax_withheld;
+				let tmrs = r.message.tmrs;
+				let medical_insurance = r.message.medical_insurance;
+				let retirement_plan = r.message.retirement_plan;
+				let social_security_wages = r.message.social_security_wages;
+				let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
 
 				if (r.message) {
 					frm.set_value("wages_tips_other_compensation", total_gross_pay);
@@ -218,94 +220,4 @@ frappe.ui.form.on("W2 Form Details", {
 			},
 		});
 	},
-
-	// year_start_date: function(frm) {
-	// 	frappe.call({
-	// 		method: "us_payroll.us_payroll.doctype.w2_form_details.w2_form_details.calculate_totals",
-	// 		args: {
-	// 			doc: frm.doc
-	// 		},
-	// 		callback: function(r) {
-	// 			total_gross_pay = r.message.total_gross_pay
-	// 			total_federal_income_tax_withheld = r.message.total_federal_income_tax_withheld
-	// 			social_security_tax_withheld = r.message.social_security_tax_withheld
-	// 			medicare_tax_withheld = r.message.medicare_tax_withheld
-	// 			tmrs = r.message.tmrs
-	// 			medical_insurance = r.message.medical_insurance
-	// 			retirement_plan = r.message.retirement_plan
-
-	// 			if (r.message) {
-	// 				frm.set_value("wages_tips_other_compensation", total_gross_pay)
-	// 				frm.set_value("federal_income_tax_withheld", total_federal_income_tax_withheld)
-	// 				frm.set_value("social_security_tax_withheld", social_security_tax_withheld)
-	// 				frm.set_value("medicare_tax_withheld", medicare_tax_withheld)
-	// 				frm.set_value("medical_insurance", medical_insurance)
-	// 				frm.set_value("tmrs", tmrs)
-	// 				frm.set_value("retirement_plan", retirement_plan)
-
-	// 			} else {
-	// 				frm.set_value("wages_tips_other_compensation", "")
-	// 				frm.set_value("federal_income_tax_withheld", "")
-	// 				frm.set_value("social_security_tax_withheld", "")
-	// 				frm.set_value("medicare_tax_withheld", "")
-	// 				frm.set_value("medical_insurance", "")
-	// 				frm.set_value("tmrs", "")
-	// 				frm.set_value("retirement_plan", false)
-
-	// 			}
-	// 			frm.refresh_field("wages_tips_other_compensation");
-	// 			frm.refresh_field("federal_income_tax_withheld");
-	// 			frm.refresh_field("social_security_tax_withheld");
-	// 			frm.refresh_field("medicare_tax_withheld");
-	// 			frm.refresh_field("medical_insurance");
-	// 			frm.refresh_field("tmrs");
-	// 			frm.refresh_field("retirement_plan");
-	// 		}
-	// 	});
-	// },
-
-	// year_end_date: function(frm) {
-	// 	frappe.call({
-	// 		method: "us_payroll.us_payroll.doctype.w2_form_details.w2_form_details.calculate_totals",
-	// 		args: {
-	// 			doc: frm.doc
-	// 		},
-	// 		callback: function(r) {
-	// 			total_gross_pay = r.message.total_gross_pay
-	// 			total_federal_income_tax_withheld = r.message.total_federal_income_tax_withheld
-	// 			social_security_tax_withheld = r.message.social_security_tax_withheld
-	// 			medicare_tax_withheld = r.message.medicare_tax_withheld
-	// 			tmrs = r.message.tmrs
-	// 			medical_insurance = r.message.medical_insurance
-	// 			retirement_plan = r.message.retirement_plan
-
-	// 			if (r.message) {
-	// 				frm.set_value("wages_tips_other_compensation", total_gross_pay)
-	// 				frm.set_value("federal_income_tax_withheld", total_federal_income_tax_withheld)
-	// 				frm.set_value("social_security_tax_withheld", social_security_tax_withheld)
-	// 				frm.set_value("medicare_tax_withheld", medicare_tax_withheld)
-	// 				frm.set_value("medical_insurance", medical_insurance)
-	// 				frm.set_value("tmrs", tmrs)
-	// 				frm.set_value("retirement_plan", retirement_plan)
-
-	// 			} else {
-	// 				frm.set_value("wages_tips_other_compensation", "")
-	// 				frm.set_value("federal_income_tax_withheld", "")
-	// 				frm.set_value("social_security_tax_withheld", "")
-	// 				frm.set_value("medicare_tax_withheld", "")
-	// 				frm.set_value("medical_insurance", "")
-	// 				frm.set_value("tmrs", "")
-	// 				frm.set_value("retirement_plan", false)
-
-	// 			}
-	// 			frm.refresh_field("wages_tips_other_compensation");
-	// 			frm.refresh_field("federal_income_tax_withheld");
-	// 			frm.refresh_field("social_security_tax_withheld");
-	// 			frm.refresh_field("medicare_tax_withheld");
-	// 			frm.refresh_field("medical_insurance");
-	// 			frm.refresh_field("tmrs");
-	// 			frm.refresh_field("retirement_plan");
-	// 		}
-	// 	});
-	// },
 });

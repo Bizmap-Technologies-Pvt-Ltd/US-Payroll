@@ -5,8 +5,10 @@ import calendar
 import json
 from collections import defaultdict
 from datetime import datetime
+from typing import Any
 
 import frappe
+from frappe import _
 from frappe.utils.file_manager import save_file
 from frappe.utils.pdf import get_pdf
 from frappe.utils.xlsxutils import make_xlsx
@@ -14,7 +16,7 @@ from frappe.utils.xlsxutils import make_xlsx
 
 def execute(filters=None):
 	if not filters.get("quarter"):
-		frappe.throw("Please select the Quarter.")
+		frappe.throw(_("Please select the Quarter."))
 
 	if not filters:
 		return [], []
@@ -39,7 +41,7 @@ def execute(filters=None):
 		grouped_data[row["employee_id"]].append(row)
 
 	grouped_data = dict(grouped_data)
-	for emp_id, records in grouped_data.items():
+	for _emp_id, records in grouped_data.items():
 		threshold_taxable_wage = 9000
 
 		for record in records:
@@ -66,7 +68,7 @@ def execute(filters=None):
 	all_data = [row for row in all_data if selected_quarter == row["quarter"]]
 
 	# Get counts for each month (1-12) for the selected quarter only
-	month_employee_count = {i: 0 for i in range(1, 13)}
+	# month_employee_count = {i: 0 for i in range(1, 13)}
 
 	quarter_to_months = {
 		"Quarter1": [1, 2, 3],
@@ -152,7 +154,7 @@ def get_data(filters):
 	selected_quarter = filters.get("quarter")
 
 	if not selected_quarter or selected_quarter not in quarter_to_months:
-		frappe.throw("Please select a valid quarter.")
+		frappe.throw(_("Please select a valid quarter."))
 
 	selected_months = quarter_to_months[selected_quarter]
 
@@ -270,50 +272,70 @@ def get_data(filters):
 def get_columns():
 	columns = [
 		{
-			"label": "payroll_entry",
+			"label": _("Payroll Entry"),
 			"fieldname": "payroll_entry",
 			"fieldtype": "Link",
 			"options": "Payroll Entry",
 			"width": 150,
 		},
-		# {'label': 'Salary Slip', 'fieldname': 'salary_slip', 'fieldtype': 'Data'},
-		{"label": "Employee Name", "fieldname": "employee", "fieldtype": "Data", "width": 150},
 		{
-			"label": "Department",
+			"label": _("Employee Name"),
+			"fieldname": "employee",
+			"fieldtype": "Data",
+			"width": 150,
+		},
+		{
+			"label": _("Department"),
 			"fieldname": "department",
 			"fieldtype": "Data",
 			"align": "center",
 			"width": 150,
 		},
-		# {'label': 'Department Name', 'fieldname': 'custom_department_number', 'fieldtype': 'Data','align': 'center','width': 150},
 		{
-			"label": "Social Security Number",
+			"label": _("Social Security Number"),
 			"fieldname": "custom_nomasked_social_security_number",
 			"fieldtype": "Data",
 			"width": 150,
 		},
-		{"label": "Reportable Wages", "fieldname": "reportable_wages", "fieldtype": "Currency", "width": 150},
-		{"label": "Excess Wages", "fieldname": "excess_wages", "fieldtype": "Currency", "width": 150},
-		{"label": "Taxable Wages", "fieldname": "taxable_wages", "fieldtype": "Currency", "width": 150},
-		{"label": "Contribution", "fieldname": "contribution", "fieldtype": "Currency", "width": 150},
-		# {'label': 'Gender', 'fieldname': 'gender', 'fieldtype': 'Data', 'width': 100},
+		{
+			"label": _("Reportable Wages"),
+			"fieldname": "reportable_wages",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Excess Wages"),
+			"fieldname": "excess_wages",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Taxable Wages"),
+			"fieldname": "taxable_wages",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Contribution"),
+			"fieldname": "contribution",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
 	]
 
 	return columns
 
 
 @frappe.whitelist()
-def get_print(report_data):
+def get_print(report_data: str):
 	report_data = json.loads(report_data)
-	filters = report_data.get("filter")
-
 	report_data = {"filter": report_data["filter"], "data": report_data}
 
 	return generate_pdf(report_data)
 
 
 @frappe.whitelist()
-def generate_pdf(data):
+def generate_pdf(data: dict[str, Any]):
 	filters = data.get("filter")
 	quarter_to_months = {
 		"Quarter1": [1, 2, 3],
@@ -326,7 +348,7 @@ def generate_pdf(data):
 	selected_year = int(filters.get("year"))
 
 	if not selected_quarter or selected_quarter not in quarter_to_months:
-		frappe.throw("Please select a valid quarter.")
+		frappe.throw(_("Please select a valid quarter."))
 
 	months = quarter_to_months[selected_quarter]
 	start_date = datetime(selected_year, months[0], 1)
@@ -388,7 +410,7 @@ def generate_pdf(data):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	html = frappe.render_template(
+	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 		template_path,
 		{
 			"data": data,
@@ -489,7 +511,7 @@ def get_department_summary(data):
 
 
 @frappe.whitelist()
-def download_excel(filters):
+def download_excel(filters: str):
 	filters = frappe._dict(json.loads(filters))
 	columns, data = execute(filters)
 

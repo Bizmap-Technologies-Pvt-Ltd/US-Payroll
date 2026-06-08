@@ -16,15 +16,8 @@ def execute(filters=None):
 
 
 def get_data(filters):
-	conditions = ["cs.docstatus = 1", "cs.posting_date BETWEEN %(from_date)s AND %(to_date)s"]
-
-	if filters.get("department"):
-		conditions.append("cs.department = %(department)s")
-
-	condition_sql = " AND ".join(conditions)
-
 	results = frappe.db.sql(
-		f"""
+		"""
 		SELECT
 			agg.employee,
 			agg.employee_name,
@@ -123,7 +116,7 @@ def get_data(filters):
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
 			WHERE cs.docstatus = 1
 			AND cs.posting_date BETWEEN %(from_date)s AND %(to_date)s
-			{"AND emp.department = %(department_name)s" if filters.get("department_name") else ""}
+			AND (%(department)s IS NULL OR %(department)s = '' OR cs.department = %(department)s)
 		) agg
 		GROUP BY agg.employee, agg.employee_name, agg.department
 		ORDER BY agg.employee_name
@@ -134,9 +127,6 @@ def get_data(filters):
 
 	social_security_wages_amt = 0
 	medicare_wages_and_tips = 0
-	wages_tips_compensation = 0
-	ss_wages = 0
-	medicare_wages_tips = 0
 
 	for row in results:
 		social_security_wages_amt = (row.get("social_security_emp") or 0) + (
@@ -151,10 +141,6 @@ def get_data(filters):
 			row["taxable_wages"] = ss_taxable_amount
 		else:
 			row["taxable_wages"] = med_taxable_amount
-
-		# row["wages_tips_compensation"] = 0
-		# row["ss_wages"] = (row.get("social_security_emp") or 0) / 0.062
-		# row["medicare_wages_tips"] = (row.get("medicare_emp") or 0)/  0.0145
 
 	return results
 

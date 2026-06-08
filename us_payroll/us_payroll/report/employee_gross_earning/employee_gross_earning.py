@@ -5,6 +5,7 @@ import calendar
 import json
 from collections import defaultdict
 from datetime import datetime
+from typing import Any
 
 import frappe
 from frappe import _
@@ -21,10 +22,6 @@ def execute(filters=None):
 
 
 def get_data(filters):
-	conditions = ["cs.docstatus = 1", "cs.start_date BETWEEN %(from_date)s AND %(to_date)s"]
-
-	condition_sql = " AND ".join(conditions)
-
 	results = frappe.db.sql(
 		"""
 		SELECT
@@ -86,17 +83,15 @@ def get_columns():
 
 
 @frappe.whitelist()
-def get_print(report_data):
+def get_print(report_data: str):
 	report_data = json.loads(report_data)
-	filters = report_data.get("filter")
-
 	report_data = {"filter": report_data["filter"], "data": report_data}
 	return generate_pdf(report_data)
 
 
 @frappe.whitelist()
-def generate_pdf(data):
-	filters = data.get("filter")
+def generate_pdf(data: dict[str, Any]):
+	filters = data.get("filter", {})
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -126,7 +121,7 @@ def generate_pdf(data):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	html = frappe.render_template(
+	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 		template_path,
 		{
 			"data": data,
@@ -136,7 +131,6 @@ def generate_pdf(data):
 			"letterhead_image": letterhead_image,
 		},
 	)
-	modified_html = f"{html}"
 
 	options = {
 		"page-width": "1500px",

@@ -5,17 +5,19 @@ import calendar
 import json
 from collections import defaultdict
 from datetime import datetime
+from typing import Any
 
 import frappe
+from frappe import _
 from frappe.utils.pdf import get_pdf
 
 
 def execute(filters=None):
 	if not filters.get("from_date"):
-		frappe.throw("Please select the from_date.")
+		frappe.throw(_("Please select the from_date."))
 
 	if not filters.get("to_date"):
-		frappe.throw("Please select the to_date.")
+		frappe.throw(_("Please select the to_date."))
 
 	if not filters:
 		return [], []
@@ -31,14 +33,10 @@ def get_data(filters):
 	department = filters.get("department")
 
 	if not from_date or not to_date:
-		frappe.throw("Please select both From Date and To Date.")
-
-	department_condition = ""
-	if department:
-		department_condition = " AND emp.department = %(department)s"
+		frappe.throw(_("Please select both From Date and To Date."))
 
 	data = frappe.db.sql(
-		f"""
+		"""
 		SELECT
 			cst.payroll_entry AS payroll_entry,
 			cst.employee,
@@ -56,9 +54,9 @@ def get_data(filters):
 		LEFT JOIN `tabDepartment` dept ON dept.name = emp.department
 		WHERE cst.posting_date BETWEEN %(from_date)s AND %(to_date)s
 		  AND cst.docstatus = 1
-		  {department_condition}
+		  AND (%(department)s IS NULL OR %(department)s = '' OR emp.department = %(department)s)
 		GROUP BY cst.employee
-	""".format(department_condition=department_condition),
+	""",
 		{"from_date": from_date, "to_date": to_date, "department": department},
 		as_dict=True,
 	)
@@ -73,17 +71,17 @@ def get_data(filters):
 
 def get_columns():
 	columns = [
-		{"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 150},
+		{"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 150},
 		{
-			"label": "Department",
+			"label": _("Department"),
 			"fieldname": "department",
 			"fieldtype": "Data",
 			"align": "center",
 			"width": 150,
 		},
-		{"label": "Rate", "fieldname": "rate", "fieldtype": "Float", "align": "center", "width": 150},
-		{"label": "Net Pay", "fieldname": "net_pay", "fieldtype": "Currency", "width": 150},
-		{"label": "Gross Pay", "fieldname": "gross_pay", "fieldtype": "Currency", "width": 150},
+		{"label": _("Rate"), "fieldname": "rate", "fieldtype": "Float", "align": "center", "width": 150},
+		{"label": _("Net Pay"), "fieldname": "net_pay", "fieldtype": "Currency", "width": 150},
+		{"label": _("Gross Pay"), "fieldname": "gross_pay", "fieldtype": "Currency", "width": 150},
 		# {'label': 'Total', 'fieldname': 'total_net_pay', 'fieldtype': 'Currency','width': 150},
 	]
 
@@ -91,20 +89,23 @@ def get_columns():
 
 
 @frappe.whitelist()
-def get_print(report_data):
+def get_print(report_data: str):
 	report_data = json.loads(report_data)
-	filters = report_data.get("filter")
 	report_data = {"filter": report_data["filter"], "data": report_data}
 
 	return generate_pdf(report_data)
 
 
 @frappe.whitelist()
-def generate_pdf(data):
-	filters = data.get("filter")
+def generate_pdf(data: dict[str, Any]):
+	filters = data.get("filter", {})
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
+
+	if not from_date or not to_date:
+		frappe.throw(_("Please select both From Date and To Date."))
+
 	from_date = datetime.strptime(from_date, "%Y-%m-%d")
 	to_date = datetime.strptime(to_date, "%Y-%m-%d")
 	formatted_from_date = from_date.strftime("%m/%d/%Y")
@@ -127,7 +128,7 @@ def generate_pdf(data):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	html = frappe.render_template(
+	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 		template_path,
 		{
 			"data": data,

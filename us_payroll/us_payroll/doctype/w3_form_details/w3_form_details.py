@@ -4,6 +4,7 @@
 import json
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -12,10 +13,10 @@ class W3FormDetails(Document):
 
 
 @frappe.whitelist()
-def calculate_totals(doc):
+def calculate_totals(doc: str):
 	doc = json.loads(doc)
 	if not (doc.get("year_start_date") and doc.get("year_end_date")):
-		frappe.throw("Please make sure Year Start Date and Year End Date are set.")
+		frappe.throw(_("Please make sure Year Start Date and Year End Date are set."))
 
 	year_start_date = doc.get("year_start_date")
 	year_end_date = doc.get("year_end_date")
@@ -104,7 +105,11 @@ def calculate_totals(doc):
 
 
 @frappe.whitelist()
-def fetch_address_details(is_your_company_address, link_doctype, link_name):
+def fetch_address_details(
+	is_your_company_address: str,
+	link_doctype: str,
+	link_name: str,
+):
 	address = frappe.db.sql(
 		"""
 			SELECT a.address_line1, a.address_line2, a.city, a.state, a.country, a.pincode, a.email_id,a.phone, a.fax
@@ -130,9 +135,21 @@ def fetch_address_details(is_your_company_address, link_doctype, link_name):
 			phone = add.get("phone") or ""
 			fax = add.get("fax") or ""
 
-			complete_address = ", ".join(
-				filter(None, [address_line1, address_line2, city, state, country, pincode])
-			)
+			address_parts = [
+				part
+				for part in [
+					address_line1,
+					address_line2,
+					city,
+					state,
+					country,
+					pincode,
+				]
+				if part
+			]
+
+			complete_address = ", ".join(address_parts)
+
 			return {
 				"complete_address": complete_address,
 				"address_line1": address_line1,
@@ -159,7 +176,7 @@ def fetch_address_details(is_your_company_address, link_doctype, link_name):
 
 
 @frappe.whitelist()
-def get_global_defaults_values(doctype):
+def get_global_defaults_values(doctype: str):
 	global_defaults_doc = frappe.get_doc("Global Defaults", doctype)
 	company = global_defaults_doc.default_company
 	return {"company": company}

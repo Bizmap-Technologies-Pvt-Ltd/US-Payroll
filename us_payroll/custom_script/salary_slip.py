@@ -1,4 +1,6 @@
 import frappe
+from erpnext.accounts.utils import get_fiscal_year
+from frappe import _
 from frappe.utils import flt, get_url
 
 
@@ -25,22 +27,22 @@ def after_insert(doc, method):
 	set_fit_add_flag(doc)
 	tax_calulations_for_fit(doc)
 	set_do_not_include_in_accounts(doc)
-	frappe.db.commit()
+	# frappe.db.commit()
 
 
-def on_cancel(doc, method):
-	if doc.custom_check_no:
-		check_doc = frappe.get_doc("Check", doc.custom_check_no)
-		check_doc.status = "Void/Cancelled"
-		check_doc.reference = doc.name
-		check_doc.save()
+# def on_cancel(doc, method):
+# 	if doc.custom_check_no:
+# 		check_doc = frappe.get_doc("Check", doc.custom_check_no)
+# 		check_doc.status = "Void/Cancelled"
+# 		check_doc.reference = doc.name
+# 		check_doc.save()
 
 
-def validate(doc, method):
-	set_check_no(doc)
-	salary_calulations_for_fit(doc)
-	set_standard_deduction(doc)
-	set_do_not_include_in_accounts(doc)
+# def validate(doc, method):
+# 	set_check_no(doc)
+# 	salary_calculations_for_fit(doc)
+# 	set_standard_deduction(doc)
+# 	set_do_not_include_in_accounts(doc)
 
 
 def set_fit_add_flag(doc):
@@ -149,26 +151,29 @@ def set_do_not_include_in_accounts(doc):
 
 def calculate_leaves_taken(doc):
 	if doc.employee:
-		employee = doc.employee
-		start_date = doc.start_date
+		query = """
+			SELECT pe.name AS payroll_entry,
+				   ped.custom_available_pto,
+				   ped.custom_available_ct,
+				   ped.custom_comp_time,
+				   ped.custom_pto_hours
+			FROM `tabPayroll Entry` pe
+			INNER JOIN `tabPayroll Employee Detail` ped
+				ON ped.parent = pe.name
+			WHERE ped.employee = %(employee)s
+			  AND pe.docstatus = 1
+			  AND pe.status != 'Failed'
+			  AND pe.posting_date <= %(start_date)s
+		"""
 
-		query = f"""
-				SELECT pe.name AS payroll_entry,
-				ped.custom_available_pto,
-				ped.custom_available_ct,
-				ped.custom_comp_time,
-				ped.custom_pto_hours
-
-				FROM `tabPayroll Entry` pe
-				INNER JOIN `tabPayroll Employee Detail` ped ON ped.parent = pe.name
-				WHERE ped.employee = '{employee}'
-				  AND pe.docstatus = 1
-				  AND pe.status != 'Failed'
-				  AND pe.posting_date <= '{start_date}'
-				"""
-
-		past_data = frappe.db.sql(query, as_dict=True)
-
+		past_data = frappe.db.sql(
+			query,
+			{
+				"employee": doc.employee,
+				"start_date": doc.start_date,
+			},
+			as_dict=True,
+		)
 		custom_used_ct_leaves = 0
 		custom_used_pto_leaves = 0
 		if past_data:
@@ -182,7 +187,7 @@ def calculate_leaves_taken(doc):
 			doc.custom_used_pto_leaves = custom_used_pto_leaves
 
 
-def salary_calulations_for_fit(doc):
+def salary_calculations_for_fit(doc):
 	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
 	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
 
@@ -227,7 +232,7 @@ def salary_calulations_for_fit(doc):
 
 
 @frappe.whitelist()
-def tax_calulations_for_fit(doc):
+def tax_calulations_for_fit(doc: str):
 	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
 	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
 	sal_structure = doc.salary_structure
@@ -252,7 +257,6 @@ def tax_calulations_for_fit(doc):
 
 	fit_amount = 0
 	if fit_component and it_slab_doc:
-		custom_annualized_wages = doc.custom_annualized_wages
 		custom_adjusted_annual_wages = doc.custom_adjusted_annual_wages
 
 		fit_amount = 0

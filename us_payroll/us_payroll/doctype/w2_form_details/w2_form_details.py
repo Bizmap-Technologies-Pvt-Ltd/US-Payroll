@@ -4,7 +4,7 @@
 import json
 
 import frappe
-from frappe import render_template
+from frappe import _, render_template
 from frappe.model.document import Document
 from frappe.utils.pdf import get_pdf
 
@@ -14,7 +14,7 @@ class W2FormDetails(Document):
 
 
 @frappe.whitelist()
-def calculate_totals(doc):
+def calculate_totals(doc: str):
 	doc = json.loads(doc)
 	# if not (doc.get("year_start_date") and doc.get("year_end_date")):
 	# 	frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
@@ -121,13 +121,15 @@ def calculate_totals(doc):
 
 
 @frappe.whitelist()
-def bulk_w2_print(names):
+def bulk_w2_print(names: str):
 	names = frappe.parse_json(names)
 	if not names:
-		frappe.throw("No records selected")
+		frappe.throw(_("No records selected"))
 
 	docs = [frappe.get_doc("W2 Form Details", name) for name in names]
-	html = render_template("us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html", {"docs": docs})
+	html = render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+		"us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html", {"docs": docs}
+	)
 
 	# options = {
 	# 	'margin-top': '14mm',

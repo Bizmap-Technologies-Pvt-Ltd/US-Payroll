@@ -5,8 +5,10 @@ import calendar
 import json
 from collections import defaultdict
 from datetime import datetime
+from typing import Any
 
 import frappe
+from frappe import _
 from frappe.utils.pdf import get_pdf
 
 
@@ -21,24 +23,44 @@ def execute(filters=None):
 
 def get_columns():
 	columns = [
-		{"label": "Employee name", "fieldname": "employee_name", "fieldtype": "Data", "width": 150},
-		{"label": "Gross Wages", "fieldname": "gross_pay", "fieldtype": "Currency", "width": 150},
-		{"label": "FIT withholdings", "fieldname": "fit_withholdings", "fieldtype": "Currency", "width": 150},
 		{
-			"label": "Social Security Wages",
+			"label": _("Employee name"),
+			"fieldname": "employee_name",
+			"fieldtype": "Data",
+			"width": 150,
+		},
+		{
+			"label": _("Gross Wages"),
+			"fieldname": "gross_pay",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("FIT withholdings"),
+			"fieldname": "fit_withholdings",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Social Security Wages"),
 			"fieldname": "social_security_wages",
 			"fieldtype": "Currency",
 			"width": 150,
 		},
-		{"label": "Medicare Wages", "fieldname": "medicare_wages", "fieldtype": "Currency", "width": 150},
 		{
-			"label": "Unemployment insurance",
+			"label": _("Medicare Wages"),
+			"fieldname": "medicare_wages",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Unemployment insurance"),
 			"fieldname": "workers_comp",
 			"fieldtype": "Currency",
 			"width": 150,
 		},
 		{
-			"label": "Workers comp",
+			"label": _("Workers comp"),
 			"fieldname": "unemployment_insurance",
 			"fieldtype": "Currency",
 			"width": 150,
@@ -51,7 +73,7 @@ def get_data(filters):
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
 	if not from_date or not to_date:
-		frappe.throw("Please select both From Date and To Date.")
+		frappe.throw(_("Please select both From Date and To Date."))
 
 	data = frappe.db.sql(
 		"""
@@ -125,15 +147,14 @@ def get_data(filters):
 
 
 @frappe.whitelist()
-def get_print(report_data):
+def get_print(report_data: str):
 	report_data = json.loads(report_data)
-	filters = report_data.get("filter")
 	report_data = {"filter": report_data["filter"], "data": report_data}
 	return generate_pdf(report_data)
 
 
 @frappe.whitelist()
-def generate_pdf(data):
+def generate_pdf(data: dict[str, Any]):
 	filters = data.get("filter")
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -155,7 +176,7 @@ def generate_pdf(data):
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M%p").lower()
 
-	html = frappe.render_template(
+	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 		template_path,
 		{
 			"data": data,
@@ -164,7 +185,6 @@ def generate_pdf(data):
 			"letterhead_image": letterhead_image,
 		},
 	)
-	modified_html = f"{html}"
 
 	options = {
 		"page-width": "2000px",

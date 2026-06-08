@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -10,11 +11,11 @@ class W2FormTool(Document):
 
 
 @frappe.whitelist()
-def get_employees(doc):
+def get_employees(doc: str):
 	doc = frappe.parse_json(doc)
 
 	if not doc.get("year_start_date") or not doc.get("year_end_date"):
-		frappe.throw("Year Start Date and Year End Date are required")
+		frappe.throw(_("Year Start Date and Year End Date are required"))
 
 	salary_slips = frappe.get_all(
 		"Salary Slip",
@@ -114,7 +115,7 @@ def get_employees(doc):
 
 
 @frappe.whitelist()
-def generate_w2_form_records(doc):
+def generate_w2_form_records(doc: str):
 	doc = frappe.parse_json(doc)
 
 	created = []

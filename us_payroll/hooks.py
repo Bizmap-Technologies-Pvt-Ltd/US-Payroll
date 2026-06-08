@@ -164,8 +164,8 @@ override_doctype_class = {
 doc_events = {
 	"Salary Slip": {
 		"after_insert": "us_payroll.custom_script.salary_slip.after_insert",
-		"validate": "us_payroll.custom_script.salary_slip.validate",
-		"on_cancel": "us_payroll.custom_script.salary_slip.on_cancel",
+		# "validate": "us_payroll.custom_script.salary_slip.validate",
+		# "on_cancel": "us_payroll.custom_script.salary_slip.on_cancel",
 		"before_save": "us_payroll.custom_script.salary_slip.before_save",
 		"before_submit": "us_payroll.custom_script.salary_slip.before_submit",
 	},
@@ -174,15 +174,12 @@ doc_events = {
 		"validate": "us_payroll.custom_script.attendance.validate",
 		"on_submit": "us_payroll.custom_script.attendance.on_submit",
 	},
-	"Payroll Entry": {
-		"validate": "us_payroll.custom_script.payroll_entry.validate",
-		"before_save": "us_payroll.custom_script.payroll_entry.before_save",
-		"on_submit": "us_payroll.custom_script.payroll_entry.on_submit",
-		"before_submit": "us_payroll.custom_script.payroll_entry.before_submit",
-	},
-	"Journal Entry": {
-		# "validate": "us_payroll.custom_script.journal_entry.validate",
-	},
+	# "Payroll Entry": {
+	# 	"validate": "us_payroll.custom_script.payroll_entry.validate",
+	# 	"before_save": "us_payroll.custom_script.payroll_entry.before_save",
+	# 	"on_submit": "us_payroll.custom_script.payroll_entry.on_submit",
+	# 	"before_submit": "us_payroll.custom_script.payroll_entry.before_submit",
+	# },
 }
 
 
@@ -287,7 +284,7 @@ fixtures = [
 	{"dt": "Custom Field", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Property Setter", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "US-Payroll"]]},
+	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
 	"Translation",
-	"Workspace",
 	"Workspace Sidebar",
 ]

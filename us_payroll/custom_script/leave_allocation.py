@@ -22,9 +22,8 @@ def set_transaction_date(doc):
 
 
 @frappe.whitelist()
-def get_old_leave_allocation_amount(employee, amount):
+def get_old_leave_allocation_amount(employee: str, amount: float):
 	fy_info = get_us_fiscal_year()
-	current_fiscal_year = fy_info["fiscal_year"]
 	fiscal_year_start = fy_info["fiscal_year_start"]
 	fiscal_year_end = fy_info["fiscal_year_end"]
 	doc = frappe.get_all(
@@ -52,7 +51,12 @@ def get_old_leave_allocation_amount(employee, amount):
 
 
 @frappe.whitelist()
-def update_allocated_leaves(employee, amount, reason, existing_amount):
+def update_allocated_leaves(
+	employee: str,
+	amount: float,
+	reason: str,
+	existing_amount: float,
+):
 	fy_info = get_us_fiscal_year()
 	fiscal_year_start = fy_info["fiscal_year_start"]
 	fiscal_year_end = fy_info["fiscal_year_end"]

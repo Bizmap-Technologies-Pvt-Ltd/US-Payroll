@@ -1,3 +1,5 @@
+/* globals erpnext */
+
 frappe.ui.form.on("Leave Allocation", {
 	onload: function (frm) {
 		frm.trigger("set_fiscal_year_dates");
@@ -37,7 +39,7 @@ frappe.ui.form.on("Leave Allocation", {
 									"new_leaves_allocated",
 									parseFloat(res.existing_amount)
 								);
-								frappe.msgprint("Operation cancelled.");
+								frappe.msgprint(__("Operation cancelled."));
 							}
 						);
 					} else if (res.status === "created") {
@@ -82,7 +84,7 @@ function show_popup_for_reason(frm, existing_amount, new_amount) {
 					frm.set_value("custom_previous_leaves_allocated", existing_amount);
 					frm.set_value("new_leaves_allocated", parseFloat(values.new_amount));
 
-					frappe.msgprint("Leave allocation updated successfully.");
+					frappe.msgprint(__("Leave allocation updated successfully."));
 					dialog.hide();
 					frm.reload_doc();
 				},

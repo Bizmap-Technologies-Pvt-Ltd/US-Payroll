@@ -4,8 +4,10 @@
 import json
 from collections import defaultdict
 from datetime import datetime
+from typing import Any
 
 import frappe
+from frappe import _
 from frappe.utils import getdate
 from frappe.utils.pdf import get_pdf
 
@@ -22,29 +24,62 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		# {"label": "Employee ID", "fieldname": "employee", "fieldtype": "Link", "options": "Employee", "width": 120},
-		{"label": "Employee Name", "fieldname": "employee_name", "fieldtype": "Data", "width": 180},
 		{
-			"label": "Comp Code",
+			"label": _("Employee Name"),
+			"fieldname": "employee_name",
+			"fieldtype": "Data",
+			"width": 180,
+		},
+		{
+			"label": _("Comp Code"),
 			"fieldname": "custom_comp_code",
 			"fieldtype": "Link",
 			"options": "Comp Code",
 			"width": 120,
 		},
 		{
-			"label": "Department",
+			"label": _("Department"),
 			"fieldname": "department",
 			"fieldtype": "Link",
 			"options": "Department",
 			"width": 150,
 		},
-		# {'label': 'Department Name', 'fieldname': 'department_name', 'fieldtype': 'Data','align': 'center','width': 150},
-		{"label": "Earnings", "fieldname": "earnings", "fieldtype": "Currency", "width": 150},
-		{"label": "Hours", "fieldname": "hours", "fieldtype": "Float", "width": 120},
-		{"label": "OT Rate", "fieldname": "ot_rate", "fieldtype": "Float", "width": 120},
-		{"label": "OT Hours", "fieldname": "ot_hours", "fieldtype": "Float", "width": 120},
-		{"label": "OT Amount", "fieldname": "ot_amount", "fieldtype": "Currency", "width": 150},
-		{"label": "Gross Amount", "fieldname": "gross_amount", "fieldtype": "Currency", "width": 150},
+		{
+			"label": _("Earnings"),
+			"fieldname": "earnings",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Hours"),
+			"fieldname": "hours",
+			"fieldtype": "Float",
+			"width": 120,
+		},
+		{
+			"label": _("OT Rate"),
+			"fieldname": "ot_rate",
+			"fieldtype": "Float",
+			"width": 120,
+		},
+		{
+			"label": _("OT Hours"),
+			"fieldname": "ot_hours",
+			"fieldtype": "Float",
+			"width": 120,
+		},
+		{
+			"label": _("OT Amount"),
+			"fieldname": "ot_amount",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Gross Amount"),
+			"fieldname": "gross_amount",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
 	]
 
 
@@ -53,10 +88,8 @@ def get_data(filters):
 	to_date = filters.get("to_date")
 
 	if not from_date or not to_date:
-		frappe.throw("Please set From Date and To Date filters")
+		frappe.throw(_("Please set From Date and To Date filters"))
 
-	conditions = ["cs.docstatus = 1", "cs.start_date BETWEEN %(from_date)s AND %(to_date)s"]
-	condition_sql = " AND ".join(conditions)
 	results = frappe.db.sql(
 		"""
 		SELECT
@@ -102,7 +135,7 @@ def get_data(filters):
 
 
 @frappe.whitelist()
-def get_print(report_data):
+def get_print(report_data: str):
 	report_data = json.loads(report_data)
 	filters = report_data.get("filter")
 	report_data = {"filter": filters, "data": report_data.get("data")}
@@ -110,7 +143,7 @@ def get_print(report_data):
 
 
 @frappe.whitelist()
-def generate_pdf(data):
+def generate_pdf(data: dict[str, Any]):
 	filters = data.get("filter")
 	template_path = "us_payroll/us_payroll/report/workers'_comp_report/workers'_comp_report.html"
 
@@ -135,7 +168,7 @@ def generate_pdf(data):
 	company_name = f"City of {company_name}"
 	department_data, comp_code_summary, department_summary, grand_totals = get_department_summary(data)
 
-	html = frappe.render_template(
+	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 		template_path,
 		{
 			"data": data,

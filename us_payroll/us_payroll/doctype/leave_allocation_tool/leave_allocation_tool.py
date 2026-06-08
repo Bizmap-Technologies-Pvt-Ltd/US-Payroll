@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import json
+from typing import Any
 
 import frappe
 from frappe.model.document import Document
@@ -13,8 +14,7 @@ class LeaveAllocationTool(Document):
 
 
 @frappe.whitelist()
-def get_employees(leave_type, from_date, to_date, department=None):
-	filters = []
+def get_employees(leave_type: str, from_date: str, to_date: str, department: str | None = None):
 	filters = {"status": "Active"}
 
 	if department:
@@ -67,7 +67,6 @@ def get_employees(leave_type, from_date, to_date, department=None):
 			)
 
 			last_submitted_pto_balance = float(past_pto[0].custom_available_pto) if past_pto else 0
-			print(last_submitted_pto_balance, "last_submitted_pto_balance")
 			emp["balanced_pto_leaves"] = last_submitted_pto_balance
 			emp["total_leaves_allocated_pto"] = total_leaves_allocated_pto
 
@@ -106,7 +105,6 @@ def get_employees(leave_type, from_date, to_date, department=None):
 			)
 
 			last_submitted_ct_balance = float(past_comp[0].custom_available_ct) if past_comp else 0
-			print(last_submitted_ct_balance, "last_submitted_ct_balance")
 			emp["balanced_ct_leaves"] = last_submitted_ct_balance
 			emp["total_leaves_allocated_ct"] = total_leaves_allocated_ct
 
@@ -114,7 +112,7 @@ def get_employees(leave_type, from_date, to_date, department=None):
 
 
 @frappe.whitelist()
-def generate_leave_allocations(doc):
+def generate_leave_allocations(doc: str | dict[str, Any]):
 	if isinstance(doc, str):
 		doc = json.loads(doc)
 
@@ -167,5 +165,5 @@ def generate_leave_allocations(doc):
 
 			created.append({"name": la.name, "employee": la.employee, "leave_type": la.leave_type})
 
-	frappe.db.commit()
+	# frappe.db.commit()
 	return {"created": created, "skipped": skipped}

@@ -60,25 +60,26 @@ def update_leave_data_from_payrol(data, filters):
 	for row in data:
 		if row.get("employee"):
 			employee = row.get("employee")
-			query = f"""
-					SELECT pe.name AS payroll_entry,
-					ped.custom_available_pto,
-					ped.custom_available_ct,
-					ped.custom_comp_time,
-					ped.custom_pto_hours
+			query = """
+				SELECT pe.name AS payroll_entry,
+				ped.custom_available_pto,
+				ped.custom_available_ct,
+				ped.custom_comp_time,
+				ped.custom_pto_hours
 
-					FROM `tabPayroll Entry` pe
-					INNER JOIN `tabPayroll Employee Detail` ped ON ped.parent = pe.name
-					WHERE ped.employee = '{employee}'
-					  AND pe.docstatus = 1
-					  AND pe.status != 'Failed'
-					  AND pe.posting_date <= '{as_of_date}'
-					"""
-			order_by = """ ORDER BY pe.modified DESC """
-			condition = " AND 1=1 "
+				FROM `tabPayroll Entry` pe
+				INNER JOIN `tabPayroll Employee Detail` ped ON ped.parent = pe.name
+				WHERE ped.employee = %(employee)s
+				  AND pe.docstatus = 1
+				  AND pe.status != 'Failed'
+				  AND pe.posting_date <= %(as_of_date)s
+			"""
 
-			query += condition + order_by
-			past_data = frappe.db.sql(query, as_dict=True)
+			order_by = " ORDER BY pe.modified DESC "
+
+			past_data = frappe.db.sql(
+				query + order_by, {"employee": employee, "as_of_date": as_of_date}, as_dict=True
+			)
 
 			if not past_data:
 				continue

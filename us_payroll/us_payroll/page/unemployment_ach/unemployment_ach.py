@@ -1,22 +1,22 @@
-import datetime
 import io
 import math
 from calendar import monthrange
 from datetime import datetime
 
 import frappe
+from frappe import _
 from frappe.utils.file_manager import save_file
 
 from us_payroll.us_payroll.report.unemployment_report import unemployment_report
 
 
 @frappe.whitelist()
-def get_unemployment_report_data(year, quarter):
+def get_unemployment_report_data(year: str, quarter: str):
 	filters = {"year": year, "quarter": quarter}
 	columns, data = unemployment_report.execute(filters)
 
 	if not data:
-		frappe.throw("No data found for the selected period.")
+		frappe.throw(_("No data found for the selected period."))
 
 	lines = []
 
@@ -135,8 +135,6 @@ def generate_b_record(data):
 
 	zipcode = ach_details.zipcode or ""
 
-	telephone_extension_box = ach_details.telephone_extension_box or ""
-
 	return (
 		"B"
 		+ pad(year, 4)
@@ -172,11 +170,11 @@ def generate_e_record(data):
 
 	company_city_name = ach_details.company_city_name or ""
 
-	type_of_employment = ach_details.type_of_employment or ""
+	# type_of_employment = ach_details.type_of_employment or ""
 
-	establishment_number_or_coverage_grouppru = ach_details.establishment_number_or_coverage_grouppru or ""
+	# establishment_number_or_coverage_grouppru = ach_details.establishment_number_or_coverage_grouppru or ""
 
-	blocking_factor = ach_details.blocking_factor or ""
+	# blocking_factor = ach_details.blocking_factor or ""
 
 	taxing_entity_code = ach_details.taxing_entity_code or ""
 
@@ -187,8 +185,6 @@ def generate_e_record(data):
 	city_code = ach_details.city_code or ""
 
 	zipcode = ach_details.zipcode or ""
-
-	telephone_extension_box = ach_details.telephone_extension_box or ""
 
 	state_unemployment_insurance_account_number = (
 		ach_details.state_unemployment_insurance_account_number or ""
@@ -206,12 +202,12 @@ def generate_e_record(data):
 	reporting_period = month
 
 	no_workersno_wages = ach_details.no_workersno_wages or ""
-	tax_type_code = ach_details.tax_type_code or ""
+	# tax_type_code = ach_details.tax_type_code or ""
 	taxing_entity_code = ach_details.taxing_entity_code or ""
-	state_control_number = ach_details.state_control_number or ""
-	unit_number = ach_details.unit_number or ""
-	foreign_indicator = ach_details.foreign_indicator or ""
-	other_ein = ach_details.other_ein or ""
+	# state_control_number = ach_details.state_control_number or ""
+	# unit_number = ach_details.unit_number or ""
+	# foreign_indicator = ach_details.foreign_indicator or ""
+	# other_ein = ach_details.other_ein or ""
 
 	return (
 		"E"
@@ -305,7 +301,7 @@ def generate_t_record(data):
 	total_wages = int(total_wages * 100)  # Convert dollars to cents
 	wages = str(total_wages).rjust(14, "0")
 
-	excess_wages = sum(emp.get("excess_wages", 0) for emp in data)
+	# excess_wages = sum(emp.get("excess_wages", 0) for emp in data)
 
 	taxable_wages = sum(emp.get("taxable_wages", 0) for emp in data)
 	taxable_wages = int(taxable_wages * 100)  # Convert dollars to cents

@@ -1,6 +1,8 @@
 // Copyright (c) 2026, us_payroll and contributors
 // For license information, please see license.txt
 
+/* globals erpnext */
+
 frappe.query_reports["Payroll Detail Report By Posted Date"] = {
 	filters: [
 		{

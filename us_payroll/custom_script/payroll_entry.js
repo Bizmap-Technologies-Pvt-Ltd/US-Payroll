@@ -1,10 +1,10 @@
 // Copyright (c) 2017, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-cur_frm.page.sidebar.toggle();
-
 frappe.ui.form.on("Payroll Entry", {
 	refresh: function (frm) {
+		frm.page.sidebar.toggle();
+
 		// Remove core Submit Salary Slips button
 		frm.remove_custom_button(__("Submit Salary Slip"));
 
@@ -51,30 +51,32 @@ frappe.ui.form.on("Payroll Entry", {
 		frm.fields_dict["employees"].grid.wrapper.find(".grid-add-row").remove();
 	},
 
-	start_date: function (frm) {
-		if (!in_progress && frm.doc.start_date) {
-			frm.trigger("set_end_date");
-		} else {
-			// reset flag
-			in_progress = false;
-		}
-		frm.events.clear_employee_table(frm);
-	},
+	// start_date: function (frm) {
+	// 	frm.trigger("make_dashboard");
 
-	set_end_date: function (frm) {
-		frappe.call({
-			method: "us_payroll.custom_script.payroll_entry.get_end_date",
-			args: {
-				frequency: frm.doc.payroll_frequency,
-				start_date: frm.doc.start_date,
-			},
-			callback: function (r) {
-				if (r.message) {
-					frm.set_value("end_date", r.message.end_date);
-				}
-			},
-		});
-	},
+	// 	if (!frm.__us_payroll_in_progress && frm.doc.start_date) {
+	// 		frm.trigger("set_end_date");
+	// 	} else {
+	// 		// reset flag
+	// 		frm.__us_payroll_in_progress = false;
+	// 	}
+	// 	frm.events.clear_employee_table(frm);
+	// },
+
+	// set_end_date: function (frm) {
+	// 	frappe.call({
+	// 		method: "us_payroll.custom_script.payroll_entry.get_end_date",
+	// 		args: {
+	// 			frequency: frm.doc.payroll_frequency,
+	// 			start_date: frm.doc.start_date,
+	// 		},
+	// 		callback: function (r) {
+	// 			if (r.message) {
+	// 				frm.set_value("end_date", r.message.end_date);
+	// 			}
+	// 		},
+	// 	});
+	// },
 
 	set_default_company: function (frm) {
 		if (frm.doc.__islocal == 1) {
@@ -85,7 +87,7 @@ frappe.ui.form.on("Payroll Entry", {
 				},
 				callback: function (r) {
 					if (r.message) {
-						default_company = r.message.company;
+						let default_company = r.message.company;
 						frm.set_value("company", default_company);
 					}
 				},
@@ -170,12 +172,12 @@ frappe.ui.form.on("Payroll Entry", {
 							employee_totals[employee_id]["overtime_amount"]
 						);
 
-						cur_frm.fields_dict["employees"].grid.get_field(
+						frm.fields_dict["employees"].grid.get_field(
 							"custom_total_working_hours"
 						).get_query = function (doc, cdt, cdn) {
 							return { read_only: 1 };
 						};
-						cur_frm.fields_dict["employees"].grid.get_field(
+						frm.fields_dict["employees"].grid.get_field(
 							"custom_total_overtime_hours"
 						).get_query = function (doc, cdt, cdn) {
 							return { read_only: 1 };
@@ -187,10 +189,6 @@ frappe.ui.form.on("Payroll Entry", {
 				frm.save();
 			},
 		});
-	},
-
-	start_date: function (frm) {
-		frm.trigger("make_dashboard");
 	},
 
 	end_date: function (frm) {
@@ -424,7 +422,7 @@ frappe.ui.form.on("Payroll Entry", {
 				callback: function (r) {
 					if (r.message.length > 0) {
 						if (!frm.custom_buttons["Void Check"]) {
-							frm.add_custom_button("Void Check", function () {
+							frm.add_custom_button(__("Void Check"), function () {
 								voidCheck(frm);
 							}).addClass("btn-primary");
 						}
@@ -489,7 +487,7 @@ function voidCheck(frm) {
 					}
 
 					if (r.message && r.message.check_voided) {
-						frappe.msgprint("Check Voided/Cancelled");
+						frappe.msgprint(__("Check Voided/Cancelled"));
 					}
 				},
 			});
@@ -503,7 +501,7 @@ function calculate_holiday_hours(frm) {
 	let total_holiday_hours = 0;
 
 	if (!frm.doc.start_date || !frm.doc.end_date) {
-		frappe.msgprint("Please select both Start Date and End Date.");
+		frappe.msgprint(__("Please select both Start Date and End Date."));
 		return;
 	}
 
@@ -631,14 +629,7 @@ frappe.ui.form.on("Payroll Employee Detail", {
 			row.custom_total_comp_time_amount = row.custom_comp_time * row.custom_hourly_rate;
 			frm.refresh_field("employees");
 		}
-	},
 
-	employee: function (frm) {
-		// calculate_holiday_hours(frm)
-	},
-
-	custom_holiday_hours: function (frm, cdt, cdn) {
-		let row = locals[cdt][cdn];
 		if (row.custom_holiday_hours && row.custom_hourly_rate) {
 			console.log(
 				row.custom_holiday_hours,
@@ -651,7 +642,11 @@ frappe.ui.form.on("Payroll Employee Detail", {
 		}
 	},
 
-	custom_hourly_rate: function (frm, cdt, cdn) {
+	employee: function (frm) {
+		// calculate_holiday_hours(frm)
+	},
+
+	custom_holiday_hours: function (frm, cdt, cdn) {
 		let row = locals[cdt][cdn];
 		if (row.custom_holiday_hours && row.custom_hourly_rate) {
 			console.log(
@@ -680,11 +675,6 @@ frappe.ui.form.on("Payroll Employee Detail", {
 						frappe.msgprint(__(response.message.error));
 						return;
 					}
-
-					// let max_working_hours = response.message.working_hours;
-					// if (max_working_hours === 0) {
-					// 	max_working_hours = 40;
-					// }
 
 					frappe.db
 						.get_single_value("Client Setup", "default_working_hours")

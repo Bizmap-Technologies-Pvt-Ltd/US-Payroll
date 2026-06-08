@@ -1,10 +1,9 @@
 // Copyright (c) 2026, us_payroll and contributors
 // For license information, please see license.txt
 
-cur_frm.page.sidebar.toggle();
-
 frappe.ui.form.on("W2 Form Tool", {
 	onload: function (frm) {
+		frm.page.sidebar.toggle();
 		// frm.trigger("set_default_year");
 		frm.trigger("set_ein");
 	},

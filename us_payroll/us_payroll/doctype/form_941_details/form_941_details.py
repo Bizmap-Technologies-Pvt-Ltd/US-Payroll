@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -13,12 +14,12 @@ class Form941Details(Document):
 
 
 @frappe.whitelist()
-def calculate_totals(doc):
+def calculate_totals(doc: str):
 	doc = json.loads(doc)
 	if doc.get("year"):
 		doc["year"] = int(doc["year"])
 	if not (doc.get("year_start_date") and doc.get("year_end_date")):
-		frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
+		frappe.throw(_("Please make sure Year Start Date, and Year End Date are set."))
 
 	start_date = doc.get("year_start_date")
 	end_date = doc.get("year_end_date")
@@ -36,82 +37,89 @@ def calculate_totals(doc):
 		start_date = datetime(doc.get("year"), 10, 1)
 		end_date = datetime(doc.get("year"), 12, 31)
 
-	conditions = ["cs.docstatus = 1", "cs.posting_date BETWEEN %(start_date)s AND %(end_date)s"]
+	query = """
+			SELECT
+				agg.employee,
+				agg.employee_name,
+				agg.department,
+				SUM(agg.gross_pay) AS gross_pay,
+				SUM(agg.federal_withholding) AS federal_withholding,
+				SUM(agg.custom_total_pretax) AS pre_tax,
+				SUM(agg.custom_total_non_taxable_earnings) AS non_taxable_earnings,
+				SUM(agg.custom_taxable_wages) AS taxable_wages,
+				SUM(agg.ss_employee_total) AS social_security_emp,
+				SUM(agg.ss_employer_total) AS social_security_er,
+				SUM(agg.medicare_employee_total) AS medicare_emp,
+				SUM(agg.medicare_employer_total) AS medicare_er
+			FROM (
+				SELECT
+					cs.name AS salary_slip_id,
+					cs.employee,
+					cs.employee_name,
+					cs.department,
+					cs.gross_pay,
+					cs.custom_total_pretax,
+					cs.custom_total_non_taxable_earnings,
+					cs.custom_taxable_wages,
 
-	condition_sql = " AND ".join(conditions)
+					COALESCE((
+						SELECT SUM(ded.amount)
+						FROM `tabSalary Detail` ded
+						LEFT JOIN `tabSalary Component` sc
+							ON ded.salary_component = sc.name
+						WHERE ded.parent = cs.name
+						AND sc.custom_federal_income_tax_and_additional_withholdings = 1
+					), 0) AS federal_withholding,
+
+					COALESCE((
+						SELECT SUM(ded.amount)
+						FROM `tabSalary Detail` ded
+						LEFT JOIN `tabSalary Component` sc
+							ON ded.salary_component = sc.name
+						WHERE ded.parent = cs.name
+						AND sc.name = 'Social Security Tax - Employee'
+					), 0) AS ss_employee_total,
+
+					COALESCE((
+						SELECT SUM(ded.amount)
+						FROM `tabSalary Detail` ded
+						LEFT JOIN `tabSalary Component` sc
+							ON ded.salary_component = sc.name
+						WHERE ded.parent = cs.name
+						AND sc.name = 'Social Security Tax - Employer'
+					), 0) AS ss_employer_total,
+
+					COALESCE((
+						SELECT SUM(ded.amount)
+						FROM `tabSalary Detail` ded
+						LEFT JOIN `tabSalary Component` sc
+							ON ded.salary_component = sc.name
+						WHERE ded.parent = cs.name
+						AND sc.name = 'Medicare Tax EE'
+					), 0) AS medicare_employee_total,
+
+					COALESCE((
+						SELECT SUM(ded.amount)
+						FROM `tabSalary Detail` ded
+						LEFT JOIN `tabSalary Component` sc
+							ON ded.salary_component = sc.name
+						WHERE ded.parent = cs.name
+						AND sc.name = 'Medicare Tax ER'
+					), 0) AS medicare_employer_total
+
+				FROM `tabSalary Slip` cs
+				WHERE {condition_sql}
+			) agg
+			GROUP BY agg.employee, agg.employee_name, agg.department
+			ORDER BY agg.employee_name
+		"""
 
 	results = frappe.db.sql(
-		f"""
-		SELECT
-			agg.employee,
-			agg.employee_name,
-			agg.department,
-			SUM(agg.gross_pay) AS gross_pay,
-			SUM(agg.federal_withholding) AS federal_withholding,
-			SUM(agg.custom_total_pretax) AS pre_tax,
-			SUM(agg.custom_total_non_taxable_earnings) AS non_taxable_earnings,
-			SUM(agg.custom_taxable_wages) AS taxable_wages,
-			SUM(agg.ss_employee_total) AS social_security_emp,
-			SUM(agg.ss_employer_total) AS social_security_er,
-			SUM(agg.medicare_employee_total) AS medicare_emp,
-			SUM(agg.medicare_employer_total) AS medicare_er
-		FROM (
-			SELECT
-				cs.name AS salary_slip_id,
-				cs.employee,
-				cs.employee_name,
-				cs.department,
-				cs.gross_pay,
-				cs.custom_total_pretax,
-				cs.custom_total_non_taxable_earnings,
-				cs.custom_taxable_wages,
-				COALESCE((
-					SELECT SUM(ded.amount)
-					FROM `tabSalary Detail` ded
-					LEFT JOIN `tabSalary Component` sc ON ded.salary_component = sc.name
-					WHERE ded.parent = cs.name
-					AND sc.custom_federal_income_tax_and_additional_withholdings = 1
-				), 0) AS federal_withholding,
-
-				COALESCE((
-					SELECT SUM(ded.amount)
-					FROM `tabSalary Detail` ded
-					LEFT JOIN `tabSalary Component` sc ON ded.salary_component = sc.name
-					WHERE ded.parent = cs.name
-					AND sc.name = 'Social Security Tax - Employee'
-				), 0) AS ss_employee_total,
-
-				COALESCE((
-					SELECT SUM(ded.amount)
-					FROM `tabSalary Detail` ded
-					LEFT JOIN `tabSalary Component` sc ON ded.salary_component = sc.name
-					WHERE ded.parent = cs.name
-					AND sc.name = 'Social Security Tax - Employer'
-				), 0) AS ss_employer_total,
-
-				COALESCE((
-					SELECT SUM(ded.amount)
-					FROM `tabSalary Detail` ded
-					LEFT JOIN `tabSalary Component` sc ON ded.salary_component = sc.name
-					WHERE ded.parent = cs.name
-					AND sc.name = 'Medicare Tax EE'
-				), 0) AS medicare_employee_total,
-
-				COALESCE((
-					SELECT SUM(ded.amount)
-					FROM `tabSalary Detail` ded
-					LEFT JOIN `tabSalary Component` sc ON ded.salary_component = sc.name
-					WHERE ded.parent = cs.name
-					AND sc.name = 'Medicare Tax ER'
-				), 0) AS medicare_employer_total
-
-			FROM `tabSalary Slip` cs
-			WHERE {condition_sql}
-		) agg
-		GROUP BY agg.employee, agg.employee_name, agg.department
-		ORDER BY agg.employee_name
-	""",
-		{"start_date": start_date, "end_date": end_date},
+		query,
+		{
+			"start_date": start_date,
+			"end_date": end_date,
+		},
 		as_dict=True,
 	)
 
@@ -154,7 +162,11 @@ def calculate_totals(doc):
 
 
 @frappe.whitelist()
-def fetch_address_details(is_your_company_address, link_doctype, link_name):
+def fetch_address_details(
+	is_your_company_address: str,
+	link_doctype: str,
+	link_name: str,
+):
 	address = frappe.db.sql(
 		"""
 			SELECT a.address_line1, a.address_line2, a.city, a.state, a.county, a.country, a.pincode, a.email_id,a.phone
@@ -181,9 +193,20 @@ def fetch_address_details(is_your_company_address, link_doctype, link_name):
 			email_id = add.get("email_id") or ""
 			phone = add.get("phone") or ""
 
-			complete_address = ", ".join(
-				filter(None, [address_line1, address_line2, city, state, country, pincode])
-			)
+			address_parts = [
+				part
+				for part in [
+					address_line1,
+					address_line2,
+					city,
+					state,
+					country,
+					pincode,
+				]
+				if part
+			]
+
+			complete_address = ", ".join(address_parts)
 
 			return {
 				"complete_address": complete_address,
@@ -213,13 +236,13 @@ def fetch_address_details(is_your_company_address, link_doctype, link_name):
 
 
 @frappe.whitelist()
-def get_quarterly_data_for_liability(doc):
+def get_quarterly_data_for_liability(doc: str):
 	doc = json.loads(doc)
 	if doc.get("year"):
 		doc["year"] = int(doc["year"])
 
 	if not (doc.get("year_start_date") and doc.get("year_end_date")):
-		frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
+		frappe.throw(_("Please make sure Year Start Date, and Year End Date are set."))
 
 	start_date = doc.get("year_start_date")
 	end_date = doc.get("year_end_date")
@@ -250,9 +273,8 @@ def get_quarterly_data_for_liability(doc):
 		fields=["name", "employee", "start_date", "gross_pay"],
 	)
 
-	employee_ids = {slip["employee"] for slip in salary_slips}
-	unique_employee_count = len(employee_ids)
-	print("Unique Employee Count in a quarter:", unique_employee_count)
+	# employee_ids = {slip["employee"] for slip in salary_slips}
+	# unique_employee_count = len(employee_ids)
 
 	total_amt = 0
 	monthly_totals = {"first_month": 0, "second_month": 0, "third_month": 0}
@@ -292,7 +314,7 @@ def get_quarterly_data_for_liability(doc):
 			break
 
 	if not target_date:
-		frappe.throw("Quarter not selected properly.")
+		frappe.throw(_("Quarter not selected properly."))
 
 	# Get salary slips overlapping the target date
 	salary_slips = frappe.get_all(
@@ -325,56 +347,3 @@ def get_quarterly_data_for_liability(doc):
 		"employees": employee_list,
 		"target_date": target_date.strftime("%Y-%m-%d"),
 	}
-
-
-# @frappe.whitelist()
-# def get_active_employees_on_12th(doc):
-# 	doc = json.loads(doc)
-# 	year = int(doc.get("year"))
-#
-# 	quarter_date_map = {
-# 		"january_february_march": datetime(year, 3, 12),
-# 		"april_may_june": datetime(year, 6, 12),
-# 		"july_august_september": datetime(year, 9, 12),
-# 		"october_november_december": datetime(year, 12, 12),
-# 	}
-#
-# 	# Determine the correct target date
-# 	target_date = None
-# 	for key, date in quarter_date_map.items():
-# 		if doc.get(key):
-# 			target_date = date
-# 			break
-#
-# 	if not target_date:
-# 		frappe.throw("Quarter not selected properly.")
-#
-# 	# Get salary slips overlapping the target date
-# 	salary_slips = frappe.get_all("Salary Slip",
-# 		filters={
-# 			"start_date": ["<=", target_date],
-# 			"end_date": [">=", target_date],
-# 			"docstatus": 1
-# 		},
-# 		fields=["employee"]
-# 	)
-#
-# 	active_employees = set()
-#
-# 	for slip in salary_slips:
-# 		employee = slip["employee"]
-# 		relieving_date = frappe.db.get_value("Employee", employee, "relieving_date")
-#
-# 		# Include if not relieved before the 12th
-# 		if not relieving_date or relieving_date >= target_date.date():
-# 			active_employees.add(employee)
-#
-# 	# Convert set to sorted list for consistency
-# 	employee_list = sorted(list(active_employees))
-# 	print(employee_list, len(employee_list), "******************************len(employee_list)")
-#
-# 	return {
-# 		"employee_count": len(employee_list),
-# 		"employees": employee_list,
-# 		"target_date": target_date.strftime("%Y-%m-%d")
-# 	}

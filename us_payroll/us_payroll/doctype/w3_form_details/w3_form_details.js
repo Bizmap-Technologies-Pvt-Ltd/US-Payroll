@@ -25,7 +25,7 @@ frappe.ui.form.on("W3 Form Details", {
 				},
 				callback: function (r) {
 					if (r.message && frm.doc.__islocal == 1) {
-						default_company = r.message.company;
+						let default_company = r.message.company;
 						frm.set_value("employer_name", default_company);
 					}
 				},
@@ -69,16 +69,17 @@ frappe.ui.form.on("W3 Form Details", {
 				doc: frm.doc,
 			},
 			callback: function (r) {
-				wages_tips_other_compensation = r.message.wages_tips_other_compensation;
-				total_federal_income_tax_withheld = r.message.total_federal_income_tax_withheld;
-				social_security_tax_withheld = r.message.social_security_tax_withheld;
-				medicare_tax_withheld = r.message.medicare_tax_withheld;
-				number_of_w2_forms = r.message.number_of_w2_forms;
-				tmrs = r.message.tmrs;
-				medical_insurance = r.message.medical_insurance;
-				retirement_plan = r.message.retirement_plan;
-				social_security_wages = r.message.social_security_wages;
-				medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+				let wages_tips_other_compensation = r.message.wages_tips_other_compensation;
+				let total_federal_income_tax_withheld =
+					r.message.total_federal_income_tax_withheld;
+				let social_security_tax_withheld = r.message.social_security_tax_withheld;
+				let medicare_tax_withheld = r.message.medicare_tax_withheld;
+				let number_of_w2_forms = r.message.number_of_w2_forms;
+				let tmrs = r.message.tmrs;
+				let medical_insurance = r.message.medical_insurance;
+				let retirement_plan = r.message.retirement_plan;
+				let social_security_wages = r.message.social_security_wages;
+				let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
 
 				if (r.message) {
 					frm.set_value("wages_tips_other_compensation", wages_tips_other_compensation);
@@ -118,16 +119,17 @@ frappe.ui.form.on("W3 Form Details", {
 				doc: frm.doc,
 			},
 			callback: function (r) {
-				wages_tips_other_compensation = r.message.wages_tips_other_compensation;
-				total_federal_income_tax_withheld = r.message.total_federal_income_tax_withheld;
-				social_security_tax_withheld = r.message.social_security_tax_withheld;
-				medicare_tax_withheld = r.message.medicare_tax_withheld;
-				number_of_w2_forms = r.message.number_of_w2_forms;
-				tmrs = r.message.tmrs;
-				medical_insurance = r.message.medical_insurance;
-				retirement_plan = r.message.retirement_plan;
-				social_security_wages = r.message.social_security_wages;
-				medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+				let wages_tips_other_compensation = r.message.wages_tips_other_compensation;
+				let total_federal_income_tax_withheld =
+					r.message.total_federal_income_tax_withheld;
+				let social_security_tax_withheld = r.message.social_security_tax_withheld;
+				let medicare_tax_withheld = r.message.medicare_tax_withheld;
+				let number_of_w2_forms = r.message.number_of_w2_forms;
+				let tmrs = r.message.tmrs;
+				let medical_insurance = r.message.medical_insurance;
+				let retirement_plan = r.message.retirement_plan;
+				let social_security_wages = r.message.social_security_wages;
+				let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
 
 				if (r.message) {
 					frm.set_value("wages_tips_other_compensation", wages_tips_other_compensation);

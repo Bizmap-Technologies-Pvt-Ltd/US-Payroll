@@ -5,8 +5,10 @@ import calendar
 import json
 from collections import defaultdict
 from datetime import datetime
+from typing import Any
 
 import frappe
+from frappe import _
 from frappe.utils.pdf import get_pdf
 
 
@@ -40,20 +42,20 @@ def get_data(filters):
 	selected_month = month_name_to_number.get(selected_month_name)
 
 	if not selected_month:
-		frappe.throw("Please select a valid month.")
+		frappe.throw(_("Please select a valid month."))
 
-	# Calculate previous month and year
-	if selected_month == 1:
-		prev_month = 12
-		prev_year = selected_year - 1
-	else:
-		prev_month = selected_month - 1
-		prev_year = selected_year
+	# # Calculate previous month and year
+	# if selected_month == 1:
+	# 	prev_month = 12
+	# 	prev_year = selected_year - 1
+	# else:
+	# 	prev_month = selected_month - 1
+	# 	prev_year = selected_year
 
-	# Get first and last day of previous month
-	start_date = datetime(selected_year, selected_month, 1)
-	last_day = calendar.monthrange(selected_year, selected_month)[1]
-	end_date = datetime(selected_year, selected_month, last_day)
+	# # Get first and last day of previous month
+	# start_date = datetime(selected_year, selected_month, 1)
+	# last_day = calendar.monthrange(selected_year, selected_month)[1]
+	# end_date = datetime(selected_year, selected_month, last_day)
 
 	data = frappe.db.sql(
 		"""
@@ -103,67 +105,6 @@ def get_data(filters):
 		{"selected_month": selected_month, "year": selected_year},
 		as_dict=True,
 	)
-
-	# # Calculate previous month and year
-	# if selected_month == 1:
-	# 	prev_month = 12
-	# 	prev_year = selected_year - 1
-	# else:
-	# 	prev_month = selected_month - 1
-	# 	prev_year = selected_year
-
-	# # Get first and last day of previous month
-	# start_date = datetime(prev_year, prev_month, 1)
-	# last_day = calendar.monthrange(prev_year, prev_month)[1]
-	# end_date = datetime(prev_year, prev_month, last_day)
-
-	# data = frappe.db.sql("""
-	# 		SELECT
-	# 			pe.name AS payroll_entry,
-	# 			ped.employee,
-	# 			ped.employee_name,
-	# 			emp.custom_department_name,
-	# 			emp.custom_nomasked_social_security_number,
-	# 			emp.first_name,
-	# 			emp.middle_name,
-	# 			emp.last_name,
-	# 			cst.gross_pay AS gross_pay,
-	# 			cst.name AS salary_slip,
-	# 			sd.salary_component,
-	# 			sd.amount AS salary_component_amount,
-	# 			(CASE
-	# 			WHEN sd.salary_component = 'TMRS (Employee)' THEN sd.amount
-	# 			ELSE 0
-	# 		END) AS tmrs_employee_total,
-	# 		(CASE
-	# 			WHEN sd.salary_component = 'TMRS (Employer)' THEN sd.amount
-	# 			ELSE 0
-	# 		END) AS tmrs_employer_total,
-	# 		ct.cost_center_name as custom_department_name
-
-	# 		FROM
-	# 			`tabPayroll Entry` pe
-	# 		JOIN
-	# 			`tabPayroll Employee Detail` ped ON ped.parent = pe.name
-	# 		LEFT JOIN
-	# 			`tabEmployee` emp ON emp.name = ped.employee
-	# 		LEFT JOIN
-	# 			`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
-	# 		LEFT JOIN
-	# 			`tabSalary Detail` sd ON sd.parent = cst.name
-	# 		LEFT JOIN
-	# 			`tabCost Center` ct ON ct.name = emp.custom_department_name
-
-	# 		WHERE
-	# 			YEAR(pe.posting_date) = %(year)s
-	# 			AND MONTH(pe.posting_date) = %(prev_month)s
-	# 			AND MONTH(cst.posting_date) = %(prev_month)s
-	# 			AND cst.docstatus = 1
-	# 			AND sd.salary_component IN ('TMRS (Employee)', 'TMRS (Employer)')
-	# 	""", {
-	# 		"prev_month": prev_month,
-	# 		"year": prev_year
-	# 	}, as_dict=True)
 
 	# Grouping by salary slip
 	grouped = {}
@@ -240,35 +181,45 @@ def get_columns():
 	columns = []
 	"payroll_entry"
 	columns = [
-		{"label": "Employee", "fieldname": "employee", "fieldtype": "Data", "width": 150},
 		{
-			"label": "Department",
+			"label": _("Employee"),
+			"fieldname": "employee",
+			"fieldtype": "Data",
+			"width": 150,
+		},
+		{
+			"label": _("Department"),
 			"fieldname": "department",
 			"fieldtype": "Data",
 			"align": "center",
 			"width": 150,
 		},
 		{
-			"label": "Social Security Number",
+			"label": _("Social Security Number"),
 			"fieldname": "custom_nomasked_social_security_number",
 			"fieldtype": "Data",
 			"width": 150,
 		},
-		{"label": "Subject Wages", "fieldname": "gross_pay", "fieldtype": "Currency", "width": 150},
 		{
-			"label": "Employee Amount",
+			"label": _("Subject Wages"),
+			"fieldname": "gross_pay",
+			"fieldtype": "Currency",
+			"width": 150,
+		},
+		{
+			"label": _("Employee Amount"),
 			"fieldname": "tmrs_employee_total",
 			"fieldtype": "Currency",
 			"width": 150,
 		},
 		{
-			"label": "Employer Amount",
+			"label": _("Employer Amount"),
 			"fieldname": "tmrs_employer_total",
 			"fieldtype": "Currency",
 			"width": 150,
 		},
 		{
-			"label": "Total Contribution",
+			"label": _("Total Contribution"),
 			"fieldname": "total_contribution",
 			"fieldtype": "Currency",
 			"width": 150,
@@ -278,16 +229,15 @@ def get_columns():
 
 
 @frappe.whitelist()
-def get_print(report_data):
+def get_print(report_data: str):
 	report_data = json.loads(report_data)
-	filters = report_data.get("filter")
 
 	report_data = {"filter": report_data["filter"], "data": report_data}
 	return generate_pdf(report_data)
 
 
 @frappe.whitelist()
-def generate_pdf(data):
+def generate_pdf(data: dict[str, Any]):
 	filters = data.get("filter")
 	month_name_to_number = {
 		"January": 1,
@@ -311,20 +261,7 @@ def generate_pdf(data):
 	month_year = f"{selected_month_name} {selected_year}"
 
 	if not selected_month:
-		frappe.throw("Please select a valid month.")
-
-	# # Calculate previous month and year
-	# if selected_month == 1:
-	# 	prev_month = 12
-	# 	prev_year = selected_year - 1
-	# else:
-	# 	prev_month = selected_month - 1
-	# 	prev_year = selected_year
-
-	# # Get first and last day of previous month
-	# start_date = datetime(prev_year, prev_month, 1)
-	# last_day = calendar.monthrange(prev_year, prev_month)[1]
-	# end_date = datetime(prev_year, prev_month, last_day)
+		frappe.throw(_("Please select a valid month."))
 
 	# Get first and last day of previous month
 	start_date = datetime(selected_year, selected_month, 1)
@@ -350,7 +287,7 @@ def generate_pdf(data):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	html = frappe.render_template(
+	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 		template_path,
 		{
 			"data": data,
@@ -366,7 +303,6 @@ def generate_pdf(data):
 			"month_year": month_year,
 		},
 	)
-	modified_html = f"{html}"
 
 	options = {
 		"page-width": "2000px",

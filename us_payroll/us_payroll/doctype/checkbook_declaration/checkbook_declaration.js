@@ -9,18 +9,18 @@ frappe.ui.form.on("Checkbook Declaration", {
 	validate: function (frm) {},
 
 	first_check_number: function (frm) {
-		first_check_number = frm.doc.first_check_number;
+		let first_check_number = frm.doc.first_check_number;
 		if (isNaN(Number(first_check_number))) {
 			frm.set_value("first_check_number", " ");
-			frappe.throw("First Check Number is not valid. Please enter integer only.");
+			frappe.throw(__("First Check Number is not valid. Please enter integer only."));
 		}
 	},
 
 	no_of_leaves: function (frm) {
-		no_of_leaves = frm.doc.no_of_leaves;
+		let no_of_leaves = frm.doc.no_of_leaves;
 		if (isNaN(Number(no_of_leaves))) {
 			frm.set_value("no_of_leaves", " ");
-			frappe.throw("Number of leaves is not valid. Please enter integer only.");
+			frappe.throw(__("Number of leaves is not valid. Please enter integer only."));
 		}
 	},
 
@@ -33,7 +33,7 @@ frappe.ui.form.on("Checkbook Declaration", {
 			freeze: true,
 			freeze_message: __("Generating checks...."),
 			callback: function (r) {
-				frappe.msgprint("Checks generated successfully.");
+				frappe.msgprint(__("Checks generated successfully."));
 				if (r.message) {
 					frappe.show_alert({
 						message: __("Checks generated successfully"),

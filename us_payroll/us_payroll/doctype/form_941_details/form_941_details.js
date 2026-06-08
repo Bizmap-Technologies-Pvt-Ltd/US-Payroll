@@ -67,12 +67,12 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_gross_pay = r.message.total_gross_pay;
-					social_security_wages_amt = r.message.social_security_wages_amt;
-					medicare_wages_and_tips = r.message.medicare_wages_and_tips;
-					taxable_wages = r.message.taxable_wages;
-					taxable_wages_medicare = r.message.taxable_wages_medicare;
-					total_federal_income_tax_withheld =
+					let total_gross_pay = r.message.total_gross_pay;
+					let social_security_wages_amt = r.message.social_security_wages_amt;
+					let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+					let taxable_wages = r.message.taxable_wages;
+					let taxable_wages_medicare = r.message.taxable_wages_medicare;
+					let total_federal_income_tax_withheld =
 						r.message.total_federal_income_tax_withheld;
 
 					if (r.message) {
@@ -109,7 +109,7 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_taxes_after_adjustments = r.message.total_amt;
+					let total_taxes_after_adjustments = r.message.total_amt;
 					if (total_taxes_after_adjustments) {
 						frm.set_value(
 							"total_taxes_after_adjustments",
@@ -129,16 +129,16 @@ frappe.ui.form.on("Form 941 Details", {
 						frm.set_value("balance_due", "");
 					}
 
-					number_of_employees = r.message.employee_count;
+					let number_of_employees = r.message.employee_count;
 					if (number_of_employees) {
 						frm.set_value("number_of_employees", number_of_employees);
 					} else {
 						frm.set_value("number_of_employees", "");
 					}
 
-					first_month = r.message.first_month;
-					second_month = r.message.second_month;
-					third_month = r.message.third_month;
+					let first_month = r.message.first_month;
+					let second_month = r.message.second_month;
+					let third_month = r.message.third_month;
 
 					frm.set_value("first_month", first_month);
 					frm.set_value("second_month", second_month);
@@ -199,12 +199,12 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_gross_pay = r.message.total_gross_pay;
-					social_security_wages_amt = r.message.social_security_wages_amt;
-					medicare_wages_and_tips = r.message.medicare_wages_and_tips;
-					taxable_wages = r.message.taxable_wages;
-					taxable_wages_medicare = r.message.taxable_wages_medicare;
-					total_federal_income_tax_withheld =
+					let total_gross_pay = r.message.total_gross_pay;
+					let social_security_wages_amt = r.message.social_security_wages_amt;
+					let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+					let taxable_wages = r.message.taxable_wages;
+					let taxable_wages_medicare = r.message.taxable_wages_medicare;
+					let total_federal_income_tax_withheld =
 						r.message.total_federal_income_tax_withheld;
 
 					if (r.message) {
@@ -241,7 +241,7 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_taxes_after_adjustments = r.message.total_amt;
+					let total_taxes_after_adjustments = r.message.total_amt;
 					if (total_taxes_after_adjustments) {
 						frm.set_value(
 							"total_taxes_after_adjustments",
@@ -261,16 +261,16 @@ frappe.ui.form.on("Form 941 Details", {
 						frm.set_value("balance_due", "");
 					}
 
-					number_of_employees = r.message.employee_count;
+					let number_of_employees = r.message.employee_count;
 					if (number_of_employees) {
 						frm.set_value("number_of_employees", number_of_employees);
 					} else {
 						frm.set_value("number_of_employees", "");
 					}
 
-					first_month = r.message.first_month;
-					second_month = r.message.second_month;
-					third_month = r.message.third_month;
+					let first_month = r.message.first_month;
+					let second_month = r.message.second_month;
+					let third_month = r.message.third_month;
 
 					frm.set_value("first_month", first_month);
 					frm.set_value("second_month", second_month);
@@ -332,12 +332,12 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_gross_pay = r.message.total_gross_pay;
-					social_security_wages_amt = r.message.social_security_wages_amt;
-					medicare_wages_and_tips = r.message.medicare_wages_and_tips;
-					taxable_wages = r.message.taxable_wages;
-					taxable_wages_medicare = r.message.taxable_wages_medicare;
-					total_federal_income_tax_withheld =
+					let total_gross_pay = r.message.total_gross_pay;
+					let social_security_wages_amt = r.message.social_security_wages_amt;
+					let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+					let taxable_wages = r.message.taxable_wages;
+					let taxable_wages_medicare = r.message.taxable_wages_medicare;
+					let total_federal_income_tax_withheld =
 						r.message.total_federal_income_tax_withheld;
 
 					if (r.message) {
@@ -374,7 +374,7 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_taxes_after_adjustments = r.message.total_amt;
+					let total_taxes_after_adjustments = r.message.total_amt;
 					if (total_taxes_after_adjustments) {
 						frm.set_value(
 							"total_taxes_after_adjustments",
@@ -394,16 +394,16 @@ frappe.ui.form.on("Form 941 Details", {
 						frm.set_value("balance_due", "");
 					}
 
-					number_of_employees = r.message.employee_count;
+					let number_of_employees = r.message.employee_count;
 					if (number_of_employees) {
 						frm.set_value("number_of_employees", number_of_employees);
 					} else {
 						frm.set_value("number_of_employees", "");
 					}
 
-					first_month = r.message.first_month;
-					second_month = r.message.second_month;
-					third_month = r.message.third_month;
+					let first_month = r.message.first_month;
+					let second_month = r.message.second_month;
+					let third_month = r.message.third_month;
 
 					frm.set_value("first_month", first_month);
 					frm.set_value("second_month", second_month);
@@ -465,12 +465,12 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_gross_pay = r.message.total_gross_pay;
-					social_security_wages_amt = r.message.social_security_wages_amt;
-					medicare_wages_and_tips = r.message.medicare_wages_and_tips;
-					taxable_wages = r.message.taxable_wages;
-					taxable_wages_medicare = r.message.taxable_wages_medicare;
-					total_federal_income_tax_withheld =
+					let total_gross_pay = r.message.total_gross_pay;
+					let social_security_wages_amt = r.message.social_security_wages_amt;
+					let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+					let taxable_wages = r.message.taxable_wages;
+					let taxable_wages_medicare = r.message.taxable_wages_medicare;
+					let total_federal_income_tax_withheld =
 						r.message.total_federal_income_tax_withheld;
 
 					if (r.message) {
@@ -507,7 +507,7 @@ frappe.ui.form.on("Form 941 Details", {
 					doc: frm.doc,
 				},
 				callback: function (r) {
-					total_taxes_after_adjustments = r.message.total_amt;
+					let total_taxes_after_adjustments = r.message.total_amt;
 					if (total_taxes_after_adjustments) {
 						frm.set_value(
 							"total_taxes_after_adjustments",
@@ -527,16 +527,16 @@ frappe.ui.form.on("Form 941 Details", {
 						frm.set_value("balance_due", "");
 					}
 
-					number_of_employees = r.message.employee_count;
+					let number_of_employees = r.message.employee_count;
 					if (number_of_employees) {
 						frm.set_value("number_of_employees", number_of_employees);
 					} else {
 						frm.set_value("number_of_employees", "");
 					}
 
-					first_month = r.message.first_month;
-					second_month = r.message.second_month;
-					third_month = r.message.third_month;
+					let first_month = r.message.first_month;
+					let second_month = r.message.second_month;
+					let third_month = r.message.third_month;
 
 					frm.set_value("first_month", first_month);
 					frm.set_value("second_month", second_month);
@@ -588,21 +588,21 @@ frappe.ui.form.on("Form 941 Details", {
 
 	social_security_wages: function (frm) {
 		if (frm.doc.social_security_wages) {
-			total_amount = frm.doc.social_security_wages + frm.doc.medicare_wages_and_tips;
+			let total_amount = frm.doc.social_security_wages + frm.doc.medicare_wages_and_tips;
 			frm.set_value("total_social_security_and_medicare_taxes", total_amount);
 		}
 	},
 
 	medicare_wages_and_tips: function (frm) {
 		if (frm.doc.medicare_wages_and_tips) {
-			total_amount = frm.doc.social_security_wages + frm.doc.medicare_wages_and_tips;
+			let total_amount = frm.doc.social_security_wages + frm.doc.medicare_wages_and_tips;
 			frm.set_value("total_social_security_and_medicare_taxes", total_amount);
 		}
 	},
 
 	total_social_security_and_medicare_taxes: function (frm) {
 		if (frm.doc.total_social_security_and_medicare_taxes) {
-			total_amount =
+			let total_amount =
 				frm.doc.total_social_security_and_medicare_taxes +
 				frm.doc.federal_income_tax_withheld;
 			frm.set_value("total_taxes_before_adjustments", total_amount);
@@ -611,26 +611,12 @@ frappe.ui.form.on("Form 941 Details", {
 
 	federal_income_tax_withheld: function (frm) {
 		if (frm.doc.federal_income_tax_withheld) {
-			total_amount =
+			let total_amount =
 				frm.doc.total_social_security_and_medicare_taxes +
 				frm.doc.federal_income_tax_withheld;
 			frm.set_value("total_taxes_before_adjustments", total_amount);
 		}
 	},
-
-	// total_taxes_before_adjustments: function(frm) {
-	//         if (frm.doc.total_taxes_before_adjustments) {
-	//             total_amount = frm.doc.total_taxes_after_adjustments - frm.doc.total_taxes_before_adjustments
-	//             frm.set_value('current_quarter_adjustment_for_fractions_of_cents', total_amount);
-	//         }
-	// },
-
-	// total_taxes_after_adjustments: function(frm) {
-	//         if (frm.doc.total_taxes_after_adjustments) {
-	//             total_amount = frm.doc.total_taxes_after_adjustments - frm.doc.total_taxes_before_adjustments
-	//             frm.set_value('current_quarter_adjustment_for_fractions_of_cents', total_amount);
-	//         }
-	// },
 
 	set_ein: function (frm) {
 		var company = frappe.defaults.get_global_default("company");

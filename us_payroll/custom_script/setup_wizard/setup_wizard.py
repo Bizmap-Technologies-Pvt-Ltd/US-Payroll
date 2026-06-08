@@ -1,16 +1,21 @@
 import json
 import os
+from pathlib import Path
 
 import frappe
 
 
-def setup_wizard_complete(args=None):
+def setup_wizard_complete():
 	company = frappe.defaults.get_global_default("company")
-	abbr = frappe.db.get_value("Company", company, "abbr")
 
-	# Load JSON file
-	path = os.path.join(frappe.get_app_path("us_payroll"), "payroll", "data", "salary_components.json")
-	with open(path) as f:
+	# # Load JSON file
+	# path = os.path.join(frappe.get_app_path("us_payroll"), "payroll", "data", "salary_components.json")
+	# with open(path) as f:
+	# 	components = json.load(f)
+
+	file_path = Path(frappe.get_app_path("us_payroll")) / "payroll" / "data" / "salary_components.json"
+
+	with file_path.open("r", encoding="utf-8") as f:
 		components = json.load(f)
 
 	# Create components only if missing
