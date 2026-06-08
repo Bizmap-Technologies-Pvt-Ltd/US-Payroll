@@ -40,10 +40,6 @@ class OverridePayrollEntry(PayrollEntry):
 		self.calculate_time_data()
 		self.validate_leave_rules()
 
-	# def before_save(self):
-	# 	super().before_save()
-	# 	self.update_amounts()
-
 	def before_submit(self):
 		super().before_submit()
 		self.warning_msg()
@@ -123,7 +119,6 @@ class OverridePayrollEntry(PayrollEntry):
 
 		return super().get_salary_component_account(
 			salary_component,
-			employee,
 		)
 
 	def get_salary_component_total(
@@ -234,23 +229,6 @@ class OverridePayrollEntry(PayrollEntry):
 	def validate_leave_rules(self):
 		self.get_leave_balance()
 		self.carry_forward()
-
-	def update_amounts(self):
-		doc = self
-		for employee in doc.employees:
-			if employee.custom_total_working_hours and employee.custom_hourly_rate:
-				total_amount = employee.custom_total_working_hours * employee.custom_hourly_rate
-				employee.custom_total_amount = total_amount
-			else:
-				employee.custom_total_amount = 0
-
-			if employee.custom_total_overtime_hours and employee.custom_overtime_hourly_rate:
-				total_overtime_amount = (
-					employee.custom_total_overtime_hours * employee.custom_overtime_hourly_rate
-				)
-				employee.custom_total_overtime_amount = total_overtime_amount
-			else:
-				employee.custom_total_overtime_amount = 0
 
 	def carry_forward(self):
 		doc = self

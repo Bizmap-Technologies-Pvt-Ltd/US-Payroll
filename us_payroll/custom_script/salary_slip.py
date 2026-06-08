@@ -2,6 +2,7 @@ import frappe
 from erpnext.accounts.utils import get_fiscal_year
 from frappe import _
 from frappe.utils import flt, get_url
+from frappe.model.document import Document
 
 
 def after_insert(doc, method):
@@ -232,7 +233,7 @@ def salary_calculations_for_fit(doc):
 
 
 @frappe.whitelist()
-def tax_calulations_for_fit(doc: str):
+def tax_calulations_for_fit(doc: Document):
 	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
 	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
 	sal_structure = doc.salary_structure
