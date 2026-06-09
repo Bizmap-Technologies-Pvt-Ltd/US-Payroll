@@ -1,16 +1,16 @@
 # Copyright (c) 2025, bizmap and contributors
 # For license information, please see license.txt
 
+import calendar
+import json
+from collections import defaultdict
+from datetime import datetime
+from typing import Any
+
 import frappe
 from frappe import _
-from frappe.utils import flt
-from frappe.utils import getdate
-import calendar
-from datetime import datetime
-from collections import defaultdict
-import json
+from frappe.utils import flt, getdate
 from frappe.utils.pdf import get_pdf
-from collections import defaultdict
 
 
 def execute(filters=None):
@@ -21,23 +21,17 @@ def execute(filters=None):
 	return columns, data
 
 
-def get_data(filters):	
-	conditions = [
-		"cs.docstatus = 1",
-		"cs.start_date BETWEEN %(from_date)s AND %(to_date)s"
-	]
-
-	condition_sql = " AND ".join(conditions)
-
-	results = frappe.db.sql(f"""
-		SELECT 
+def get_data(filters):
+	results = frappe.db.sql(
+		"""
+		SELECT
 			agg.employee,
 			agg.employee_name,
 			agg.department AS department,
 			SUM(agg.gross_pay) AS gross_pay
-			
+
 		FROM (
-			SELECT 
+			SELECT
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
@@ -48,37 +42,40 @@ def get_data(filters):
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
 			WHERE cs.docstatus = 1
 			AND cs.start_date BETWEEN %(from_date)s AND %(to_date)s
-			
+
 		) agg
 		GROUP BY agg.employee, agg.employee_name
 		ORDER BY agg.employee_name
-	""", filters, as_dict=True)
-		
+	""",
+		filters,
+		as_dict=True,
+	)
+
 	return results
 
 
 def get_columns():
-	columns = [	
+	columns = [
 		{
 			"label": _("Employee Name"),
 			"fieldname": "employee_name",
 			"fieldtype": "Data",
 			"width": 200,
-			"align": "left"
+			"align": "left",
 		},
 		{
 			"label": _("Department"),
 			"fieldname": "department",
 			"fieldtype": "Data",
 			"width": 150,
-			"align": "left"
+			"align": "left",
 		},
 		{
 			"label": _("Gross Pay"),
 			"fieldname": "gross_pay",
 			"fieldtype": "Currency",
 			"width": 150,
-			"align": "right"
+			"align": "right",
 		},
 	]
 
@@ -86,20 +83,15 @@ def get_columns():
 
 
 @frappe.whitelist()
-def get_print(report_data):	
+def get_print(report_data: str):
 	report_data = json.loads(report_data)
-	filters = report_data.get("filter")
-
-	report_data = {
-		'filter': report_data['filter'],
-		'data': report_data
-	}
+	report_data = {"filter": report_data["filter"], "data": report_data}
 	return generate_pdf(report_data)
 
 
 @frappe.whitelist()
-def generate_pdf(data):
-	filters = data.get("filter")
+def generate_pdf(data: dict[str, Any]):
+	filters = data.get("filter", {})
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -119,26 +111,34 @@ def generate_pdf(data):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = 'us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html'
+	template_path = "us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html"
 
-	data = data.get('data')["data"]
-	
+	data = data.get("data")["data"]
+
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M%p").lower()
 
-	company_name = frappe.defaults.get_global_default('company').replace("City of ", "")
+	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	html = frappe.render_template(template_path, {"data": data, "company_name": company_name, "formatted_start_end_date":formatted_start_end_date, "formatted_datetime": formatted_datetime,"letterhead_image": letterhead_image})
-	modified_html = f'{html}'
+	html = frappe.render_template(  # nosemgrep: frappe-ssti
+		template_path,
+		{
+			"data": data,
+			"company_name": company_name,
+			"formatted_start_end_date": formatted_start_end_date,
+			"formatted_datetime": formatted_datetime,
+			"letterhead_image": letterhead_image,
+		},
+	)
 
 	options = {
-	'page-width': '1500px',
-	'page-height': '1500px',
-	'orientation': 'Landscape',
-	'margin-right': '20mm',
-	'margin-left': '20mm',
+		"page-width": "1500px",
+		"page-height": "1500px",
+		"orientation": "Landscape",
+		"margin-right": "20mm",
+		"margin-left": "20mm",
 	}
-	
-	pdf_file = get_pdf(html, options=options)	
-	return {'data': data, 'html': html, 'pdf_file': pdf_file}
+
+	pdf_file = get_pdf(html, options=options)
+	return {"data": data, "html": html, "pdf_file": pdf_file}

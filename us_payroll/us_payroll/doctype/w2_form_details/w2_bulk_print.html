@@ -5,16 +5,16 @@
 /* ===================================== */
 /* PAGE SETUP                             */
 /* ===================================== */
- 
+
 @page {
     size: A4;
     margin: 6mm;
 }
- 
+
 /* ===================================== */
 /* FIXED PAGE CONTAINER                   */
 /* ===================================== */
- 
+
 .page {
     height: 287mm;                 /* A4 height minus margins */
     display: flex;
@@ -22,36 +22,36 @@
     justify-content: space-between;
     page-break-after: always;
 }
- 
+
 /* 🚑 FIX: prevent blank last page */
 .page:last-child {
     page-break-after: auto !important;
 }
- 
+
 /* ===================================== */
 /* W2 BLOCKS                              */
 /* ===================================== */
- 
+
 .w2 {
     height: 132mm;                 /* controlled height */
     overflow: hidden;
 }
- 
+
 Gap before second W2
 .page .w2 + .w2 {
     margin-top: 4mm;
 }
- 
+
 /* Prevent splitting */
 table {
     page-break-inside: avoid;
     break-inside: avoid;
 }
- 
+
 /* ===================================== */
 /* FONT (wkhtmltopdf SAFE)                */
 /* ===================================== */
- 
+
 body {
     font-family: "DejaVu Sans Mono", monospace !important;
     font-size: 9px !important;
@@ -59,68 +59,67 @@ body {
     margin: 0;
     padding: 0;
 }
- 
+
 /* ===================================== */
 /* HEIGHT TUNING                          */
 /* ===================================== */
- 
+
 .h-top { height: 18px !important; }
 .h-sm { height: 22px !important; }
 .h-tall { height: 70px !important; }
 .h-bottom { height: 38px !important; }
- 
+
 /* ===================================== */
 /* TEXT SAFETY                            */
 /* ===================================== */
- 
+
 .value,
 .name-value {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
- 
+
 /* ===================================== */
 /* TABLE CLEANUP                          */
 /* ===================================== */
- 
+
 table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
     margin: 0 auto !important;
 }
- 
+
 td {
     padding: 1px 2px !important;
     line-height: 1.1 !important;
 }
 </style>
 </head>
- 
+
 <body>
- 
+
 {% for doc in docs %}
     {% if loop.index0 % 2 == 0 %}
         <div class="page">
     {% endif %}
- 
+
     <div class="w2-canvas">
         {% include "us_payroll/us_payroll/doctype/w2_form_details/w2_single_print.html" %}
     </div>
- 
+
     {% if loop.index0 % 2 == 1 %}
         </div>
     {% endif %}
 {% endfor %}
- 
+
 {# Close the last page only if docs length is odd #}
 {% if docs|length % 2 == 1 %}
     </div>
 {% endif %}
- 
- 
- 
+
+
+
 </body>
 </html>
- 

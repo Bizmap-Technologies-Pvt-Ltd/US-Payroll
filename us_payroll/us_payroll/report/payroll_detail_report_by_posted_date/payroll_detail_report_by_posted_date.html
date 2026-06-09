@@ -19,7 +19,7 @@
             text-align: left;
             line-height: 1.0;
         }
-        
+
         thead {
             display: table-header-group;
         }
@@ -31,7 +31,7 @@
 </head>
 <body>
     <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
-       <div class="header"> 
+       <div class="header">
             <img src="{{ letterhead_image }}" style="width: 200px; height: auto; float:left;">
        </div>
 
@@ -40,12 +40,12 @@
         </div>
     </div>
 
-    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">        
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
         <div style="float: left;">
             <div>{{ formatted_date_range }}</div>
-            <div>{{ current_datetime }}</div>           
+            <div>{{ current_datetime }}</div>
         </div>
-    </div> 
+    </div>
     <br>
     <br>
 
@@ -56,7 +56,7 @@
                     <td colspan="7" style="font-size: 14px; font-weight: bold; padding-top: 20px;">
                         Department: {{ department.department_code }}
                     </td>
-                </tr>     
+                </tr>
                 <tr>
                     <th style="font-size: 15px; text-align: left; width: 20%;">Employee Name</th>
                     <th style="font-size: 15px; text-align: right; width: 20%;">Rate</th>
@@ -82,7 +82,7 @@
                     <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">{{ frappe.utils.fmt_money(department.rate, currency="$") }}</td>
                     <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">{{ frappe.utils.fmt_money(department.net_pay, currency="$") }}</td>
                     <td style="font-size: 12px; font-weight: bold; text-align: right; padding-top: 10px; width: 20%;">{{ frappe.utils.fmt_money(department.gross_pay, currency="$") }}</td>
-                   
+
                 </tr>
             {% endfor %}
         </tbody>

@@ -36,7 +36,7 @@
             <!-- <img src="/files/overton logo.PNG" style="width: 300px; height: auto; float: left;"> -->
             <img src="{{ letterhead_image }}" style="width: 300px; height: auto; float: left;">
         </div>
-        
+
         <div style="text-align: left; margin-left: 320px;">
             <h1 style="font-size: 28px; margin: 0; white-space: nowrap;"><b>State Quarterly Standard Unemployment Report</b></h1>
             <div style="font-size: 22px; margin: 0;">Overton, TX</div>
@@ -60,7 +60,7 @@
                 <th style="font-size: 15px; text-align: left; width: 10%; ">Reporting ID</th>
                 <th style="font-size: 15px; text-align: left; width: 30%; "></th>
                 <th style="font-size: 15px; text-align: left; width: 40%; "></th>
-                
+
             </tr>
         </thead>
         <tbody>
@@ -85,7 +85,7 @@
                 <td style="font-size: 15px; text-align: left; width: 10%; ">
                     {{ "998811503" }}
                 </td>
-                
+
             </tr>
         </tbody>
     </table>
@@ -206,7 +206,7 @@
 
     <br><br>
 
-    <table>     
+    <table>
         <tbody>
             {% for department in department_data %}
                 <tr>
@@ -273,7 +273,7 @@
                         {{ "%.2f"|format(department.contribution) }}
                     </td>
                 </tr>
-              
+
             {% endfor %}
         </tbody>
 

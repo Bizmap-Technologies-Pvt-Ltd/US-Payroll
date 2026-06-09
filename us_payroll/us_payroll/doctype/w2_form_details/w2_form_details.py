@@ -1,17 +1,20 @@
 # Copyright (c) 2026, us_payroll and contributors
 # For license information, please see license.txt
 
-import frappe
-from frappe.model.document import Document
 import json
-from frappe import render_template
+
+import frappe
+from frappe import _, render_template
+from frappe.model.document import Document
 from frappe.utils.pdf import get_pdf
+
 
 class W2FormDetails(Document):
 	pass
 
+
 @frappe.whitelist()
-def calculate_totals(doc):
+def calculate_totals(doc: str):
 	doc = json.loads(doc)
 	# if not (doc.get("year_start_date") and doc.get("year_end_date")):
 	# 	frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
@@ -21,15 +24,20 @@ def calculate_totals(doc):
 	year_end_date = doc.get("year_end_date")
 
 	salary_slips = frappe.get_all(
-		'Salary Slip',
+		"Salary Slip",
 		filters={
-			'employee': employee,
-			'posting_date': ['between', [year_start_date, year_end_date]],
-			'docstatus': 1
+			"employee": employee,
+			"posting_date": ["between", [year_start_date, year_end_date]],
+			"docstatus": 1,
 		},
-		fields=['name', 'gross_pay', 'custom_taxable_wages',
-				'custom_total_non_taxable_earnings',
-				'custom_ss_taxable_wages', 'custom_mc_taxable_wages']
+		fields=[
+			"name",
+			"gross_pay",
+			"custom_taxable_wages",
+			"custom_total_non_taxable_earnings",
+			"custom_ss_taxable_wages",
+			"custom_mc_taxable_wages",
+		],
 	)
 
 	wages_tips_other_compensation = 0.0
@@ -45,7 +53,7 @@ def calculate_totals(doc):
 	medicare_wages_and_tips = 0.0
 
 	for slip in salary_slips:
-		salary_slip_doc = frappe.get_doc('Salary Slip', slip['name'])
+		salary_slip_doc = frappe.get_doc("Salary Slip", slip["name"])
 
 		# --- Wages, tips, other compensation ---
 		if slip.custom_taxable_wages:
@@ -60,7 +68,8 @@ def calculate_totals(doc):
 			social_security_wages += slip.custom_ss_taxable_wages
 		else:
 			ss_emp = sum(
-				d.amount for d in salary_slip_doc.deductions
+				d.amount
+				for d in salary_slip_doc.deductions
 				if d.salary_component == "Social Security Tax - Employee"
 			)
 			if ss_emp:
@@ -72,8 +81,7 @@ def calculate_totals(doc):
 			medicare_wages_and_tips += slip.custom_mc_taxable_wages
 		else:
 			mc_emp = sum(
-				d.amount for d in salary_slip_doc.deductions
-				if d.salary_component == "Medicare Tax EE"
+				d.amount for d in salary_slip_doc.deductions if d.salary_component == "Medicare Tax EE"
 			)
 			if mc_emp:
 				medicare_wages_and_tips += mc_emp / 0.0145
@@ -81,7 +89,7 @@ def calculate_totals(doc):
 
 		# --- Other deductions ---
 		for deduction in salary_slip_doc.deductions:
-			salary_component = frappe.get_doc('Salary Component', deduction.salary_component)
+			salary_component = frappe.get_doc("Salary Component", deduction.salary_component)
 
 			if salary_component.custom_federal_income_tax_and_additional_withholdings:
 				total_federal_income_tax_withheld += deduction.amount
@@ -108,20 +116,19 @@ def calculate_totals(doc):
 		"medicare_wages_and_tips": medicare_wages_and_tips,
 		"tmrs": tmrs,
 		"medical_insurance": medical_insurance,
-		"retirement_plan": retirement_plan
+		"retirement_plan": retirement_plan,
 	}
 
 
 @frappe.whitelist()
-def bulk_w2_print(names):
+def bulk_w2_print(names: str):
 	names = frappe.parse_json(names)
 	if not names:
-		frappe.throw("No records selected")
+		frappe.throw(_("No records selected"))
 
 	docs = [frappe.get_doc("W2 Form Details", name) for name in names]
-	html = render_template(
-		"us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html",
-		{"docs": docs}
+	html = render_template(  # nosemgrep: frappe-ssti
+		"us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html", {"docs": docs}
 	)
 
 	# options = {

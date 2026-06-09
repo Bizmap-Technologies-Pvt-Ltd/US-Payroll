@@ -10,7 +10,7 @@ class CheckbookDeclaration(Document):
 
 
 @frappe.whitelist()
-def generate_checks(docname):
+def generate_checks(docname: str):
 	checkbook_doc = frappe.get_doc("Checkbook Declaration", docname)
 	first_check_number = checkbook_doc.first_check_number
 	no_of_leaves = checkbook_doc.no_of_leaves
@@ -19,11 +19,8 @@ def generate_checks(docname):
 	for i in range(no_of_leaves):
 		first_check_number = int(first_check_number)
 		check_number = first_check_number + i
-		check_doc = frappe.get_doc({
-			"doctype": "Check",
-			"check_number": check_number,
-			"bank": bank,
-			"status":"Available"
-		})
+		check_doc = frappe.get_doc(
+			{"doctype": "Check", "check_number": check_number, "bank": bank, "status": "Available"}
+		)
 		check_doc.insert()
-	return ("Checks generated successfully.")
+	return "Checks generated successfully."

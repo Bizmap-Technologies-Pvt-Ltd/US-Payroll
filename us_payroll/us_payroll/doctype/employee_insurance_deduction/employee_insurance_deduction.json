@@ -13,6 +13,7 @@
   "is_active",
   "is_employer_component",
   "do_not_include_in_total",
+  "do_not_include_in_accounts",
   "is_this_employees_insurance_component",
   "is_this_employers_insurance_component",
   "insurance_component",
@@ -117,13 +118,20 @@
    "fieldtype": "Check",
    "label": "Insurance Component",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "do_not_include_in_accounts",
+   "fieldtype": "Check",
+   "label": " Do Not Include in Accounting Entries",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-23 02:18:34.233962",
+ "modified": "2026-05-29 12:24:48.223854",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Employee Insurance Deduction",

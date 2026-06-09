@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">        
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
         <div style="float: left;">
             <div>City Name: 00962</div>
             <div>Employer Name: {{ company_name }}</div>
@@ -71,7 +71,7 @@
                     <th rowspan="3" style="font-size: 12px; text-align: right;">Employee Amount</th>
                     <th rowspan="3" style="font-size: 12px; text-align: right;">Employer Amount</th>
                     <th rowspan="3" style="font-size: 12px; text-align: right;">Total Contribution</th>
-                    
+
                 </tr>
             </thead>
             <tbody>
@@ -95,56 +95,56 @@
                                     {{ row.get("employee", "") }}
 
                                 {% else %}
-                                    
+
                                 {% endif %}
                             </td>
-                            
-                            <td style="font-size: 12px;">                               
+
+                            <td style="font-size: 12px;">
                                 {% if "custom_department_name" in row %}
-                                    
+
                                     {{ row.get("custom_department_name", "") }}
-                                
+
                                 {% else %}
 
-                                {% endif %} 
+                                {% endif %}
                             </td>
-                            
+
                             <td style="font-size: 12px;">
                                 {% if "custom_nomasked_social_security_number" in row  and "employee" in row and row.get("employee") == "Total"%}
-                                  
+
                                     <b>{{ "Grand Totals:" }}</b>
-                               
+
                                 {% else %}
 
                                     {{ row.get("custom_nomasked_social_security_number", "N/A") }}
-                                    
+
 
                                 {% endif %}
-                            
+
                             </td>
-                            
-                            <td style="font-size: 12px; text-align: right;">                               
+
+                            <td style="font-size: 12px; text-align: right;">
                                 {% if "gross_pay" in row  and "employee" in row and row.get("employee") == "Total"%}
-                                 
+
                                     <b> ${{ "%.2f" | format(row.get("gross_pay", 0)) }} </b>
                                 {% else %}
 
-                                    ${{ "%.2f" | format(row.get("gross_pay", 0)) }} 
-                                    
+                                    ${{ "%.2f" | format(row.get("gross_pay", 0)) }}
+
                                 {% endif %}
-                               
+
                             </td>
-                            
+
                             <td style="font-size: 12px; text-align: right;">
 
                                 {% if "tmrs_employee_total" in row  and "employee" in row and row.get("employee") == "Total"%}
-                                   
+
                                     <b> ${{ "%.2f" | format(row.get("tmrs_employee_total", 0)) }}</b>
-                 
+
                                 {% else %}
 
                                     ${{ "%.2f" | format(row.get("tmrs_employee_total", 0)) }}
-                                    
+
                                 {% endif %}
 
                             <td style="font-size: 12px; text-align: right;">
@@ -154,13 +154,13 @@
                                     <b>${{ "%.2f" | format(row.get("tmrs_employer_total", 0)) }}</b>
 
                                 {% else %}
-                                    
+
                                     ${{ "%.2f" | format(row.get("tmrs_employer_total", 0)) }}
 
                                 {% endif %}
 
                             </td>
-                            
+
                             <td style="font-size: 12px; text-align: right;">
                                 {% if "total_contribution" in row   and "employee" in row and row.get("employee") == "Total"%}
 
@@ -169,16 +169,16 @@
                                 {% else %}
 
                                     ${{ "%.2f" | format(row.get("total_contribution", 0)) }}
-                                    
-                                {% endif %}                   
 
-                            </td>                                                   
+                                {% endif %}
+
+                            </td>
                         </tr>
 
                     {% else %}
 
-                    {% endif %}  
-                       
+                    {% endif %}
+
                 {% endfor %}
             </tbody>
         </table>
@@ -196,7 +196,7 @@
             </div>
 
         </div>
-    
+
         <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
             <div style="float: left;">
                 <div>City Name: 00962</div>
@@ -262,7 +262,7 @@
                         <td colspan="1"></td>
                     </tr>
 
-                    <td colspan="1" style="font-size: 12px; font-weight: bold;"></td>  
+                    <td colspan="1" style="font-size: 12px; font-weight: bold;"></td>
 
                     <td colspan="1" style="font-size: 12px; font-weight: bold;">Grand Totals:</td>
                     <td style="font-size: 12px; font-weight: bold;">{{ department_grand_totals.employee_count }}</td>

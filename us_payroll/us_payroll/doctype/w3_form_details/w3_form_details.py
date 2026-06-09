@@ -1,32 +1,37 @@
 # Copyright (c) 2026, us_payroll and contributors
 # For license information, please see license.txt
 
-import frappe
-from frappe.model.document import Document
 import json
+
+import frappe
+from frappe import _
+from frappe.model.document import Document
+
 
 class W3FormDetails(Document):
 	pass
 
+
 @frappe.whitelist()
-def calculate_totals(doc):
-	import json
+def calculate_totals(doc: str):
 	doc = json.loads(doc)
-	# if not (doc.get("year_start_date") and doc.get("year_end_date")):
-	# 	frappe.throw("Please make sure Year Start Date and Year End Date are set.")
+	if not (doc.get("year_start_date") and doc.get("year_end_date")):
+		frappe.throw(_("Please make sure Year Start Date and Year End Date are set."))
 
 	year_start_date = doc.get("year_start_date")
 	year_end_date = doc.get("year_end_date")
 
 	salary_slips = frappe.get_all(
 		"Salary Slip",
-		filters={
-			"posting_date": ["between", [year_start_date, year_end_date]],
-			"docstatus": 1
-		},
-		fields=["name", "gross_pay", "custom_taxable_wages",
-				"custom_total_non_taxable_earnings",
-				"custom_ss_taxable_wages", "custom_mc_taxable_wages"]
+		filters={"posting_date": ["between", [year_start_date, year_end_date]], "docstatus": 1},
+		fields=[
+			"name",
+			"gross_pay",
+			"custom_taxable_wages",
+			"custom_total_non_taxable_earnings",
+			"custom_ss_taxable_wages",
+			"custom_mc_taxable_wages",
+		],
 	)
 
 	wages_tips_other_compensation = 0.0
@@ -52,7 +57,8 @@ def calculate_totals(doc):
 			social_security_wages += slip.custom_ss_taxable_wages
 		else:
 			ss_emp = sum(
-				d.amount for d in salary_slip_doc.deductions
+				d.amount
+				for d in salary_slip_doc.deductions
 				if d.salary_component == "Social Security Tax - Employee"
 			)
 			if ss_emp:
@@ -64,8 +70,7 @@ def calculate_totals(doc):
 			medicare_wages_and_tips += slip.custom_mc_taxable_wages
 		else:
 			mc_emp = sum(
-				d.amount for d in salary_slip_doc.deductions
-				if d.salary_component == "Medicare Tax EE"
+				d.amount for d in salary_slip_doc.deductions if d.salary_component == "Medicare Tax EE"
 			)
 			if mc_emp:
 				medicare_wages_and_tips += mc_emp / 0.0145
@@ -85,10 +90,7 @@ def calculate_totals(doc):
 
 	number_of_w2_forms = frappe.db.count(
 		"W2 Form Details",
-		filters={
-			"docstatus": 1,
-			"year_start_date": ["between", [year_start_date, year_end_date]]
-		}
+		filters={"docstatus": 1, "year_start_date": ["between", [year_start_date, year_end_date]]},
 	)
 
 	return {
@@ -98,20 +100,28 @@ def calculate_totals(doc):
 		"medicare_tax_withheld": medicare_tax_withheld,
 		"number_of_w2_forms": number_of_w2_forms,
 		"social_security_wages": social_security_wages,
-		"medicare_wages_and_tips": medicare_wages_and_tips
+		"medicare_wages_and_tips": medicare_wages_and_tips,
 	}
-	
+
 
 @frappe.whitelist()
-def fetch_address_details(is_your_company_address, link_doctype, link_name):
-	address = frappe.db.sql(f""" 
+def fetch_address_details(
+	is_your_company_address: str,
+	link_doctype: str,
+	link_name: str,
+):
+	address = frappe.db.sql(
+		"""
 			SELECT a.address_line1, a.address_line2, a.city, a.state, a.country, a.pincode, a.email_id,a.phone, a.fax
 			FROM `tabAddress` a
 			JOIN `tabDynamic Link` l ON l.parent = a.name
 			WHERE a.is_your_company_address = 1
 			  AND l.link_doctype = 'Company'
 			  AND l.link_name = %(employer_name)s
-		""", {"employer_name": link_name},as_dict=1)
+		""",
+		{"employer_name": link_name},
+		as_dict=1,
+	)
 
 	for add in address:
 		if add:
@@ -125,33 +135,48 @@ def fetch_address_details(is_your_company_address, link_doctype, link_name):
 			phone = add.get("phone") or ""
 			fax = add.get("fax") or ""
 
-			complete_address = ", ".join(filter(None, [address_line1, address_line2, city, state, country, pincode]))
+			address_parts = [
+				part
+				for part in [
+					address_line1,
+					address_line2,
+					city,
+					state,
+					country,
+					pincode,
+				]
+				if part
+			]
+
+			complete_address = ", ".join(address_parts)
+
 			return {
-					"complete_address" : complete_address,
-					"address_line1" : address_line1,
-					"address_line2" : address_line2,
-					"city" : city,
-					"state" : state,
-					"country" : country,
-					"pincode" : pincode,
-					"email_id" : email_id,
-					"phone" : phone,
-					"fax" : fax
-					}
-	return {
-			"complete_address" : "",
-			"address_line1" : "",
-			"address_line2" : "",
-			"city" : "",
-			"state" : "",
-			"country" : "",
-			"pincode" : "",
-			"email_id" : "",
-			"phone" : "",
+				"complete_address": complete_address,
+				"address_line1": address_line1,
+				"address_line2": address_line2,
+				"city": city,
+				"state": state,
+				"country": country,
+				"pincode": pincode,
+				"email_id": email_id,
+				"phone": phone,
+				"fax": fax,
 			}
+	return {
+		"complete_address": "",
+		"address_line1": "",
+		"address_line2": "",
+		"city": "",
+		"state": "",
+		"country": "",
+		"pincode": "",
+		"email_id": "",
+		"phone": "",
+	}
+
 
 @frappe.whitelist()
-def get_global_defaults_values(doctype):
+def get_global_defaults_values(doctype: str):
 	global_defaults_doc = frappe.get_doc("Global Defaults", doctype)
 	company = global_defaults_doc.default_company
-	return {"company":company}
+	return {"company": company}

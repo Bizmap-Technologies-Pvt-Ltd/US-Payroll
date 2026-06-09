@@ -48,18 +48,16 @@ setup_wizard_complete = "us_payroll.custom_script.setup_wizard.setup_wizard.setu
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 
 doctype_js = {
-                "Salary Structure Assignment" : "custom_script/salary_structure_assignment.js",
-                "Salary Component" : "custom_script/salary_component.js",
-                "Employee" : "custom_script/employee.js", 
-                "Journal Entry": "custom_script/journal_entry.js",
-                "Attendance": "custom_script/attendance.js",
-                "Payroll Entry": "custom_script/payroll_entry.js",
-            }
-
-
-doctype_list_js = {
-    "W2 Form Details": "us_payroll/doctype/w2_form_details/w2_form_details_list.js"
+	"Salary Structure Assignment": "custom_script/salary_structure_assignment.js",
+	"Salary Component": "custom_script/salary_component.js",
+	"Employee": "custom_script/employee.js",
+	"Journal Entry": "custom_script/journal_entry.js",
+	"Attendance": "custom_script/attendance.js",
+	"Payroll Entry": "custom_script/payroll_entry.js",
 }
+
+
+doctype_list_js = {"W2 Form Details": "us_payroll/doctype/w2_form_details/w2_form_details_list.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -146,9 +144,9 @@ doctype_list_js = {
 # Override standard doctype classes
 
 override_doctype_class = {
-    # "ToDo": "custom_app.overrides.CustomToDo"
-    "Salary Slip": "us_payroll.override.salary_slip.OverrideSalarySlip",
-    "Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry"
+	# "ToDo": "custom_app.overrides.CustomToDo"
+	"Salary Slip": "us_payroll.override.salary_slip.OverrideSalarySlip",
+	"Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry",
 }
 
 # Document Events
@@ -164,35 +162,24 @@ override_doctype_class = {
 # }
 
 doc_events = {
-    "Salary Slip":{
-                   "after_insert":"us_payroll.custom_script.salary_slip.after_insert",
-                   "validate":"us_payroll.custom_script.salary_slip.validate",
-                   "on_cancel":"us_payroll.custom_script.salary_slip.on_cancel",
-                   "before_save":"us_payroll.custom_script.salary_slip.before_save",
-                   "before_submit":"us_payroll.custom_script.salary_slip.before_submit",
-                },
-
-    "Employee":{
-        "validate":"us_payroll.custom_script.employee.validate"
-  },
-
-    "Attendance": {
-        "validate": "us_payroll.custom_script.attendance.validate",
-        "on_submit": "us_payroll.custom_script.attendance.on_submit"
-    },
-
-    "Payroll Entry":{
-        "validate":"us_payroll.custom_script.payroll_entry.validate",
-        "before_save":"us_payroll.custom_script.payroll_entry.before_save",
-        "on_submit":"us_payroll.custom_script.payroll_entry.on_submit",
-        "before_submit":"us_payroll.custom_script.payroll_entry.before_submit",
-  },
-
-    "Journal Entry": {
-        # "validate": "us_payroll.custom_script.journal_entry.validate",
-
-    }
-
+	"Salary Slip": {
+		"after_insert": "us_payroll.custom_script.salary_slip.after_insert",
+		# "validate": "us_payroll.custom_script.salary_slip.validate",
+		# "on_cancel": "us_payroll.custom_script.salary_slip.on_cancel",
+		"before_save": "us_payroll.custom_script.salary_slip.before_save",
+		"before_submit": "us_payroll.custom_script.salary_slip.before_submit",
+	},
+	"Employee": {"validate": "us_payroll.custom_script.employee.validate"},
+	"Attendance": {
+		"validate": "us_payroll.custom_script.attendance.validate",
+		"on_submit": "us_payroll.custom_script.attendance.on_submit",
+	},
+	"Payroll Entry": {
+		# "validate": "us_payroll.custom_script.payroll_entry.validate",
+		"before_save": "us_payroll.custom_script.payroll_entry.before_save",
+		# "on_submit": "us_payroll.custom_script.payroll_entry.on_submit",
+		# "before_submit": "us_payroll.custom_script.payroll_entry.before_submit",
+	},
 }
 
 
@@ -294,27 +281,11 @@ doc_events = {
 # }
 
 
-
 fixtures = [
-    {
-        "dt": "Custom Field",
-        "filters": [
-            ["module", "=", "US-Payroll"]
-        ]
-    },
-    {
-        "dt": "Property Setter",
-        "filters": [
-            ["module", "=", "US-Payroll"]
-        ]
-    },
-    {
-        "dt": "Workspace",
-        "filters": [
-            ["module", "=", "US-Payroll"]
-        ]
-    },
-    "Translation",
-    "Workspace",
-    "Workspace Sidebar"
+	{"dt": "Custom Field", "filters": [["module", "=", "US-Payroll"]]},
+	{"dt": "Property Setter", "filters": [["module", "=", "US-Payroll"]]},
+	{"dt": "Workspace", "filters": [["module", "=", "US-Payroll"]]},
+	"Translation",
+	"Workspace",
+	"Workspace Sidebar",
 ]

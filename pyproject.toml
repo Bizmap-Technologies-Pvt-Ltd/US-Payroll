@@ -56,6 +56,9 @@ ignore = [
 ]
 typing-modules = ["frappe.types.DF"]
 
+[tool.ruff.lint.per-file-ignores]
+"us_payroll/ach_lib/*.py" = ["RUF012"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "tab"

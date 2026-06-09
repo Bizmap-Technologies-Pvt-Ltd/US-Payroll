@@ -1,16 +1,16 @@
 # Copyright (c) 2026, bizmap and contributors
 # For license information, please see license.txt
 
+import calendar
+import json
+from collections import defaultdict
+from datetime import datetime
+from typing import Any
+
 import frappe
 from frappe import _
-from frappe.utils import flt
-from frappe.utils import getdate
-import calendar
-from datetime import datetime
-from collections import defaultdict
-import json
+from frappe.utils import flt, getdate
 from frappe.utils.pdf import get_pdf
-from collections import defaultdict
 
 
 def execute(filters=None):
@@ -21,16 +21,12 @@ def execute(filters=None):
 	return columns, data
 
 
-def get_data(filters):	
-	conditions = [
-		"cs.docstatus = 1",
-		"cs.posting_date BETWEEN %(from_date)s AND %(to_date)s"
-	]
+def get_data(filters):
+	# conditions = ["cs.docstatus = 1", "cs.posting_date BETWEEN %(from_date)s AND %(to_date)s"]
 
-	condition_sql = " AND ".join(conditions)
-
-	results = frappe.db.sql(f"""
-		SELECT 
+	results = frappe.db.sql(
+		"""
+		SELECT
 			agg.employee,
 			agg.employee_name,
 			agg.department AS department,
@@ -58,7 +54,7 @@ def get_data(filters):
 			SUM(agg.basic) AS basic
 
 		FROM (
-			SELECT 
+			SELECT
 				cs.name AS salary_slip_id,
 				cs.employee,
 				cs.employee_name,
@@ -240,197 +236,179 @@ def get_data(filters):
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
 			WHERE cs.docstatus = 1
 			AND cs.posting_date BETWEEN %(from_date)s AND %(to_date)s
-			
+
 		) agg
 		GROUP BY agg.employee, agg.employee_name
 		ORDER BY agg.employee_name
-	""", filters, as_dict=True)
-		
+	""",
+		filters,
+		as_dict=True,
+	)
+
 	return results
 
 
 def get_columns():
 	columns = [
-			{
+		{
 			"label": _("Employee Name"),
 			"fieldname": "employee_name",
 			"fieldtype": "Data",
 			"width": 200,
-			"align": "left"
+			"align": "left",
 		},
 		{
 			"label": _("Department"),
 			"fieldname": "department",
 			"fieldtype": "Data",
 			"width": 150,
-			"align": "left"
+			"align": "left",
 		},
 		{
 			"label": _("Hourly"),
 			"fieldname": "hourly",
 			"fieldtype": "Currency",
 			"width": 100,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Overtime"),
 			"fieldname": "overtime",
 			"fieldtype": "Currency",
 			"width": 100,
-			"align": "right"
+			"align": "right",
 		},
-		{
-			"label": _("CT"),
-			"fieldname": "ct",
-			"fieldtype": "Currency",
-			"width": 140,
-			"align": "right"
-		},
-		{
-			"label": _("PTO"),
-			"fieldname": "pto",
-			"fieldtype": "Currency",
-			"width": 140,
-			"align": "right"
-		},
+		{"label": _("CT"), "fieldname": "ct", "fieldtype": "Currency", "width": 140, "align": "right"},
+		{"label": _("PTO"), "fieldname": "pto", "fieldtype": "Currency", "width": 140, "align": "right"},
 		{
 			"label": _("Holiday Pay"),
 			"fieldname": "holiday_pay",
 			"fieldtype": "Currency",
 			"width": 170,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Cell Phone"),
 			"fieldname": "cell_phone",
 			"fieldtype": "Currency",
 			"width": 200,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Vehicle"),
 			"fieldname": "vehicle",
 			"fieldtype": "Currency",
 			"width": 200,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Administrative Stipend"),
 			"fieldname": "administrative_stipend",
 			"fieldtype": "Currency",
 			"width": 170,
-			"align": "right"
-		},		
+			"align": "right",
+		},
 		{
 			"label": _("Certificate Pay"),
 			"fieldname": "certificate_pay",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("TMRS FIX"),
 			"fieldname": "tmrs_fix",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Holiday Pay M"),
 			"fieldname": "holiday_pay_m",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Payroll Correction"),
 			"fieldname": "payroll_correction",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Sick Leave"),
 			"fieldname": "sick_leave",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("PR ADJ"),
 			"fieldname": "pr_adj",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Fed Withholding Fix"),
 			"fieldname": "fed_withholding_fix",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Vehicle Allowance"),
 			"fieldname": "vehicle_allowance",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Elected"),
 			"fieldname": "elected",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Salary"),
 			"fieldname": "salary",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Leave Encashment"),
 			"fieldname": "leave_encashment",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
 		{
 			"label": _("Arrear"),
 			"fieldname": "arrear",
 			"fieldtype": "Currency",
 			"width": 180,
-			"align": "right"
+			"align": "right",
 		},
-		{
-			"label": _("Basic"),
-			"fieldname": "basic",
-			"fieldtype": "Currency",
-			"width": 180,
-			"align": "right"
-		}
+		{"label": _("Basic"), "fieldname": "basic", "fieldtype": "Currency", "width": 180, "align": "right"},
 	]
 
 	return columns
 
-@frappe.whitelist()
-def get_print(report_data):	
-	report_data = json.loads(report_data)
-	filters = report_data.get("filter")
 
-	report_data = {
-		'filter': report_data['filter'],
-		'data': report_data
-	}
+@frappe.whitelist()
+def get_print(report_data: str):
+	report_data = json.loads(report_data)
+
+	report_data = {"filter": report_data["filter"], "data": report_data}
 	return generate_pdf(report_data)
 
 
 @frappe.whitelist()
-def generate_pdf(data):
-	filters = data.get("filter")
+def generate_pdf(data: dict[str, Any]):
+	filters = data.get("filter", {})
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -444,26 +422,33 @@ def generate_pdf(data):
 	formatted_end_date = to_date.strftime("%m/%d/%Y")
 	formatted_start_end_date = f"{formatted_start_date} - {formatted_end_date}"
 
-	template_path = 'us_payroll/us_payroll/report/employee_earning_reports_by_posted_date/employee_earning_reports_by_posted_date.html'
+	template_path = "us_payroll/us_payroll/report/employee_earning_reports_by_posted_date/employee_earning_reports_by_posted_date.html"
 
-	data = data.get('data')["data"]
-	
+	data = data.get("data")["data"]
+
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M%p").lower()
 
-	company_name = frappe.defaults.get_global_default('company').replace("City of ", "")
+	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	html = frappe.render_template(template_path, {"data": data, "company_name": company_name, "formatted_start_end_date":formatted_start_end_date, "formatted_datetime": formatted_datetime})
-	modified_html = f'{html}'
+	html = frappe.render_template(  # nosemgrep: frappe-ssti
+		template_path,
+		{
+			"data": data,
+			"company_name": company_name,
+			"formatted_start_end_date": formatted_start_end_date,
+			"formatted_datetime": formatted_datetime,
+		},
+	)
 
 	options = {
-	'page-width': '2000px',
-	'page-height': '1500px',
-	'orientation': 'Landscape',
-	'margin-right': '20mm',
-	'margin-left': '20mm',
+		"page-width": "2000px",
+		"page-height": "1500px",
+		"orientation": "Landscape",
+		"margin-right": "20mm",
+		"margin-left": "20mm",
 	}
-	
-	pdf_file = get_pdf(html, options=options)	
-	return {'data': data, 'html': html, 'pdf_file': pdf_file}
+
+	pdf_file = get_pdf(html, options=options)
+	return {"data": data, "html": html, "pdf_file": pdf_file}

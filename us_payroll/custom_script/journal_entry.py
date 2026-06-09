@@ -1,17 +1,10 @@
-import frappe
 import json
-from frappe import _
-from frappe.utils import getdate
 
-
-# def validate(self,method):
-# 	print("Aaaaalalallalalaa")
-# 	if not self.cheque_date:
-# 		self.cheque_date =  today()
+import frappe
 
 
 @frappe.whitelist()
-def get_global_defaults_values(doctype):
+def get_global_defaults_values(doctype: str):
 	global_defaults_doc = frappe.get_doc("Global Defaults", doctype)
 	company = global_defaults_doc.default_company
-	return {"company":company}
+	return {"company": company}

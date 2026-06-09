@@ -2,7 +2,6 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Insurance Provider", {
-
 	setup: function (frm) {
 		frm.set_query("account", "accounts", function (doc, cdt, cdn) {
 			var d = locals[cdt][cdn];
@@ -15,8 +14,5 @@ frappe.ui.form.on("Insurance Provider", {
 		});
 	},
 
-
-	refresh(frm) {
-
-	},
+	refresh(frm) {},
 });

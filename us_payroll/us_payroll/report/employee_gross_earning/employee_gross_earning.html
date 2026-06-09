@@ -46,9 +46,9 @@
                 <b>Employee Gross Earning</b>
             </h1>
         </div>
-    </div>  
+    </div>
 
-    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">        
+    <div style="font-size: 15px; line-height: 1.6; overflow: hidden;">
         <div style="float: left;">
             <div>Employer Name: {{ company_name }}</div>
             <div>Date Range: {{ formatted_start_end_date }}</div>
@@ -64,19 +64,19 @@
                 <th>Employee Name</th>
                 <th>Department</th>
                 <th style="text-align: right;">Gross Pay</th>
-                
+
             </tr>
         </thead>
         <tbody>
             {% for row in data %}
-                {% if row %}                  
+                {% if row %}
                     {% if row.get("employee_name") == "Total" %}
                         <!-- TOTAL ROW -->
                         <tr style="border-top: 2px solid black; font-weight: bold;">
                             <td>Total</td>
                             <td>{{ row.get("department", "") }}</td>
                             <td style="text-align: right;">${{ "{:,.2f}".format(row.get("gross_pay") or 0) }}</td>
-                            
+
                         </tr>
                     {% else %}
                         <!-- EMPLOYEE ROW -->
@@ -84,7 +84,7 @@
                             <td>{{ row.get("employee_name", "") }}</td>
                             <td>{{ row.get("department", "") }}</td>
                             <td style="text-align: right;">${{ "{:,.2f}".format(row.get("gross_pay") or 0) }}</td>
-                            
+
                         </tr>
                     {% endif %}
                 {% endif %}
