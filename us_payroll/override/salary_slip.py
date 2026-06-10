@@ -152,6 +152,7 @@ class OverrideSalarySlip(SalarySlip):
 
 		# --- 2. Pre-tax deductions (from Deductions table) ---
 		total_pretax = 0
+		total_fica = 0
 		for row in doc.deductions:
 			if row.salary_component:
 				# For insurance components
@@ -168,7 +169,11 @@ class OverrideSalarySlip(SalarySlip):
 				):
 					total_pretax += flt(row.amount)
 
+				if comp_doc.custom_is_this_fica_component:
+					total_fica += flt(row.amount)
+
 		doc.custom_total_pretax = total_pretax
+		doc.custom_total_fica_deductions = total_fica
 
 		# --- 3. Apply formulas ---
 		non_taxable_deductions = total_pretax + total_non_taxable_earnings
@@ -189,8 +194,10 @@ class OverrideSalarySlip(SalarySlip):
 		doc.custom_non_taxable_deductions = non_taxable_deductions
 		doc.custom_taxable_wages = taxable_wages
 		doc.custom_adjusted_annual_wages = adjusted_annual_wages
-		doc.custom_ss_taxable_wages = taxable_wages + (doc.gross_pay * 0.06)
-		doc.custom_mc_taxable_wages = taxable_wages + (doc.gross_pay * 0.06)
+		# doc.custom_ss_taxable_wages = taxable_wages + (doc.gross_pay * 0.06)
+		# doc.custom_mc_taxable_wages = taxable_wages + (doc.gross_pay * 0.06)
+		doc.custom_ss_taxable_wages = doc.custom_taxable_wages + doc.custom_total_fica_deductions
+		doc.custom_mc_taxable_wages = doc.custom_taxable_wages + doc.custom_total_fica_deductions
 
 	def get_insurance_flags_from_assignment(self, employee, salary_component):
 		sal_assignment_name = frappe.get_value(

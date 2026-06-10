@@ -192,8 +192,6 @@ def generate_pdf(data: dict[str, Any]):
 		"margin-left": "20mm",
 	}
 
-	print(html, "html-----------------")
-
 	pdf_file = get_pdf(html, options=options)
 
 	return {

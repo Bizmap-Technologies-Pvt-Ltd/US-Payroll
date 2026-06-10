@@ -114,7 +114,7 @@ def get_employees(doc: str):
 	return list(employee_map.values())
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def generate_w2_form_records(doc: str):
 	doc = frappe.parse_json(doc)
 

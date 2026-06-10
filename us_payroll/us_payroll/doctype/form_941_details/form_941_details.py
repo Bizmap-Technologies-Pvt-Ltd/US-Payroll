@@ -108,8 +108,7 @@ def calculate_totals(doc: str):
 					), 0) AS medicare_employer_total
 
 				FROM `tabSalary Slip` cs
-				WHERE cs.docstatus = 1
-				AND cs.posting_date BETWEEN %(start_date)s AND %(end_date)s
+				WHERE cs.docstatus = 1 AND cs.posting_date BETWEEN %(start_date)s AND %(end_date)s
 			) agg
 			GROUP BY agg.employee, agg.employee_name, agg.department
 			ORDER BY agg.employee_name

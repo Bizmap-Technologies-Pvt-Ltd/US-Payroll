@@ -40,10 +40,6 @@ class OverridePayrollEntry(PayrollEntry):
 		self.calculate_time_data()
 		self.validate_leave_rules()
 
-	def before_save(self):
-		super().before_save()
-		self.update_amounts()
-
 	def before_submit(self):
 		super().before_submit()
 		self.warning_msg()
@@ -51,7 +47,7 @@ class OverridePayrollEntry(PayrollEntry):
 	def on_submit(self):
 		super().on_submit()
 
-	@frappe.whitelist()
+	@frappe.whitelist(methods=["POST"])
 	def create_salary_slips(self):
 		add_check_employees = []
 
@@ -233,23 +229,6 @@ class OverridePayrollEntry(PayrollEntry):
 		self.get_leave_balance()
 		self.carry_forward()
 
-	def update_amounts(self):
-		doc = self
-		for employee in doc.employees:
-			if employee.custom_total_working_hours and employee.custom_hourly_rate:
-				total_amount = employee.custom_total_working_hours * employee.custom_hourly_rate
-				employee.custom_total_amount = total_amount
-			else:
-				employee.custom_total_amount = 0
-
-			if employee.custom_total_overtime_hours and employee.custom_overtime_hourly_rate:
-				total_overtime_amount = (
-					employee.custom_total_overtime_hours * employee.custom_overtime_hourly_rate
-				)
-				employee.custom_total_overtime_amount = total_overtime_amount
-			else:
-				employee.custom_total_overtime_amount = 0
-
 	def carry_forward(self):
 		doc = self
 		for row in doc.employees:
@@ -331,7 +310,7 @@ class OverridePayrollEntry(PayrollEntry):
 				and sal_doc.do_not_include_in_total
 			):
 				sal_doc.do_not_include_in_total = False
-				frappe.db.set_value("Salary Component", sc.name, "do_not_include_in_total", 0)
+				sal_doc.save(ignore_permissions=True)
 
 	def validate_ssa_do_not_include_in_total(self):
 		doc = self
@@ -352,9 +331,6 @@ class OverridePayrollEntry(PayrollEntry):
 					and ins_row.do_not_include_in_total
 				):
 					ins_row.do_not_include_in_total = 0
-					frappe.db.set_value(
-						"Employee Insurance Deduction", ins_row.name, "do_not_include_in_total", 0
-					)
 			ssa_doc.save(ignore_permissions=True)
 
 	def get_leave_balance(self):

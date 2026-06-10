@@ -187,8 +187,8 @@ def get_submitted_check_stubs(doc_id: str):
 			frappe.get_doc("Salary Slip", slip.get("name"))
 			submitted_entries.append(slip.get("name"))
 
-		except Exception as e:
-			print(e, "e get_submitted_check_stubs")
+		except Exception:
+			frappe.logger("us_payroll").exception("Unable to load submitted salary slip")
 
 	return {"submitted_entries": submitted_entries}
 
@@ -322,7 +322,7 @@ def get_check_to_void(
 	return entries
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def assign_new_check_no(
 	source_name: str,
 	payroll_entry: str,
@@ -334,7 +334,8 @@ def assign_new_check_no(
 	payroll_entry_doc = frappe.get_doc("Payroll Entry", payroll_entry)
 
 	if new_check_required:
-		frappe.db.set_value("Payroll Entry", payroll_entry_doc, "custom_new_check_required", True)
+		payroll_entry_doc.custom_new_check_required = True
+		payroll_entry_doc.save(ignore_permissions=True)
 
 	all_checks = frappe.get_all(
 		"Check", filters={"status": "Available"}, fields=["name", "check_number", "status"], order_by="name"
@@ -343,7 +344,9 @@ def assign_new_check_no(
 	# If no new check required, just void the existing one
 	if not new_check_required:
 		cheque_no = frappe.db.get_value("Salary Slip", {"name": source_name}, "custom_check_no")
-		frappe.db.set_value("Check", cheque_no, "status", "Void/Cancelled")
+		check_doc = frappe.get_doc("Check", cheque_no)
+		check_doc.status = "Void/Cancelled"
+		check_doc.save(ignore_permissions=True)
 		return {"check_voided": True}
 
 	if not all_checks and new_check_required:
@@ -357,9 +360,11 @@ def assign_new_check_no(
 
 	# Void the old check
 	if old_check_no:
-		frappe.db.set_value("Check", old_check_no, "status", "Void/Cancelled")
-		frappe.db.set_value("Check", old_check_no, "reference", source_name)
-		frappe.db.set_value("Check", old_check_no, "reason_for_cancellation", reason)
+		old_check_doc = frappe.get_doc("Check", old_check_no)
+		old_check_doc.status = "Void/Cancelled"
+		old_check_doc.reference = source_name
+		old_check_doc.reason_for_cancellation = reason
+		old_check_doc.save(ignore_permissions=True)
 
 	# Assign new check to the existing slip
 	frappe.db.set_value("Salary Slip", source_name, "custom_check_no", new_check_no)
@@ -373,9 +378,11 @@ def assign_new_check_no(
 
 	emp_name = frappe.db.get_value("Salary Slip", {"name": source_name}, "employee_name")
 	# Mark the new check as issued
-	frappe.db.set_value("Check", new_check_no, "status", "Issued")
-	frappe.db.set_value("Check", new_check_no, "reference", source_name)
-	frappe.db.set_value("Check", new_check_no, "reason", reason_of_new_check_no)
+	new_check_doc = frappe.get_doc("Check", new_check_no)
+	new_check_doc.status = "Issued"
+	new_check_doc.reference = source_name
+	new_check_doc.reason = reason_of_new_check_no
+	new_check_doc.save(ignore_permissions=True)
 
 	return {"updated_slip": source_name, "new_check_no": new_check_no, "emp_name": emp_name}
 
@@ -388,7 +395,7 @@ def get_department_working_hours(employee: str):
 	or if the working hours are 0.
 	"""
 	if not employee:
-		return {"error": "Employee is required"}
+		return {"error": _("Employee is required")}
 
 	employee_doc = frappe.get_doc("Employee", employee)
 	department_name = getattr(employee_doc, "department", None)

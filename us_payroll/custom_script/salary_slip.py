@@ -226,7 +226,7 @@ def salary_calculations_for_fit(doc):
 	doc.custom_mc_taxable_wages = taxable_wages + (doc.gross_pay * 0.06)
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def tax_calulations_for_fit(doc: str):
 	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
 	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
@@ -244,7 +244,11 @@ def tax_calulations_for_fit(doc: str):
 		"Salary Structure Assignment", {"employee": doc.employee, "docstatus": 1}, "name"
 	)
 	if not sal_assignment_name:
-		frappe.throw(f"No active Salary Structure Assignment found for employee {doc.employee}")
+		frappe.throw(
+			_("No active Salary Structure Assignment found for employee {employee}").format(
+				employee=doc.employee
+			)
+		)
 
 	sal_assignment_doc = frappe.get_doc("Salary Structure Assignment", sal_assignment_name)
 	income_tax_slab = sal_assignment_doc.income_tax_slab
@@ -313,7 +317,10 @@ def tax_calulations_for_fit(doc: str):
 		site_url = get_url()
 		fund_settings_url = f"{site_url}/desk/client-setup"
 		frappe.throw(
-			f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>"
+			_(
+				"Please add <b>Total weeks of the year</b> in Client Setup. "
+				"<a href='{url}'>Client Setup</a>"
+			).format(url=fund_settings_url)
 		)
 	doc.save()
 

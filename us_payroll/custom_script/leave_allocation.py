@@ -50,7 +50,7 @@ def get_old_leave_allocation_amount(employee: str, amount: float):
 	return {"employee": employee, "amount": float(amount)}
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def update_allocated_leaves(
 	employee: str,
 	amount: float,

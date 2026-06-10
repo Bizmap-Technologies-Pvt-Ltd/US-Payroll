@@ -5,6 +5,7 @@ import json
 from typing import Any
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.utils import nowdate
 
@@ -111,7 +112,7 @@ def get_employees(leave_type: str, from_date: str, to_date: str, department: str
 	return employees
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def generate_leave_allocations(doc: str | dict[str, Any]):
 	if isinstance(doc, str):
 		doc = json.loads(doc)
@@ -122,8 +123,12 @@ def generate_leave_allocations(doc: str | dict[str, Any]):
 	for row in doc.get("leave_allocation_details"):
 		if not row.get("leave_type") or not row.get("employee"):
 			frappe.throw(
-				f"Please select <b>Leave Type</b> for employee <b>{row.get('employee')}</b> "
-				f"in row <b>{row.get('idx')}</b>"
+				_(
+					"Please select <b>Leave Type</b> for employee <b>{employee}</b> in row <b>{row}</b>"
+				).format(
+					employee=row.get("employee"),
+					row=row.get("idx"),
+				)
 			)
 			continue
 

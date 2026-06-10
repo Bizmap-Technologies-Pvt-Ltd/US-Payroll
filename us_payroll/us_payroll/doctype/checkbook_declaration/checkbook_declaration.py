@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -9,7 +10,7 @@ class CheckbookDeclaration(Document):
 	pass
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def generate_checks(docname: str):
 	checkbook_doc = frappe.get_doc("Checkbook Declaration", docname)
 	first_check_number = checkbook_doc.first_check_number
@@ -23,4 +24,4 @@ def generate_checks(docname: str):
 			{"doctype": "Check", "check_number": check_number, "bank": bank, "status": "Available"}
 		)
 		check_doc.insert()
-	return "Checks generated successfully."
+	return _("Checks generated successfully.")

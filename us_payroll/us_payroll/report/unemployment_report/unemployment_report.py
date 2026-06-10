@@ -131,11 +131,6 @@ def execute(filters=None):
 			}
 		)
 
-	for entry in print_data:
-		print(
-			f"Month: {entry['month']}, Year: {entry['year']}, Male: {entry['male']}, Female: {entry['female']}, Total: {entry['total']}"
-		)
-
 	for record in all_data:
 		record["print_data"] = print_data
 

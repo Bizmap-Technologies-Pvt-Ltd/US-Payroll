@@ -13,7 +13,7 @@ from ach.builder import AchFile
 # from ach.builder import AchFile
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def generate_ach_file(payroll_entry: str):
 	ach_data = frappe.get_doc("ACH Report Details", "ACH Report Details")
 	settings = {
@@ -165,7 +165,7 @@ import frappe
 from pyach.ACHRecordTypes import ACHFile, BatchHeader, Entry
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def generate_ach_filess(payroll_entry: str):
 	try:
 		# Fetch salary slips from the database
