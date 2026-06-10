@@ -1,8 +1,6 @@
 // Copyright (c) 2017, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-let in_progress = false;
-
 frappe.ui.form.on("Payroll Entry", {
 	refresh: function (frm) {
 		frm.page.sidebar.toggle();
@@ -51,33 +49,6 @@ frappe.ui.form.on("Payroll Entry", {
 
 	hide_add_row_btn: function (frm) {
 		frm.fields_dict["employees"].grid.wrapper.find(".grid-add-row").remove();
-	},
-
-	start_date: function (frm) {
-		frm.trigger("make_dashboard");
-
-		if (!in_progress && frm.doc.start_date) {
-			frm.trigger("set_end_date");
-		} else {
-			// reset flag
-			in_progress = false;
-		}
-		frm.events.clear_employee_table(frm);
-	},
-
-	set_end_date: function (frm) {
-		frappe.call({
-			method: "us_payroll.custom_script.payroll_entry.get_end_date",
-			args: {
-				frequency: frm.doc.payroll_frequency,
-				start_date: frm.doc.start_date,
-			},
-			callback: function (r) {
-				if (r.message) {
-					frm.set_value("end_date", r.message.end_date);
-				}
-			},
-		});
 	},
 
 	set_default_company: function (frm) {
