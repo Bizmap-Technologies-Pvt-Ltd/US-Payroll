@@ -5,7 +5,7 @@ from pathlib import Path
 import frappe
 
 
-def setup_wizard_complete():
+def setup_wizard_complete(args=None):
 	company = frappe.defaults.get_global_default("company")
 
 	# # Load JSON file
