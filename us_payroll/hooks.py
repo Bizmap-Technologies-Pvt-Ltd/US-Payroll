@@ -144,7 +144,6 @@ doctype_list_js = {"W2 Form Details": "us_payroll/doctype/w2_form_details/w2_for
 # Override standard doctype classes
 
 override_doctype_class = {
-	# "ToDo": "custom_app.overrides.CustomToDo"
 	"Salary Slip": "us_payroll.override.salary_slip.OverrideSalarySlip",
 	"Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry",
 }
@@ -164,8 +163,6 @@ override_doctype_class = {
 doc_events = {
 	"Salary Slip": {
 		"after_insert": "us_payroll.custom_script.salary_slip.after_insert",
-		# "validate": "us_payroll.custom_script.salary_slip.validate",
-		# "on_cancel": "us_payroll.custom_script.salary_slip.on_cancel",
 		"before_save": "us_payroll.custom_script.salary_slip.before_save",
 		"before_submit": "us_payroll.custom_script.salary_slip.before_submit",
 	},
@@ -174,12 +171,9 @@ doc_events = {
 		"validate": "us_payroll.custom_script.attendance.validate",
 		"on_submit": "us_payroll.custom_script.attendance.on_submit",
 	},
-	# "Payroll Entry": {
-	# 	"validate": "us_payroll.custom_script.payroll_entry.validate",
-	# 	"before_save": "us_payroll.custom_script.payroll_entry.before_save",
-	# 	"on_submit": "us_payroll.custom_script.payroll_entry.on_submit",
-	# 	"before_submit": "us_payroll.custom_script.payroll_entry.before_submit",
-	# },
+	"Payroll Entry": {
+		"before_save": "us_payroll.custom_script.payroll_entry.before_save",
+	},
 }
 
 

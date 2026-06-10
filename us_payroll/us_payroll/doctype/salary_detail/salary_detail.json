@@ -23,6 +23,7 @@
   "variable_based_on_taxable_salary",
   "do_not_include_in_total",
   "do_not_include_in_accounts",
+  "accrual_component",
   "deduct_full_tax_on_selected_payroll_date",
   "section_break_2",
   "condition",
@@ -268,6 +269,15 @@
    "fieldname": "do_not_include_in_accounts",
    "fieldtype": "Check",
    "label": "Do Not Include in Accounting Entries"
+  },
+  {
+   "default": "0",
+   "fetch_from": "salary_component.accrual_component",
+   "fieldname": "accrual_component",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Accrual Component",
+   "read_only": 1
   }
  ],
  "istable": 1,

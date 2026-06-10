@@ -16,6 +16,10 @@ def execute(filters=None):
 
 
 def get_data(filters):
+	from_date = filters.get("from_date")
+	to_date = filters.get("to_date")
+	department = filters.get("department")
+
 	results = frappe.db.sql(
 		"""
 		SELECT
@@ -31,7 +35,7 @@ def get_data(filters):
 			SUM(
 				CASE
 					WHEN agg.custom_taxable_wages IS NOT NULL
-					     AND agg.custom_taxable_wages > 0
+						 AND agg.custom_taxable_wages > 0
 					THEN agg.custom_taxable_wages
 					ELSE (agg.gross_pay - IFNULL(agg.custom_total_non_taxable_earnings, 0))
 				END
@@ -40,7 +44,7 @@ def get_data(filters):
 			SUM(
 				CASE
 					WHEN agg.custom_ss_taxable_wages IS NOT NULL
-					     AND agg.custom_ss_taxable_wages > 0
+						 AND agg.custom_ss_taxable_wages > 0
 					THEN agg.custom_ss_taxable_wages
 					ELSE IFNULL(agg.ss_employee_total, 0) / 0.062
 				END
@@ -49,7 +53,7 @@ def get_data(filters):
 			SUM(
 				CASE
 					WHEN agg.custom_mc_taxable_wages IS NOT NULL
-					     AND agg.custom_mc_taxable_wages > 0
+						 AND agg.custom_mc_taxable_wages > 0
 					THEN agg.custom_mc_taxable_wages
 					ELSE IFNULL(agg.medicare_employee_total, 0) / 0.0145
 				END
@@ -116,12 +120,12 @@ def get_data(filters):
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
 			WHERE cs.docstatus = 1
 			AND cs.posting_date BETWEEN %(from_date)s AND %(to_date)s
-			AND (%(department)s IS NULL OR %(department)s = '' OR cs.department = %(department)s)
+			AND (%(department)s IS NULL OR %(department)s = '' OR emp.department = %(department)s)
 		) agg
 		GROUP BY agg.employee, agg.employee_name, agg.department
 		ORDER BY agg.employee_name
 	""",
-		filters,
+		{"from_date": from_date, "to_date": to_date, "department": department},
 		as_dict=True,
 	)
 
