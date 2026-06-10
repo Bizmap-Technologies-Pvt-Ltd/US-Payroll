@@ -37,6 +37,8 @@ def calculate_totals(doc: str):
 		start_date = datetime(doc.get("year"), 10, 1)
 		end_date = datetime(doc.get("year"), 12, 31)
 
+	# condition_sql = "cs.docstatus = 1 AND cs.posting_date BETWEEN %(start_date)s AND %(end_date)s"
+
 	query = """
 			SELECT
 				agg.employee,
@@ -108,7 +110,7 @@ def calculate_totals(doc: str):
 					), 0) AS medicare_employer_total
 
 				FROM `tabSalary Slip` cs
-				WHERE {condition_sql}
+				WHERE cs.docstatus = 1 AND cs.posting_date BETWEEN %(start_date)s AND %(end_date)s
 			) agg
 			GROUP BY agg.employee, agg.employee_name, agg.department
 			ORDER BY agg.employee_name
