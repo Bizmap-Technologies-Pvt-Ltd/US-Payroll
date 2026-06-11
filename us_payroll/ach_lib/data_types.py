@@ -2,6 +2,7 @@ import math
 import re
 import string
 from datetime import datetime
+from typing import ClassVar
 
 """
 Collection of classes that comprise the row type objects
@@ -95,7 +96,7 @@ class Ach:
 
 	def validate_binary_field(self, field):
 		"""
-		Validates binary string field (either '1' or '0')
+		Validates binary string field (either self'1' or '0')
 		"""
 
 		if field not in ["1", "0"]:
@@ -114,7 +115,7 @@ class Header(Ach):
 	blk_factor = "10"
 	format_code = "1"
 
-	alpha_numeric_fields = [
+	alpha_numeric_fields: ClassVar = [
 		"immediate_dest",
 		"immediate_org",
 		"file_id_mod",
@@ -125,7 +126,7 @@ class Header(Ach):
 		"file_crt_time",
 	]
 
-	field_lengths = {
+	field_lengths: ClassVar = {
 		"immediate_dest": 10,
 		"immediate_org": 10,
 		"file_id_mod": 1,
@@ -222,7 +223,7 @@ class FileControl(Ach):
 
 	record_type_code = "9"
 
-	numeric_fields = [
+	numeric_fields: ClassVar = [
 		"batch_count",
 		"block_count",
 		"entadd_count",
@@ -231,11 +232,11 @@ class FileControl(Ach):
 		"credit_amount",
 	]
 
-	alpha_numeric_fields = [
+	alpha_numeric_fields: ClassVar = [
 		"reserved",
 	]
 
-	field_lengths = {
+	field_lengths: ClassVar = {
 		"batch_count": 6,
 		"block_count": 6,
 		"entadd_count": 8,
@@ -287,7 +288,7 @@ class FileControl(Ach):
 class BatchHeader(Ach):
 	record_type_code = "5"
 
-	std_ent_cls_code_list = [
+	std_ent_cls_code_list: ClassVar = [
 		"ARC",
 		"PPD",
 		"CTX",
@@ -303,11 +304,11 @@ class BatchHeader(Ach):
 		"RCK",
 	]
 
-	serv_cls_code_list = ["200", "220", "225"]
+	serv_cls_code_list: ClassVar = ["200", "220", "225"]
 
-	numeric_fields = ["orig_dfi_id", "batch_id", "eff_ent_date", "serv_cls_code"]
+	numeric_fields: ClassVar = ["orig_dfi_id", "batch_id", "eff_ent_date", "serv_cls_code"]
 
-	alpha_numeric_fields = [
+	alpha_numeric_fields: ClassVar = [
 		"company_name",
 		"cmpy_dis_data",
 		"company_id",
@@ -318,7 +319,7 @@ class BatchHeader(Ach):
 		"settlement_date",
 	]
 
-	field_lengths = {
+	field_lengths: ClassVar = {
 		"serv_cls_code": 3,
 		"company_name": 16,
 		"cmpy_dis_data": 20,
@@ -412,7 +413,7 @@ class BatchHeader(Ach):
 class BatchControl(Ach):
 	record_type_code = "8"
 
-	numeric_fields = [
+	numeric_fields: ClassVar = [
 		"serv_cls_code",
 		"entadd_count",
 		"entry_hash",
@@ -422,9 +423,9 @@ class BatchControl(Ach):
 		"batch_id",
 	]
 
-	alpha_numeric_fields = ["company_id", "mesg_auth_code", "reserved"]
+	alpha_numeric_fields: ClassVar = ["company_id", "mesg_auth_code", "reserved"]
 
-	field_lengths = {
+	field_lengths: ClassVar = {
 		"serv_cls_code": 3,
 		"entadd_count": 6,
 		"entry_hash": 10,
@@ -508,7 +509,7 @@ class EntryDetail(Ach):
 
 	record_type_code = "6"
 
-	std_ent_cls_code_list = [
+	std_ent_cls_code_list: ClassVar = [
 		"ARC",
 		"PPD",
 		"CTX",
@@ -524,7 +525,7 @@ class EntryDetail(Ach):
 		"RCK",
 	]
 
-	numeric_fields = [
+	numeric_fields: ClassVar = [
 		"transaction_code",
 		"recv_dfi_id",
 		"check_digit",
@@ -538,7 +539,7 @@ class EntryDetail(Ach):
 		"trace_num",
 	]
 
-	alpha_numeric_fields = [
+	alpha_numeric_fields: ClassVar = [
 		"dfi_acnt_num",
 		"chk_serial_num",
 		"ind_name",
@@ -552,7 +553,7 @@ class EntryDetail(Ach):
 		"pmt_type_code",
 	]
 
-	field_lengths = {
+	field_lengths: ClassVar = {
 		"transaction_code": 2,
 		"recv_dfi_id": [8, 9],
 		"check_digit": 1,
@@ -755,7 +756,7 @@ class AddendaRecord(Ach):
 	record_type_code = "7"
 	addenda_type_code = "05"
 
-	alpha_numeric_fields = [
+	alpha_numeric_fields: ClassVar = [
 		"trans_desc",
 		"net_id_code",
 		"term_id_code",
@@ -769,9 +770,15 @@ class AddendaRecord(Ach):
 		"auth_card_exp",
 	]
 
-	numeric_fields = ["trans_date", "trans_time", "trace_num", "ent_det_seq_num", "add_seq_num"]
+	numeric_fields: ClassVar = [
+		"trans_date",
+		"trans_time",
+		"trace_num",
+		"ent_det_seq_num",
+		"add_seq_num",
+	]
 
-	field_lengths = {
+	field_lengths: ClassVar = {
 		"trans_desc": 7,
 		"net_id_code": 3,
 		"term_id_code": 6,

@@ -9,7 +9,7 @@ readme = "README.md"
 dynamic = ["version"]
 dependencies = [
     # "frappe~=15.0.0" # Installed and managed by bench.
-    "python-ach>=0.1.0"
+    "python-ach @ git+https://github.com/affinitas/python-ach.git@master"
 ]
 
 [build-system]
