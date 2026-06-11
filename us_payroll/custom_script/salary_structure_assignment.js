@@ -111,8 +111,6 @@ frappe.ui.form.on("Salary Structure Assignment", {
 								row.variable_based_on_taxable_salary =
 									earning.variable_based_on_taxable_salary;
 								row.do_not_include_in_total = earning.do_not_include_in_total;
-								row.do_not_include_in_accounts =
-									earning.do_not_include_in_accounts;
 								row.deduct_full_tax_on_selected_payroll_date =
 									earning.deduct_full_tax_on_selected_payroll_date;
 								row.condition = earning.condition;
@@ -144,8 +142,6 @@ frappe.ui.form.on("Salary Structure Assignment", {
 								row.variable_based_on_taxable_salary =
 									deduction.variable_based_on_taxable_salary;
 								row.do_not_include_in_total = deduction.do_not_include_in_total;
-								row.do_not_include_in_accounts =
-									deduction.do_not_include_in_accounts;
 								row.deduct_full_tax_on_selected_payroll_date =
 									deduction.deduct_full_tax_on_selected_payroll_date;
 								row.condition = deduction.condition;
@@ -181,7 +177,6 @@ frappe.ui.form.on("Employee Insurance Deduction", {
 			.get_value("Salary Component", row.salary_component, [
 				"custom_is_employer_component",
 				"do_not_include_in_total",
-				"do_not_include_in_accounts",
 				"custom_is_this_insurance_component",
 				"custom_is_this_employers_insurance_component",
 				"custom_insurance_component",
@@ -198,7 +193,6 @@ frappe.ui.form.on("Employee Insurance Deduction", {
 				const field_map = {
 					custom_is_employer_component: "is_employer_component",
 					do_not_include_in_total: "do_not_include_in_total",
-					do_not_include_in_accounts: "do_not_include_in_accounts",
 					custom_is_this_insurance_component: "is_this_employees_insurance_component",
 					custom_is_this_employers_insurance_component:
 						"is_this_employers_insurance_component",

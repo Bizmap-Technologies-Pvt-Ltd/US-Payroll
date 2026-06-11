@@ -47,8 +47,7 @@ frappe.ui.form.on("Salary Component", {
 										if (deduction.salary_component === frm.doc.name) {
 											deduction.do_not_include_in_total =
 												frm.doc.do_not_include_in_total;
-											deduction.do_not_include_in_accounts =
-												frm.doc.do_not_include_in_accounts;
+
 											updated = true;
 										}
 									});

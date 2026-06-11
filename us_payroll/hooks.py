@@ -280,6 +280,7 @@ fixtures = [
 	{"dt": "Custom Field", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Property Setter", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "US-Payroll"]]},
+	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
 	"Translation",
 	"Workspace",
 ]

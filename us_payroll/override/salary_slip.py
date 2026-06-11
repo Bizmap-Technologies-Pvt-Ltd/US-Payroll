@@ -14,7 +14,6 @@ class OverrideSalarySlip(SalarySlip):
 		self.set_check_no()
 		self.set_standard_deduction()
 		self.salary_calculations_for_fit()
-		self.set_do_not_include_in_accounts()
 
 	def on_cancel(self):
 		super().on_cancel()
@@ -233,13 +232,3 @@ class OverrideSalarySlip(SalarySlip):
 			doc.custom_standard_deduction = 8600
 		else:
 			doc.custom_standard_deduction = 12900
-
-	def set_do_not_include_in_accounts(self):
-		doc = self
-		sal_structure = doc.salary_structure
-		sal_doc = frappe.get_doc("Salary Structure", sal_structure)
-
-		for deduction_row in doc.deductions:
-			for sal_row in sal_doc.deductions:
-				if deduction_row.salary_component == sal_row.salary_component:
-					deduction_row.do_not_include_in_accounts = sal_row.do_not_include_in_accounts
