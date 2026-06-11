@@ -119,7 +119,6 @@ class OverridePayrollEntry(PayrollEntry):
 
 		return super().get_salary_component_account(
 			salary_component,
-			employee,
 		)
 
 	def get_salary_component_total(
