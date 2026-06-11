@@ -164,7 +164,7 @@ class OverrideSalarySlip(SalarySlip):
 				comp_doc = frappe.get_doc("Salary Component", row.salary_component)
 				if (
 					comp_doc.custom_is_this_pretax_component
-					and not comp_doc.is_this_employees_insurance_component
+					and not comp_doc.custom_is_this_insurance_component
 					and not comp_doc.get("do_not_include_in_total")
 				):
 					total_pretax += flt(row.amount)
