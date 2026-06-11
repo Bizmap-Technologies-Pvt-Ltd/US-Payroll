@@ -148,7 +148,7 @@ def render_html_for_holiday(
 	holidays = frappe.db.sql(
 		"""
 		SELECT holiday_date, description FROM `tabHoliday`
-		WHERE parent=%s AND holiday_date >= %s AND holiday_date <= %s
+		WHERE parent=%(holiday_list)s AND holiday_date >= %(start_date)s AND holiday_date <= %(end_date)s
 		ORDER BY holiday_date ASC
 	""",
 		{
