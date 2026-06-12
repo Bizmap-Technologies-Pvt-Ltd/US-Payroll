@@ -171,6 +171,7 @@ doc_events = {
 	"Attendance": {
 		"validate": "us_payroll.custom_script.attendance.validate",
 		"on_submit": "us_payroll.custom_script.attendance.on_submit",
+		"before_submit": "us_payroll.custom_script.attendance.set_total_and_overtime_hours",
 	},
 	"Payroll Entry": {
 		"before_save": "us_payroll.custom_script.payroll_entry.before_save",

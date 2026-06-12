@@ -621,7 +621,7 @@ class OverridePayrollEntry(PayrollEntry):
 			if not row.custom_total_working_hours:
 				total_hours, overtime_hours = frappe.db.sql(
 					"""
-					SELECT SUM(working_hours), SUM(custom_overtime_hours)
+					SELECT SUM(custom_total_working_hours), SUM(custom_overtime_hours)
 					FROM `tabAttendance`
 					WHERE employee = %s
 					AND attendance_date BETWEEN %s AND %s
