@@ -47,6 +47,24 @@ frappe.ui.form.on("Payroll Entry", {
 		frm.trigger("set_default_company");
 	},
 
+	custom_deduct_insurance: function (frm) {
+		frappe.call({
+			method: "us_payroll.custom_script.payroll_entry.toggle_insurance_components",
+			args: {
+				deduct_insurance: frm.doc.custom_deduct_insurance ? 1 : 0,
+			},
+			callback: function (r) {
+				frappe.show_alert({
+					message: __("Updated {0} Salary Components and {1} SSA records", [
+						r.message.updated_components,
+						r.message.updated_ssa,
+					]),
+					indicator: "green",
+				});
+			},
+		});
+	},
+
 	hide_add_row_btn: function (frm) {
 		frm.fields_dict["employees"].grid.wrapper.find(".grid-add-row").remove();
 	},

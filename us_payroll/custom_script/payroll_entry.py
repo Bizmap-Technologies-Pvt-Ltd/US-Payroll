@@ -416,3 +416,32 @@ def get_department_working_hours(employee: str):
 
 	except Exception as e:
 		return {"error": f"Unexpected error: {e!s}"}
+
+
+@frappe.whitelist()
+def toggle_insurance_components(deduct_insurance: int):
+	set_to = 0 if int(deduct_insurance) else 1
+
+	# --- Update Salary Components ---
+	comps = frappe.db.get_list(
+		"Salary Component", filters={"custom_is_this_insurance_component": 1}, fields=["name"]
+	)
+	for comp in comps:
+		frappe.db.set_value("Salary Component", comp.name, "do_not_include_in_total", set_to)
+
+	# --- Update Employee Insurance Deduction child rows in ALL SSA ---
+	ssas = frappe.db.get_list("Salary Structure Assignment", fields=["name"])
+	for ssa in ssas:
+		children = frappe.db.get_list(
+			"Employee Insurance Deduction",
+			filters={
+				"parent": ssa.name,
+				"parenttype": "Salary Structure Assignment",
+				"parentfield": "custom_employee_insurance_deduction",
+			},
+			fields=["name"],
+		)
+		for row in children:
+			frappe.db.set_value("Employee Insurance Deduction", row.name, "do_not_include_in_total", set_to)
+
+	return {"updated_components": len(comps), "updated_ssa": len(ssas)}
