@@ -7,7 +7,7 @@
     "label": "Outgoing Salary"
    }
   ],
-  "content": "[{\"id\":\"sN-N90hh44\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Salary\",\"col\":12}},{\"id\":\"ORKhwX-uqw\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"gGURwviUAZ\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"PWuecwd6bd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee\",\"col\":3}},{\"id\":\"RQ-BpZzZSf\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Income Tax Slab\",\"col\":3}},{\"id\":\"AWz4SawlG_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Component\",\"col\":3}},{\"id\":\"48X74tGCgW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure\",\"col\":3}},{\"id\":\"OFlZvpWVhS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure Assignment\",\"col\":3}},{\"id\":\"xUF_irqFeq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Checkin\",\"col\":3}},{\"id\":\"UdLRCjxt7e\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attendance\",\"col\":3}},{\"id\":\"UecXW485Ks\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll Entry\",\"col\":3}},{\"id\":\"g-V4NtB4YG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Check Stubs\",\"col\":3}},{\"id\":\"lkO8TQ9lsS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll ACH\",\"col\":3}},{\"id\":\"jVmuFS11Kz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Checkbook Declaration\",\"col\":3}},{\"id\":\"i8uUxIqf0k\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Check\",\"col\":3}},{\"id\":\"nuqgcV13aB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leave Allocation Tool\",\"col\":3}},{\"id\":\"b_dEYqa_Kf\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leave Allocation\",\"col\":3}},{\"id\":\"oWY75-JxoN\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Department\",\"col\":3}},{\"id\":\"lJfNZoXjNv\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"MkKbhzruhK\",\"type\":\"card\",\"data\":{\"card_name\":\"Payroll Compliance Forms\",\"col\":4}},{\"id\":\"ulG33lqBda\",\"type\":\"card\",\"data\":{\"card_name\":\"Tools\",\"col\":4}},{\"id\":\"IA4MdWCEXH\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+  "content": "[{\"id\":\"sN-N90hh44\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Outgoing Salary\",\"col\":12}},{\"id\":\"ORKhwX-uqw\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"gGURwviUAZ\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"PWuecwd6bd\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee\",\"col\":3}},{\"id\":\"RQ-BpZzZSf\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Income Tax Slab\",\"col\":3}},{\"id\":\"AWz4SawlG_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Component\",\"col\":3}},{\"id\":\"48X74tGCgW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure\",\"col\":3}},{\"id\":\"OFlZvpWVhS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Structure Assignment\",\"col\":3}},{\"id\":\"xUF_irqFeq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee Checkin\",\"col\":3}},{\"id\":\"UdLRCjxt7e\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attendance\",\"col\":3}},{\"id\":\"UecXW485Ks\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll Entry\",\"col\":3}},{\"id\":\"g-V4NtB4YG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Check Stubs\",\"col\":3}},{\"id\":\"lkO8TQ9lsS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll ACH\",\"col\":3}},{\"id\":\"jVmuFS11Kz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Checkbook Declaration\",\"col\":3}},{\"id\":\"i8uUxIqf0k\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Check\",\"col\":3}},{\"id\":\"nuqgcV13aB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leave Allocation Tool\",\"col\":3}},{\"id\":\"b_dEYqa_Kf\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Leave Allocation\",\"col\":3}},{\"id\":\"oWY75-JxoN\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Department\",\"col\":3}},{\"id\":\"lJfNZoXjNv\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"IA4MdWCEXH\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}},{\"id\":\"MkKbhzruhK\",\"type\":\"card\",\"data\":{\"card_name\":\"Payroll Compliance Forms\",\"col\":4}},{\"id\":\"ulG33lqBda\",\"type\":\"card\",\"data\":{\"card_name\":\"Tools\",\"col\":4}}]",
   "custom_blocks": [],
   "docstatus": 0,
   "doctype": "Workspace",
@@ -32,7 +32,7 @@
     "link_to": null,
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Card Break"
    },
@@ -47,7 +47,7 @@
     "link_to": "Employee Earning Reports By Posted Date",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -62,7 +62,7 @@
     "link_to": "Employee Gross Earning",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -77,7 +77,7 @@
     "link_to": "Payroll Detail Report By Posted Date",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -92,7 +92,7 @@
     "link_to": "Payroll Employee Taxes",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -107,7 +107,7 @@
     "link_to": "Payroll Leave Balance Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -122,7 +122,7 @@
     "link_to": "Payroll Tax Summary Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -137,7 +137,7 @@
     "link_to": "TMRS Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -152,7 +152,7 @@
     "link_to": "Unemployment Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -167,7 +167,7 @@
     "link_to": "Workers' Comp Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -182,24 +182,9 @@
     "link_to": null,
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Card Break"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "W2 Form Details",
-    "link_count": 0,
-    "link_to": "W2 Form Details",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": "",
-    "report_ref_doctype": null,
-    "type": "Link"
    },
    {
     "dependencies": null,
@@ -212,7 +197,22 @@
     "link_to": "W2 Form Tool",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "W2 Form Details",
+    "link_count": 0,
+    "link_to": "W2 Form Details",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -227,7 +227,7 @@
     "link_to": "W3 Form Details",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -242,7 +242,7 @@
     "link_to": "Form 941 Details",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -272,7 +272,7 @@
     "link_to": "ACH Report Details",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -287,7 +287,7 @@
     "link_to": "Checkbook Declaration",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -317,7 +317,7 @@
     "link_to": "Department",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -332,22 +332,7 @@
     "link_to": "Leave Allocation Tool",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
-    "report_ref_doctype": null,
-    "type": "Link"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "Payroll Settings",
-    "link_count": 0,
-    "link_to": "Payroll Settings",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": "",
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -362,12 +347,27 @@
     "link_to": "W2 Form Tool",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "",
+    "only_for": null,
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Payroll Settings",
+    "link_count": 0,
+    "link_to": "Payroll Settings",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
     "report_ref_doctype": null,
     "type": "Link"
    }
   ],
-  "modified": "2026-06-15 13:09:13.893423",
+  "modified": "2026-06-15 16:16:29.280100",
   "module": "us_payroll",
   "name": "USA Payroll",
   "number_cards": [],
