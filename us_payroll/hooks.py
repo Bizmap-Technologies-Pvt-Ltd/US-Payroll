@@ -282,5 +282,6 @@ fixtures = [
 	{"dt": "Property Setter", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
+	{"dt": "Workspace", "filters": [["module", "=", ""]]},
 	"Translation",
 ]
