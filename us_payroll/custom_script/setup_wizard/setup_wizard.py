@@ -5,7 +5,7 @@ from pathlib import Path
 import frappe
 
 
-def setup_wizard_complete(args=None):
+def setup_wizard_complete(args=None):  # nosemgrep: overusing-args - framework hook signature
 	company = frappe.defaults.get_global_default("company")
 
 	# # Load JSON file

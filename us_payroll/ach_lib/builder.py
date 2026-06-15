@@ -93,7 +93,7 @@ class AchFile:
 				entry.check_digit = record["routing_number"][8]
 
 			entry.dfi_acnt_num = record["account_number"]
-			entry.amount = int(round(float(record["amount"]) * 100))
+			entry.amount = round(float(record["amount"]) * 100)
 			entry.ind_name = record["name"].upper()[:22]
 			entry.trace_num = self.settings["immediate_dest"][:8] + entry.validate_numeric_field(
 				entry_counter, 7
@@ -118,7 +118,7 @@ class AchFile:
 		)
 
 	def get_block_count(self, batches):
-		return int(math.ceil(self.get_lines(batches) / 10.0))
+		return math.ceil(self.get_lines(batches) / 10.0)
 
 	def get_lines(self, batches):
 		header_count = 1
@@ -208,7 +208,7 @@ class AchFile:
 
 		lines = self.get_lines(self.batches)
 
-		nine_lines = int(round(10 * (math.ceil(lines / 10.0) - (lines / 10.0))))
+		nine_lines = round(10 * (math.ceil(lines / 10.0) - (lines / 10.0)))
 
 		ret_string += self.get_nines(nine_lines, line_ending)
 
