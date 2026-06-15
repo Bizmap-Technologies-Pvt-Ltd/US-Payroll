@@ -47,7 +47,7 @@
     "link_to": "Employee Earning Reports By Posted Date",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -62,7 +62,7 @@
     "link_to": "Employee Gross Earning",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -77,7 +77,7 @@
     "link_to": "Payroll Detail Report By Posted Date",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -92,7 +92,7 @@
     "link_to": "Payroll Employee Taxes",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -107,7 +107,7 @@
     "link_to": "Payroll Leave Balance Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -122,7 +122,7 @@
     "link_to": "Payroll Tax Summary Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -137,7 +137,7 @@
     "link_to": "TMRS Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -152,7 +152,7 @@
     "link_to": "Unemployment Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -167,7 +167,7 @@
     "link_to": "Workers' Comp Report",
     "link_type": "Report",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -197,7 +197,7 @@
     "link_to": "W2 Form Details",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -212,7 +212,7 @@
     "link_to": "W2 Form Tool",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -227,7 +227,7 @@
     "link_to": "W3 Form Details",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -242,7 +242,7 @@
     "link_to": "Form 941 Details",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -272,7 +272,7 @@
     "link_to": "ACH Report Details",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -287,7 +287,7 @@
     "link_to": "Checkbook Declaration",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -317,7 +317,7 @@
     "link_to": "Department",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -332,7 +332,7 @@
     "link_to": "Leave Allocation Tool",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -347,7 +347,7 @@
     "link_to": "Payroll Settings",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    },
@@ -362,12 +362,12 @@
     "link_to": "W2 Form Tool",
     "link_type": "DocType",
     "onboard": 0,
-    "only_for": "India",
+    "only_for": "",
     "report_ref_doctype": null,
     "type": "Link"
    }
   ],
-  "modified": "2026-06-15 13:01:16.873565",
+  "modified": "2026-06-15 13:09:13.893423",
   "module": "us_payroll",
   "name": "USA Payroll",
   "number_cards": [],
