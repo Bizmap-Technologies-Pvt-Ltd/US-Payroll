@@ -5,7 +5,8 @@ from pathlib import Path
 import frappe
 
 
-def setup_wizard_complete(args=None):
+# Frappe setup-wizard hook: the `args` payload is passed in by the framework, so the signature is fixed.
+def setup_wizard_complete(args=None):  # nosemgrep
 	company = frappe.defaults.get_global_default("company")
 
 	# # Load JSON file

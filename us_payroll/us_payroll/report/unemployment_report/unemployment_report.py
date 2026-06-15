@@ -508,7 +508,7 @@ def get_department_summary(data):
 @frappe.whitelist()
 def download_excel(filters: str):
 	filters = frappe._dict(json.loads(filters))
-	columns, data = execute(filters)
+	_columns, data = execute(filters)
 
 	xlsx_data = []
 	for row in data:

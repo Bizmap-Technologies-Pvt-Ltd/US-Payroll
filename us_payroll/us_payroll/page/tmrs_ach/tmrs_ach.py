@@ -40,15 +40,15 @@ def get_tmrs_report_data(year: str, month: str):
 
 	filters = {"year": year, "month": month}
 
-	columns, sample_data = tmrs_report.execute(filters)
+	_columns, sample_data = tmrs_report.execute(filters)
 
 	# Build lines
 	ach_lines = []
 	for row in sample_data:
 		city_number = "00962"
-		ssn = f'{row["custom_nomasked_social_security_number"]:<9}'.replace("-", "")
-		salary = f'{int(row["gross_pay"] * 100):08}'  # 8 digits, cents
-		deposit = f'{int(row["tmrs_employee_total"] * 100):07}'  # 7 digits, cents
+		ssn = f"{row['custom_nomasked_social_security_number']:<9}".replace("-", "")
+		salary = f"{int(row['gross_pay'] * 100):08}"  # 8 digits, cents
+		deposit = f"{int(row['tmrs_employee_total'] * 100):07}"  # 7 digits, cents
 
 		# name = f'{row["employee"]:<33}'[:33]  # limit to 33 characters
 

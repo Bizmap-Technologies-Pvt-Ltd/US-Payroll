@@ -307,8 +307,7 @@ def tax_calulations_for_fit(doc: Document):
 		fund_settings_url = f"{site_url}/desk/client-setup"
 		frappe.throw(
 			_(
-				"Please add <b>Total weeks of the year</b> in Client Setup. "
-				"<a href='{url}'>Client Setup</a>"
+				"Please add <b>Total weeks of the year</b> in Client Setup. <a href='{url}'>Client Setup</a>"
 			).format(url=fund_settings_url)
 		)
 	doc.save()

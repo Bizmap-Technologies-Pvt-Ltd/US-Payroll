@@ -12,7 +12,7 @@ from us_payroll.us_payroll.report.unemployment_report import unemployment_report
 @frappe.whitelist()
 def get_unemployment_report_data(year: str, quarter: str):
 	filters = {"year": year, "quarter": quarter}
-	columns, data = unemployment_report.execute(filters)
+	_columns, data = unemployment_report.execute(filters)
 
 	if not data:
 		frappe.throw(_("No data found for the selected period."))
@@ -311,7 +311,7 @@ def generate_t_record(data):
 	taxable_wages_str = str(taxable_wages).rjust(14, "0")
 
 	contribution_rate = ".013000"
-	contribution_amount = int(round(taxable_wages * 0.013))
+	contribution_amount = round(taxable_wages * 0.013)
 	contribution_amount_str = str(contribution_amount).rjust(13, "0")
 
 	ach_details = frappe.get_single("ACH Report Details")
