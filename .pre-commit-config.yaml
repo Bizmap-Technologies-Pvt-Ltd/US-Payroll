@@ -5,35 +5,45 @@ fail_fast: false
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
-        files: "us_payroll.*"
+        files: "^(apps/)?us_payroll/.*"
         exclude: ".*json$|.*txt$|.*csv|.*md|.*svg"
       - id: check-merge-conflict
+        files: "^(apps/)?us_payroll/.*"
       - id: check-ast
+        files: "^(apps/)?us_payroll/.*"
       - id: check-json
+        files: "^(apps/)?us_payroll/.*"
       - id: check-toml
+        files: "^(apps/)?us_payroll/.*"
       - id: check-yaml
+        files: "^(apps/)?us_payroll/.*"
       - id: debug-statements
+        files: "^(apps/)?us_payroll/.*\\.py$"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.17
     hooks:
       - id: ruff
         name: "Run ruff import sorter"
+        files: "^(apps/)?us_payroll/.*\\.py$"
         args: ["--select=I", "--fix"]
 
       - id: ruff
         name: "Run ruff linter"
+        files: "^(apps/)?us_payroll/.*\\.py$"
 
       - id: ruff-format
         name: "Run ruff formatter"
+        files: "^(apps/)?us_payroll/.*\\.py$"
 
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v2.7.1
     hooks:
       - id: prettier
+        files: "^(apps/)?us_payroll/.*"
         types_or: [javascript, vue, scss]
         # Ignore any files that might contain jinja / bundles
         exclude: |
@@ -50,6 +60,7 @@ repos:
     rev: v8.44.0
     hooks:
       - id: eslint
+        files: "^(apps/)?us_payroll/.*"
         types_or: [javascript]
         args: ['--quiet']
         # Ignore any files that might contain jinja / bundles
