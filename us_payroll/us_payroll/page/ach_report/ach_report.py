@@ -26,7 +26,7 @@ def generate_ach_file(payroll_entry: str):
 	else:
 		site_url = get_url()
 		ach_url = f"{site_url}/app/ach-report-details/ACH%20Report%20Details"
-		frappe.throw(_(f"Please check <a href= '{ach_url}' >ACH Report Details</a>"))
+		frappe.throw(_(f"Please update the details in <a href= '{ach_url}' >ACH Report Details</a>"))
 
 	ach_file = AchFile("A", settings)
 	entries = []
