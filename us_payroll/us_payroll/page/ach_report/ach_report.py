@@ -4,6 +4,7 @@ from datetime import datetime
 
 import frappe
 from frappe import _
+from frappe.utils import get_url
 
 from us_payroll.ach_lib.builder import AchFile
 
@@ -11,13 +12,21 @@ from us_payroll.ach_lib.builder import AchFile
 @frappe.whitelist(methods=["POST"])
 def generate_ach_file(payroll_entry: str):
 	ach_data = frappe.get_single("ACH Report Details")
-	settings = {
-		"immediate_dest": ach_data.bank_routing_no,
-		"immediate_org": ach_data.bank_account_no,
-		"immediate_dest_name": ach_data.bank_name,
-		"immediate_org_name": ach_data.bank_name,
-		"company_id": ach_data.company_id,
-	}
+
+	if ach_data and any(
+		[ach_data.bank_routing_no, ach_data.bank_account_no, ach_data.bank_name, ach_data.company_id]
+	):
+		settings = {
+			"immediate_dest": ach_data.bank_routing_no,
+			"immediate_org": ach_data.bank_account_no,
+			"immediate_dest_name": ach_data.bank_name,
+			"immediate_org_name": ach_data.bank_name,
+			"company_id": ach_data.company_id,
+		}
+	else:
+		site_url = get_url()
+		ach_url = f"{site_url}/app/ach-report-details/ACH%20Report%20Details"
+		frappe.throw(_(f"Please check <a href= '{ach_url}' >ACH Report Details</a>"))
 
 	ach_file = AchFile("A", settings)
 	entries = []
