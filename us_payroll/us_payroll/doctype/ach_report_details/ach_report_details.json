@@ -43,27 +43,36 @@
   {
    "fieldname": "company_id",
    "fieldtype": "Data",
-   "label": "company id"
+   "in_list_view": 1,
+   "label": "company id",
+   "reqd": 1
   },
   {
    "fieldname": "company_name",
    "fieldtype": "Data",
-   "label": "company name"
+   "in_list_view": 1,
+   "label": "company name",
+   "reqd": 1
   },
   {
    "fieldname": "bank_routing_no",
    "fieldtype": "Data",
-   "label": "bank routing no"
+   "in_list_view": 1,
+   "label": "bank routing no",
+   "reqd": 1
   },
   {
    "fieldname": "bank_account_no",
    "fieldtype": "Data",
-   "label": "bank account no"
+   "in_list_view": 1,
+   "label": "bank account no",
+   "reqd": 1
   },
   {
    "fieldname": "bank_name",
    "fieldtype": "Data",
-   "label": "bank name"
+   "label": "bank name",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_sv3j",
@@ -209,7 +218,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-05-05 11:33:12.862125",
+ "modified": "2026-06-17 19:26:21.525473",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "ACH Report Details",
