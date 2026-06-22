@@ -284,4 +284,5 @@ fixtures = [
 	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", ""]]},
 	"Translation",
+	"Server Script",
 ]
