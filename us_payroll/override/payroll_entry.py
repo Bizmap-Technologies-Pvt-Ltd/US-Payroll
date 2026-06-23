@@ -458,7 +458,8 @@ class OverridePayrollEntry(PayrollEntry):
 
 			site_url = get_url()
 			leave_allocation_url = f"{site_url}/app/leave-allocation"
-			if row.custom_pto_hours > 0 and not leave_alloc:
+			# if row.custom_pto_hours > 0 and not leave_alloc:
+			if row.custom_pto_hours > 0 and row.custom_available_pto <= 0:
 				frappe.throw(
 					f"Please allocate PTO Leaves for employee <b>{row.employee_name}</b> in row <b>{row.get('idx')}</b> <a href= '{leave_allocation_url}' > Leave Allocation </a>"
 				)
