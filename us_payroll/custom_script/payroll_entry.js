@@ -615,12 +615,6 @@ frappe.ui.form.on("Payroll Employee Detail", {
 			row.custom_pto_amount = row.custom_pto_hours * row.custom_hourly_rate;
 			frm.refresh_field("employees");
 		}
-
-		if (row.custom_available_pto) {
-			let remaining_pto_hrs = 0;
-			remaining_pto_hrs = row.custom_available_pto - row.custom_pto_hours;
-			frappe.model.set_value(cdt, cdn, "custom_available_pto", remaining_pto_hrs);
-		}
 	},
 
 	custom_hourly_rate: function (frm, cdt, cdn) {

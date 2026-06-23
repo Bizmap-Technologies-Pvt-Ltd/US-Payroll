@@ -24,6 +24,7 @@ from frappe.utils import (
 	get_first_day,
 	get_last_day,
 	get_link_to_form,
+	get_url,
 	getdate,
 	now_datetime,
 	rounded,
@@ -231,10 +232,12 @@ class OverridePayrollEntry(PayrollEntry):
 		self.carry_forward()
 
 	def carry_forward(self):
-		doc = self
-		for row in doc.employees:
-			if not row.custom_pto_hours:
-				self.process_pto_leave_balance_and_carry_forward()
+		# doc = self
+		# for row in doc.employees:
+		# 	if not row.custom_pto_hours:
+		# 		self.process_pto_leave_balance_and_carry_forward()
+
+		self.process_pto_leave_balance_and_carry_forward()
 
 	def warning_msg(self):
 		doc = self
@@ -452,6 +455,14 @@ class OverridePayrollEntry(PayrollEntry):
 				["name", "from_date", "to_date", "total_leaves_allocated", "modified"],
 				as_dict=True,
 			)
+
+			site_url = get_url()
+			leave_allocation_url = f"{site_url}/app/leave-allocation"
+			if row.custom_pto_hours > 0 and not leave_alloc:
+				frappe.throw(
+					f"Please allocate PTO Leaves for employee <b>{row.employee_name}</b> in row <b>{row.get('idx')}</b> <a href= '{leave_allocation_url}' > Leave Allocation </a>"
+				)
+
 			total_leaves_allocated_pto = flt(leave_alloc.total_leaves_allocated) if leave_alloc else 0
 			emp = frappe.db.get_value("Employee", employee, ["custom_pto_hours"], as_dict=True)
 			pto_rate = flt(emp.custom_pto_hours) if emp else 0
@@ -505,6 +516,10 @@ class OverridePayrollEntry(PayrollEntry):
 			delta_allocation = (total_leaves_allocated_pto - past_alloc_used) if leave_alloc else 0
 
 			row.custom_available_pto = new_pto_balance + delta_allocation
+			row.custom_pto_leaves_allocated = total_leaves_allocated_pto
+
+			pto_used = flt(row.custom_pto_hours)
+			row.custom_available_pto = new_pto_balance + delta_allocation - pto_used
 			row.custom_pto_leaves_allocated = total_leaves_allocated_pto
 
 			# --------------------------------    CARRY FORWARD Logic  --------------------------------------------------
