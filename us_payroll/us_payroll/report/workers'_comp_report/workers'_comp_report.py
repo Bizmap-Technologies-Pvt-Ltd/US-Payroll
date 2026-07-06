@@ -168,6 +168,7 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = f"City of {company_name}"
 	department_data, comp_code_summary, department_summary, grand_totals = get_department_summary(data)
 
+	# Template path is hardcoded and bundled with the app, not user-controlled.
 	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 		template_path,
 		{

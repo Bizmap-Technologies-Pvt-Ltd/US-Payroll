@@ -143,7 +143,12 @@ doctype_list_js = {"W2 Form Details": "us_payroll/doctype/w2_form_details/w2_for
 # ---------------
 # Override standard doctype classes
 
-override_doctype_class = {
+# override_doctype_class = {
+# 	"Salary Slip": "us_payroll.override.salary_slip.OverrideSalarySlip",
+# 	"Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry",
+# }
+
+extend_doctype_class = {
 	"Salary Slip": "us_payroll.override.salary_slip.OverrideSalarySlip",
 	"Payroll Entry": "us_payroll.override.payroll_entry.OverridePayrollEntry",
 }
