@@ -96,15 +96,6 @@ A Frappe site with **ERPNext** and **Frappe HR (hrms)** installed.
 
 ### Install on an existing bench
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-
-# choose the branch that matches your ERPNext version (version-16 or version-15)
-bench get-app https://github.com/Bizmap-Technologies-Pvt-Ltd/US-Payroll.git --branch version-16
-
-bench --site your.site.name install-app us_payroll
-```
-
 Open the **USA Payroll** workspace in the desk to start setting up employees, salary structures and
 pay runs. The full step by step guide lives in the [product wiki](https://bizmap.in/us-payroll-wiki).
 

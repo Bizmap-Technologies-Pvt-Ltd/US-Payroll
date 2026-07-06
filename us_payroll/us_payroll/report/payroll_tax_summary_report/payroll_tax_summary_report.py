@@ -176,6 +176,7 @@ def generate_pdf(data: dict[str, Any]):
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M%p").lower()
 
+	# Template path is hardcoded and bundled with the app, not user-controlled.
 	html = frappe.render_template(  # nosemgrep: frappe-ssti
 		template_path,
 		{

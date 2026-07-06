@@ -127,6 +127,8 @@ def bulk_w2_print(names: str):
 		frappe.throw(_("No records selected"))
 
 	docs = [frappe.get_doc("W2 Form Details", name) for name in names]
+
+	# Template path is hardcoded and bundled with the app, not user-controlled.
 	html = render_template(  # nosemgrep: frappe-ssti
 		"us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html", {"docs": docs}
 	)

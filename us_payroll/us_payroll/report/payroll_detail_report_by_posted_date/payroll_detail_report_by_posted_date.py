@@ -130,6 +130,7 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
+	# Template path is hardcoded and bundled with the app, not user-controlled.
 	html = frappe.render_template(  # nosemgrep: frappe-ssti
 		template_path,
 		{
