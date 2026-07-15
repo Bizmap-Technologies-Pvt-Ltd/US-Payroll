@@ -11,6 +11,8 @@ from frappe import _
 from frappe.utils import getdate
 from frappe.utils.pdf import get_pdf
 
+WORKERS_COMP_REPORT_TEMPLATE = "us_payroll/us_payroll/report/workers_comp_report/workers_comp_report.html"
+
 
 def execute(filters=None):
 	if not filters:
@@ -96,7 +98,6 @@ def get_data(filters):
 			agg.employee,
 			agg.employee_name,
 			agg.department AS department,
-			# agg.custom_department_number AS department_name,
 			agg.custom_comp_code AS custom_comp_code,
 			ROUND(SUM(agg.gross_pay), 2) AS gross_amount,
 			ROUND(SUM(agg.custom_custom_total_working_hours), 2) AS hours,
@@ -117,7 +118,6 @@ def get_data(filters):
 				cs.custom_custom_total_overtime_hours,
 				cs.custom_total_overtime_amount,
 				ct.cost_center_name
-				# ct.custom_department_number
 			FROM `tabSalary Slip` cs
 			LEFT JOIN `tabEmployee` emp ON emp.name = cs.employee
 			LEFT JOIN `tabCost Center` ct ON ct.name = emp.department
@@ -145,7 +145,6 @@ def get_print(report_data: str):
 @frappe.whitelist()
 def generate_pdf(data: dict[str, Any]):
 	filters = data.get("filter")
-	template_path = "us_payroll/us_payroll/report/workers_comp_report/workers_comp_report.html"
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -168,9 +167,9 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = f"City of {company_name}"
 	department_data, comp_code_summary, department_summary, grand_totals = get_department_summary(data)
 
-	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# Static, repository-controlled template; callers can supply context data only.
 	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-		template_path,
+		WORKERS_COMP_REPORT_TEMPLATE,
 		{
 			"data": data,
 			"department_data": department_data,
@@ -229,7 +228,6 @@ def get_department_summary(data):
 	# --- Build department + comp code structure ---
 	for row in data:
 		dept_code = row.get("department") or "Unknown"
-		# dept_name = row.get("department_name") or "Unknown"
 		comp_code = row.get("custom_comp_code") or "NA"
 
 		if "Unknown" in (dept_code):
@@ -237,7 +235,6 @@ def get_department_summary(data):
 
 		summary = department_summary[dept_code]
 		summary["department_code"] = dept_code
-		# summary["department_description"] = dept_name
 
 		comp_summary = summary["comp_codes"][comp_code]
 		comp_summary["comp_code"] = comp_code

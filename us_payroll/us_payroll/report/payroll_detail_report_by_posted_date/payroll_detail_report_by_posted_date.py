@@ -11,6 +11,8 @@ import frappe
 from frappe import _
 from frappe.utils.pdf import get_pdf
 
+PAYROLL_DETAIL_TEMPLATE = "us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
+
 
 def execute(filters=None):
 	if not filters.get("from_date"):
@@ -117,8 +119,6 @@ def generate_pdf(data: dict[str, Any]):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = "us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
-
 	data = data.get("data")["data"]
 
 	department_data, department_grand_totals = get_department_summary(data)
@@ -128,9 +128,9 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# Static, repository-controlled template; callers can supply context data only.
 	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-		template_path,
+		PAYROLL_DETAIL_TEMPLATE,
 		{
 			"data": data,
 			"department_data": department_data,

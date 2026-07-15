@@ -12,6 +12,10 @@ from frappe import _
 from frappe.utils import flt, getdate
 from frappe.utils.pdf import get_pdf
 
+EMPLOYEE_GROSS_EARNING_TEMPLATE = (
+	"us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html"
+)
+
 
 def execute(filters=None):
 	if not filters:
@@ -111,8 +115,6 @@ def generate_pdf(data: dict[str, Any]):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = "us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html"
-
 	data = data.get("data")["data"]
 
 	current_datetime = datetime.now()
@@ -121,9 +123,9 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# Static, repository-controlled template; callers can supply context data only.
 	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-		template_path,
+		EMPLOYEE_GROSS_EARNING_TEMPLATE,
 		{
 			"data": data,
 			"company_name": company_name,

@@ -11,6 +11,8 @@ import frappe
 from frappe import _
 from frappe.utils.file_manager import save_file
 from frappe.utils.pdf import get_pdf
+
+UNEMPLOYMENT_REPORT_TEMPLATE = "us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
 from frappe.utils.xlsxutils import make_xlsx
 
 
@@ -170,7 +172,6 @@ def get_data(filters):
 			emp.first_name,
 			emp.middle_name,
 			emp.last_name,
-			-- ct.department,
 			cst.posting_date,
 			cst.gross_pay AS gross_pay,
 			cst.name AS salary_slip,
@@ -227,7 +228,6 @@ def get_data(filters):
 				"custom_nomasked_social_security_number": formatted_ssn,
 				"gender": row["gender"],
 				"reportable_wages": row["gross_pay"],  # Set once per slip
-				# 'custom_department_number': row['custom_department_number'],
 				"posting_date": row["posting_date"],
 			}
 
@@ -255,7 +255,6 @@ def get_data(filters):
 				"last_name": row["last_name"],
 				"payroll_entry": row["payroll_entry"],
 				"department": row["department"],
-				# 'custom_department_number': row['custom_department_number'],
 				"custom_nomasked_social_security_number": emp_formatted_ssn,
 				"gender": row["gender"],
 				"reportable_wages": 0.0,  # Set once per slip
@@ -359,7 +358,6 @@ def generate_pdf(data: dict[str, Any]):
 
 	month_year = f"{selected_quarter} {selected_year}"
 
-	template_path = "us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
 	letterhead_image = frappe.db.get_value("Letter Head", {"is_default": True}, "image")
 	site_url = frappe.utils.get_url()
 	if letterhead_image and not letterhead_image.startswith("http"):
@@ -410,9 +408,9 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# Static, repository-controlled template; callers can supply context data only.
 	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-		template_path,
+		UNEMPLOYMENT_REPORT_TEMPLATE,
 		{
 			"data": data,
 			"department_data": department_data,
@@ -452,7 +450,6 @@ def get_department_summary(data):
 	department_summary = defaultdict(
 		lambda: {
 			"department_code": "",
-			# "department_description": "",
 			"employee_count": 0,
 			"reportable_wages": 0.0,
 			"excess_wages": 0.0,
@@ -464,7 +461,6 @@ def get_department_summary(data):
 
 	for row in data:
 		department_code = row.get("department") or "Unknown"
-		# department_name = row.get("custom_department_number") or "Unknown"
 
 		if department_code == "Unknown":
 			continue
@@ -474,7 +470,6 @@ def get_department_summary(data):
 
 		if not summary["department_code"]:
 			summary["department_code"] = department_code
-			# summary["department_description"] = department_name
 
 		summary["employee_count"] += 1
 		summary["reportable_wages"] += float(row.get("reportable_wages") or 0)
@@ -536,10 +531,6 @@ def download_excel(filters: str):
 	file_name = "Unemployment_Report.xlsx"
 	xlsx_file = make_xlsx(xlsx_data, file_name)
 
-	# Option 1 (recommended): Attach to known Doctype
 	saved_file = save_file(file_name, xlsx_file.getvalue(), "Report", "Unemployment Report", is_private=1)
-
-	# Option 2 (safe fallback):
-	# saved_file = save_file(file_name, xlsx_file.getvalue(), None, None, is_private=1)
 
 	return {"file_url": saved_file.file_url}

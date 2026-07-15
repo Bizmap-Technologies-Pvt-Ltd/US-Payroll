@@ -11,6 +11,8 @@ import frappe
 from frappe import _
 from frappe.utils.pdf import get_pdf
 
+TMRS_REPORT_TEMPLATE = "us_payroll/us_payroll/report/tmrs_report/tmrs_report.html"
+
 
 def execute(filters=None):
 	if not filters:
@@ -43,19 +45,6 @@ def get_data(filters):
 
 	if not selected_month:
 		frappe.throw(_("Please select a valid month."))
-
-	# # Calculate previous month and year
-	# if selected_month == 1:
-	# 	prev_month = 12
-	# 	prev_year = selected_year - 1
-	# else:
-	# 	prev_month = selected_month - 1
-	# 	prev_year = selected_year
-
-	# # Get first and last day of previous month
-	# start_date = datetime(selected_year, selected_month, 1)
-	# last_day = calendar.monthrange(selected_year, selected_month)[1]
-	# end_date = datetime(selected_year, selected_month, last_day)
 
 	data = frappe.db.sql(
 		"""
@@ -273,8 +262,6 @@ def generate_pdf(data: dict[str, Any]):
 
 	formatted_start_end_date = f"{formatted_start_date} - {formatted_end_date}"
 
-	template_path = "us_payroll/us_payroll/report/tmrs_report/tmrs_report.html"
-
 	letterhead_image = frappe.db.get_value("Letter Head", {"is_default": True}, "image")
 
 	data = data.get("data")["data"]
@@ -287,9 +274,9 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
 
-	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# Static, repository-controlled template; callers can supply context data only.
 	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-		template_path,
+		TMRS_REPORT_TEMPLATE,
 		{
 			"data": data,
 			"department_data": department_data,

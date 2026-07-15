@@ -11,6 +11,10 @@ import frappe
 from frappe import _
 from frappe.utils.pdf import get_pdf
 
+PAYROLL_TAX_SUMMARY_TEMPLATE = (
+	"us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html"
+)
+
 
 def execute(filters=None):
 	if not filters:
@@ -86,10 +90,6 @@ def get_data(filters):
 			emp.last_name,
 			gp.gross_pay,
 
-			-- COALESCE(SUM(CASE
-			-- 	WHEN sd.salary_component = 'FIT Withholdings' THEN sd.amount
-			-- 	ELSE 0 END), 0) AS fit_withholdings,
-
 			COALESCE(SUM(
 				CASE
 					WHEN sd.salary_component IN ('FIT Withholdings', 'FIT') THEN sd.amount
@@ -111,7 +111,6 @@ def get_data(filters):
 		LEFT JOIN
 			`tabEmployee` emp ON emp.name = ped.employee
 
-		-- Subquery: gross pay per employee (avoids duplication)
 		LEFT JOIN (
 			SELECT employee, SUM(gross_pay) AS gross_pay
 			FROM `tabSalary Slip`
@@ -120,7 +119,6 @@ def get_data(filters):
 			GROUP BY employee
 		) gp ON gp.employee = ped.employee
 
-		-- Salary components join
 		LEFT JOIN
 			`tabSalary Slip` cst ON cst.employee = ped.employee AND cst.payroll_entry = pe.name
 		LEFT JOIN
@@ -169,16 +167,14 @@ def generate_pdf(data: dict[str, Any]):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = "us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html"
-
 	data = data.get("data")["data"]
 
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M%p").lower()
 
-	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# Static, repository-controlled template; callers can supply context data only.
 	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-		template_path,
+		PAYROLL_TAX_SUMMARY_TEMPLATE,
 		{
 			"data": data,
 			"current_datetime": formatted_datetime,
