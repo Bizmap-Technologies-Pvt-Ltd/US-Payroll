@@ -1,4 +1,4 @@
-# Copyright (c) 2026, bizmap and contributors
+# Copyright (c) 2026, Bizmap Technologies and contributors
 # For license information, please see license.txt
 
 import json
@@ -145,7 +145,7 @@ def get_print(report_data: str):
 @frappe.whitelist()
 def generate_pdf(data: dict[str, Any]):
 	filters = data.get("filter")
-	template_path = "us_payroll/us_payroll/report/workers'_comp_report/workers'_comp_report.html"
+	template_path = "us_payroll/us_payroll/report/workers_comp_report/workers_comp_report.html"
 
 	from_date = filters.get("from_date")
 	to_date = filters.get("to_date")
@@ -192,8 +192,6 @@ def generate_pdf(data: dict[str, Any]):
 		"margin-right": "20mm",
 		"margin-left": "20mm",
 	}
-
-	print(html, "html-----------------")
 
 	pdf_file = get_pdf(html, options=options)
 
