@@ -31,10 +31,10 @@ from frappe.utils import (
 	today,
 )
 from hrms.hr.doctype.leave_application.leave_application import get_leave_details
-from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry, get_month_details
+from hrms.payroll.doctype.payroll_entry.payroll_entry import get_month_details
 
 
-class OverridePayrollEntry(PayrollEntry):
+class PayrollEntryMixin(Document):
 	def validate(self):
 		super().validate()
 		self.validate_business_rules()
@@ -44,9 +44,6 @@ class OverridePayrollEntry(PayrollEntry):
 	def before_submit(self):
 		super().before_submit()
 		self.warning_msg()
-
-	def on_submit(self):
-		super().on_submit()
 
 	@frappe.whitelist()
 	def create_salary_slips(self):
@@ -159,6 +156,7 @@ class OverridePayrollEntry(PayrollEntry):
 			return account_details
 
 	def get_account(self, component_dict=None, employee=None):
+		component_dict = component_dict or {}
 		account_dict = {}
 		for key, amount in component_dict.items():
 			component, cost_center, employee = key
@@ -216,8 +214,6 @@ class OverridePayrollEntry(PayrollEntry):
 
 		return super().make_journal_entry(*args, **kwargs)
 
-	# ===========================================
-
 	def validate_business_rules(self):
 		self.insurance_deduction_limitation()
 		self.validate_do_not_include_in_total()
@@ -232,22 +228,17 @@ class OverridePayrollEntry(PayrollEntry):
 		self.carry_forward()
 
 	def carry_forward(self):
-		# doc = self
-		# for row in doc.employees:
-		# 	if not row.custom_pto_hours:
-		# 		self.process_pto_leave_balance_and_carry_forward()
-
 		self.process_pto_leave_balance_and_carry_forward()
 
 	def warning_msg(self):
 		doc = self
 		for row in doc.employees:
-			total_hours = float(row.custom_total_working_hours or 0)
-			overtime = float(row.custom_total_overtime_hours or 0)
-			comp_time = float(row.custom_comp_time or 0)
-			pto = float(row.custom_pto_hours or 0)
-			holiday = float(row.custom_holiday_hours or 0)
-			base_amount = float(row.custom_base_amount or 0)
+			total_hours = flt(row.custom_total_working_hours or 0)
+			overtime = flt(row.custom_total_overtime_hours or 0)
+			comp_time = flt(row.custom_comp_time or 0)
+			pto = flt(row.custom_pto_hours or 0)
+			holiday = flt(row.custom_holiday_hours or 0)
+			base_amount = flt(row.custom_base_amount or 0)
 
 			if (
 				total_hours == 0
@@ -258,10 +249,11 @@ class OverridePayrollEntry(PayrollEntry):
 				and base_amount == 0
 			):
 				frappe.throw(
-					f"Row <b>{row.idx}</b> for employee <b>{row.employee_name}</b> "
-					"has zero hours entered in all categories: "
-					"<b>Hourly, Overtime, Comp Time, PTO, Holiday and Base Amount</b>. "
-					"Please enter hours to proceed."
+					_(
+						"Row <b>{0}</b> for employee <b>{1}</b> has zero hours entered "
+						"in all categories: <b>Hourly, Overtime, Comp Time, PTO, Holiday "
+						"and Base Amount</b>. Please enter hours to proceed."
+					).format(row.idx, row.employee_name)
 				)
 
 	def insurance_deduction_limitation(self):
@@ -297,8 +289,10 @@ class OverridePayrollEntry(PayrollEntry):
 				if count >= 2:
 					frappe.throw(
 						_(
-							f"Please remove employee <b>{emp_name}</b> from row <b>{row}</b>, as for this employee the insurance deduction has already been skipped twice in this fiscal year."
-						)
+							"Please remove employee <b>{0}</b> from row <b>{1}</b>, "
+							"as the insurance deduction has already been skipped twice "
+							"for this employee in the current fiscal year."
+						).format(emp_name, row)
 					)
 
 	def validate_do_not_include_in_total(self):
@@ -325,7 +319,9 @@ class OverridePayrollEntry(PayrollEntry):
 				fieldname="name",
 			)
 			if not ssa_name:
-				frappe.throw(f"No Salary Structure Assignment found for employee {emp_row.employee}")
+				frappe.throw(
+					_("No Salary Structure Assignment found for employee {0}.").format(emp_row.employee)
+				)
 
 			ssa_doc = frappe.get_doc("Salary Structure Assignment", ssa_name)
 			for ins_row in ssa_doc.custom_employee_insurance_deduction:
@@ -338,7 +334,6 @@ class OverridePayrollEntry(PayrollEntry):
 					frappe.db.set_value(
 						"Employee Insurance Deduction", ins_row.name, "do_not_include_in_total", 0
 					)
-			ssa_doc.save(ignore_permissions=True)
 
 	def get_leave_balance(self):
 		payroll_doc = self
@@ -351,14 +346,19 @@ class OverridePayrollEntry(PayrollEntry):
 				as_dict=1,
 			)
 
-			from frappe.utils import get_url
-
 			site_url = get_url()
 			leave_allocation_url = f"{site_url}/app/leave-allocation"
 
 			if row.custom_comp_time > 0 and not leave_allocation_data:
 				frappe.throw(
-					f"Please allocate CT Leaves for employee <b>{row.employee_name}</b> in row <b>{row.get('idx')}</b> <a href= '{leave_allocation_url}' > Leave Allocation </a>"
+					_(
+						"Please allocate CT Leaves for employee <b>{0}</b> in row "
+						"<b>{1}</b>. <a href='{2}'>Leave Allocation</a>"
+					).format(
+						row.employee_name,
+						row.idx,
+						leave_allocation_url,
+					)
 				)
 
 			total_comp_leaves_allocated = 0
@@ -383,8 +383,6 @@ class OverridePayrollEntry(PayrollEntry):
 			if payrol_entry_data:
 				payrol_entry_data = payrol_entry_data[0]
 				total_cmp_leaves_from_payroll = payrol_entry_data.get("total_cmp_leaves") or 0
-				if total_cmp_leaves_from_payroll:
-					total_cmp_leaves_from_payroll = total_cmp_leaves_from_payroll
 
 			if row.custom_comp_time and total_comp_leaves_allocated:
 				custom_comp_time = row.custom_comp_time
@@ -400,17 +398,14 @@ class OverridePayrollEntry(PayrollEntry):
 
 				if (total_cmp_leaves + leave_application_comp_leaves_taken) > total_comp_leaves_allocated:
 					frappe.throw(
-						f"Comp Time leaves cannot be more than allocated leaves for employee <b>{row.employee_name}</b> in row <b>{row.get('idx')}</b>."
+						_(
+							"Comp Time leaves cannot be more than allocated leaves for "
+							"employee <b>{0}</b> in row <b>{1}</b>."
+						).format(row.employee_name, row.idx)
 					)
 
 			elif not row.custom_comp_time and total_comp_leaves_allocated:
 				row.custom_available_ct = total_comp_leaves_allocated - total_cmp_leaves_from_payroll
-
-			elif not row.custom_comp_time and not total_comp_leaves_allocated:
-				pass
-
-			else:
-				pass
 
 	def get_us_fiscal_year(self, date_value=None):
 		if not date_value:
@@ -461,7 +456,14 @@ class OverridePayrollEntry(PayrollEntry):
 			# if row.custom_pto_hours > 0 and not leave_alloc:
 			if row.custom_pto_hours > 0 and row.custom_available_pto <= 0:
 				frappe.throw(
-					f"Please allocate PTO Leaves for employee <b>{row.employee_name}</b> in row <b>{row.get('idx')}</b> <a href= '{leave_allocation_url}' > Leave Allocation </a>"
+					_(
+						"Please allocate PTO Leaves for employee <b>{0}</b> in row "
+						"<b>{1}</b>. <a href='{2}'>Leave Allocation</a>"
+					).format(
+						row.employee_name,
+						row.idx,
+						leave_allocation_url,
+					)
 				)
 
 			total_leaves_allocated_pto = flt(leave_alloc.total_leaves_allocated) if leave_alloc else 0
@@ -516,24 +518,35 @@ class OverridePayrollEntry(PayrollEntry):
 			new_pto_balance = cumulative_pto + pto_rate
 			delta_allocation = (total_leaves_allocated_pto - past_alloc_used) if leave_alloc else 0
 
-			row.custom_available_pto = new_pto_balance + delta_allocation
-			row.custom_pto_leaves_allocated = total_leaves_allocated_pto
-
 			pto_used = flt(row.custom_pto_hours)
 			row.custom_available_pto = new_pto_balance + delta_allocation - pto_used
 			row.custom_pto_leaves_allocated = total_leaves_allocated_pto
 
 			# --------------------------------    CARRY FORWARD Logic  --------------------------------------------------
 			# Check if this is the first payroll for the fiscal year for this employee
-			first_payroll_in_fy = not frappe.db.exists(
-				"Payroll Employee Detail",
-				{
-					"employee": employee,
-					"parenttype": "Payroll Entry",
-					"start_date": ["between", [fiscal_year_start, fiscal_year_end]],
-				},
+			existing_payroll = frappe.db.sql(
+				"""
+				SELECT pe.name
+				FROM `tabPayroll Entry` pe
+				INNER JOIN `tabPayroll Employee Detail` ped
+					ON ped.parent = pe.name
+				WHERE ped.employee = %s
+				  AND pe.docstatus = 1
+				  AND pe.start_date BETWEEN %s AND %s
+				  AND pe.name != %s
+				LIMIT 1
+				""",
+				(
+					employee,
+					fiscal_year_start,
+					fiscal_year_end,
+					self.name or "",
+				),
 			)
 
+			first_payroll_in_fy = not existing_payroll
+
+			already_carry_forwarded = []
 			if first_payroll_in_fy:
 				already_carry_forwarded = frappe.db.sql(
 					"""
@@ -598,9 +611,7 @@ class OverridePayrollEntry(PayrollEntry):
 		start_date = getdate(start_date)
 		end_date = getdate(end_date)
 
-		holiday_list = frappe.db.get_value(
-			"Company", frappe.defaults.get_global_default("company"), "default_holiday_list"
-		)
+		holiday_list = frappe.db.get_value("Company", self.company, "default_holiday_list")
 
 		if not holiday_list:
 			frappe.throw(_("No holiday list found for the company."))

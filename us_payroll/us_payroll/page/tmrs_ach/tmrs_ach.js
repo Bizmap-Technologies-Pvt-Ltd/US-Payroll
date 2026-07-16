@@ -57,8 +57,6 @@ frappe.pages["tmrs-ach"].on_page_load = function (wrapper) {
 		let year = page.fields_dict.year.get_value();
 		let month = page.fields_dict.month.get_value();
 
-		console.log(year, month, "year month ==========");
-
 		if (!year || !month) {
 			frappe.msgprint(__("Please select both Year and Month"));
 			return;
@@ -71,7 +69,6 @@ frappe.pages["tmrs-ach"].on_page_load = function (wrapper) {
 				month: month,
 			},
 			callback: function (r) {
-				console.log(r, "rrrrrrrrrrrrrrrrrrrrrr ============");
 				if (r.message && r.message.file_url) {
 					frappe.msgprint(__("TMRS ACH File Generated Successfully"));
 

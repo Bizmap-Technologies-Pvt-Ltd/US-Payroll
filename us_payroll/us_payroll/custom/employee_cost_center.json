@@ -1,7 +1,5 @@
 {
- "custom_fields": [
- 
- ],
+ "custom_fields": [],
  "custom_perms": [],
  "doctype": "Employee Cost Center",
  "links": [],

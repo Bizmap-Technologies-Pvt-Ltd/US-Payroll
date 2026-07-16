@@ -29,7 +29,6 @@
     "formula": "custom_base_amount",
     "is_tax_applicable": 1
   },
- 
   {
     "doctype": "Salary Component",
     "name": "Dental",

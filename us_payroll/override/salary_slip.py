@@ -1,13 +1,12 @@
 import frappe
+from frappe import _
+from frappe.model.document import Document
 from frappe.utils import flt, get_url
-from hrms.payroll.doctype.salary_slip.salary_slip import (
-	SalarySlip,
-	_safe_eval,
-)
+from hrms.payroll.doctype.salary_slip.salary_slip import _safe_eval
 from hrms.payroll.utils import sanitize_expression
 
 
-class OverrideSalarySlip(SalarySlip):
+class SalarySlipMixin(Document):
 	def validate(self):
 		super().validate()
 
@@ -26,43 +25,46 @@ class OverrideSalarySlip(SalarySlip):
 			check_doc.save()
 
 	def eval_condition_and_formula(self, struct_row, data):
-		# Preserve original condition evaluation behavior
-		condition = sanitize_expression(struct_row.condition)
-
-		if condition:
-			if not _safe_eval(condition, self.whitelisted_globals, data):
-				return None
-
 		formula = sanitize_expression(struct_row.formula)
 
-		# Custom US Payroll logic
 		if struct_row.amount_based_on_formula and formula and formula.startswith("custom_formula"):
+			condition = sanitize_expression(struct_row.condition)
+
+			if condition and not _safe_eval(
+				condition,
+				self.whitelisted_globals,
+				data,
+			):
+				return None
+
 			sal_assignment_name = frappe.db.get_value(
 				"Salary Structure Assignment",
 				{
 					"employee": self.employee,
 					"salary_structure": self.salary_structure,
+					"docstatus": 1,
 				},
 				"name",
 			)
 
-			if sal_assignment_name:
-				sal_assignment_doc = frappe.get_doc(
-					"Salary Structure Assignment",
-					sal_assignment_name,
-				)
+			if not sal_assignment_name:
+				return 0.0
 
-				for row in sal_assignment_doc.custom_employee_insurance_deduction:
-					if row.salary_component == struct_row.salary_component:
-						return row.amount
+			sal_assignment_doc = frappe.get_doc(
+				"Salary Structure Assignment",
+				sal_assignment_name,
+			)
 
-				for row in sal_assignment_doc.custom_employee_earnings:
-					if row.earning_component == struct_row.salary_component:
-						return row.amount
+			for row in sal_assignment_doc.custom_employee_insurance_deduction:
+				if row.salary_component == struct_row.salary_component:
+					return flt(row.amount)
+
+			for row in sal_assignment_doc.custom_employee_earnings:
+				if row.earning_component == struct_row.salary_component:
+					return flt(row.amount)
 
 			return 0.0
 
-		# Delegate standard behavior to HRMS
 		return super().eval_condition_and_formula(struct_row, data)
 
 	def compute_year_to_date(self):
@@ -82,7 +84,11 @@ class OverrideSalarySlip(SalarySlip):
 			},
 		)
 
-		total_deduction_sum = flt(deduction_sum[0].total_deduction_sum or 0.0)
+		total_deduction_sum = (
+			flt(deduction_sum[0].total_deduction_sum)
+			if deduction_sum and deduction_sum[0].total_deduction_sum
+			else 0.0
+		)
 
 		self.custom_deduction_year_to_date = total_deduction_sum + flt(self.total_deduction)
 
@@ -185,7 +191,10 @@ class OverrideSalarySlip(SalarySlip):
 			site_url = get_url()
 			client_settings_url = f"{site_url}/desk/client-setup"
 			frappe.throw(
-				f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{client_settings_url}' >Client Setup</a>"
+				_(
+					"Please add <b>Total weeks of the year</b> in Client Setup. "
+					"<a href='{0}'>Client Setup</a>"
+				).format(client_settings_url)
 			)
 
 		doc.custom_annualized_wages = annualized_wages
@@ -223,10 +232,21 @@ class OverrideSalarySlip(SalarySlip):
 			"Salary Structure Assignment", {"employee": doc.employee, "docstatus": 1}, "name"
 		)
 		if not sal_assignment_name:
-			frappe.throw(f"No active Salary Structure Assignment found for employee {doc.employee}")
+			frappe.throw(
+				_("No active Salary Structure Assignment found for employee {0}.").format(doc.employee)
+			)
 
 		sal_assignment_doc = frappe.get_doc("Salary Structure Assignment", sal_assignment_name)
 		income_tax_slab = sal_assignment_doc.income_tax_slab
+
+		if not income_tax_slab:
+			frappe.throw(
+				_(
+					"Please set an Income Tax Slab in the active Salary Structure "
+					"Assignment for employee {0}."
+				).format(self.employee)
+			)
+
 		it_slab_doc = frappe.get_doc("Income Tax Slab", income_tax_slab)
 		it_filing_jointly = it_slab_doc.custom_married_filing_jointly
 		if not it_filing_jointly:
