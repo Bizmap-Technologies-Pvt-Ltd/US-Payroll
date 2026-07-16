@@ -59,11 +59,8 @@ frappe.ui.form.on("Salary Component", {
 											args: {
 												doc: r.message,
 											},
-											callback: function (saveRes) {
-												console.log(
-													"Updated Salary Structure:",
-													saveRes.message.name
-												);
+											callback: function () {
+												// Updated Salary Structure
 											},
 										});
 									}

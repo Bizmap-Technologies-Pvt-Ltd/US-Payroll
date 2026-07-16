@@ -126,10 +126,9 @@ def bulk_w2_print(names: str):
 
 	docs = [frappe.get_doc("W2 Form Details", name) for name in names]
 
-	# Static, repository-controlled template; callers can supply context data only.
-	html = render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-		W2_BULK_PRINT_TEMPLATE, {"docs": docs}
-	)
+	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	html = render_template(W2_BULK_PRINT_TEMPLATE, {"docs": docs})
 
 	pdf = get_pdf(html)
 	frappe.local.response.filename = "W2-Bulk.pdf"

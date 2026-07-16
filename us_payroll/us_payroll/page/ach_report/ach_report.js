@@ -22,7 +22,6 @@ frappe.pages["ach-report"].on_page_load = function (wrapper) {
 		},
 		onchange: function () {
 			payroll_entry = field.get_value();
-			console.log("onchage calll", payroll_entry);
 
 			if (payroll_entry) {
 				frappe.call({

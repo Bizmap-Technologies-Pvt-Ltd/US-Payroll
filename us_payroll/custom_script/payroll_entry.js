@@ -215,7 +215,6 @@ frappe.ui.form.on("Payroll Entry", {
 									args: { doc_id: frm.doc.name },
 									callback: function (r) {
 										if (r.message && r.message.length > 0) {
-											console.log("Payroll ACH");
 											frm.trigger("redirection"); // Trigger only if bank entries exist
 										} else {
 											frappe.msgprint(
@@ -250,14 +249,12 @@ frappe.ui.form.on("Payroll Entry", {
 					} else {
 						if (!frm.custom_buttons["Print Checks"]) {
 							frm.add_custom_button(__("Print Checks"), function () {
-								console.log("check printed");
 								frm.trigger("print_checks");
 							}).addClass("btn-primary");
 						}
 
 						if (!frm.custom_buttons["Print Void Check"]) {
 							frm.add_custom_button(__("Print Void Check"), function () {
-								console.log("Print Void Check");
 								frm.trigger("print_voids_checks");
 							}).addClass("btn-primary");
 						}
@@ -400,7 +397,7 @@ frappe.ui.form.on("Payroll Entry", {
 						frm.dashboard.add_section(holiday_html, __("Holidays"));
 						frm.dashboard.show();
 					} else {
-						console.log("No Holidays Found.");
+						// No holidays found for the selected range
 					}
 				},
 			});
@@ -516,8 +513,6 @@ function calculate_holiday_hours(frm) {
 				let leave_details = r.message.holidays;
 				total_holiday_hours = leave_details.length * 8; // Each holiday = 8 hours
 
-				console.log(`Total Holiday Hours: ${total_holiday_hours}`);
-
 				if (frm.doc.employees && frm.doc.employees.length > 0) {
 					frm.doc.employees.forEach((row) => {
 						row.custom_holiday_hours = total_holiday_hours;
@@ -526,7 +521,6 @@ function calculate_holiday_hours(frm) {
 					frm.refresh_field("employees");
 				}
 			} else {
-				console.log("No Holidays Found.");
 				if (frm.doc.employees && frm.doc.employees.length > 0) {
 					frm.doc.employees.forEach((row) => {
 						row.custom_holiday_hours = 0;
@@ -625,12 +619,6 @@ frappe.ui.form.on("Payroll Employee Detail", {
 		}
 
 		if (row.custom_holiday_hours && row.custom_hourly_rate) {
-			console.log(
-				row.custom_holiday_hours,
-				"row.custom_holiday_hours",
-				row.custom_hourly_rate,
-				"row.custom_hourly_rate"
-			);
 			row.custom_holiday_amount = row.custom_holiday_hours * row.custom_hourly_rate;
 			frm.refresh_field("employees");
 		}
@@ -643,12 +631,6 @@ frappe.ui.form.on("Payroll Employee Detail", {
 	custom_holiday_hours: function (frm, cdt, cdn) {
 		let row = locals[cdt][cdn];
 		if (row.custom_holiday_hours && row.custom_hourly_rate) {
-			console.log(
-				row.custom_holiday_hours,
-				"row.custom_holiday_hours",
-				row.custom_hourly_rate,
-				"row.custom_hourly_rate"
-			);
 			row.custom_holiday_amount = row.custom_holiday_hours * row.custom_hourly_rate;
 			frm.refresh_field("employees");
 		}

@@ -167,8 +167,9 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = f"City of {company_name}"
 	department_data, comp_code_summary, department_summary, grand_totals = get_department_summary(data)
 
-	# Static, repository-controlled template; callers can supply context data only.
-	html = frappe.render_template(  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	# Template path is hardcoded and bundled with the app, not user-controlled.
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	html = frappe.render_template(
 		WORKERS_COMP_REPORT_TEMPLATE,
 		{
 			"data": data,
@@ -209,7 +210,6 @@ def get_department_summary(data):
 	department_summary = defaultdict(
 		lambda: {
 			"department_code": "",
-			# "department_description": "",
 			"comp_codes": defaultdict(
 				lambda: {
 					"comp_code": "",
@@ -291,7 +291,6 @@ def get_department_summary(data):
 	for dept in department_list:
 		totals = {
 			"department_code": dept["department_code"],
-			# "department_description": dept["department_description"],
 			"employee_count": sum(comp["employee_count"] for comp in dept["comp_codes"].values()),
 			"earnings": sum(comp["earnings"] for comp in dept["comp_codes"].values()),
 			"hours": sum(comp["hours"] for comp in dept["comp_codes"].values()),

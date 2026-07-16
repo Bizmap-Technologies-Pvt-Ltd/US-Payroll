@@ -130,7 +130,6 @@ frappe.ui.form.on("Leave Allocation Details", {
 		const row = locals[cdt][cdn];
 		if (row.new_leaves_allocated) {
 			let updated_allocated_leaves = row.new_leaves_allocated + row.total_leaves_allocated;
-			console.log(updated_allocated_leaves, "updated_allocated_leaves");
 			frappe.model.set_value(cdt, cdn, "total_leaves_allocated", updated_allocated_leaves);
 		}
 	},

@@ -201,10 +201,7 @@ frappe.ui.form.on("Employee", {
 							value: frm.doc.custom_filing_method,
 						},
 						callback: function () {
-							console.log(
-								"Updated Income Tax Slab in Salary Structure Assignment " +
-									ssa.name
-							);
+							// Updated Income Tax Slab in Salary Structure Assignment
 						},
 					});
 				}
