@@ -11,9 +11,9 @@ import frappe
 from frappe import _
 from frappe.utils.pdf import get_pdf
 
-PAYROLL_TAX_SUMMARY_TEMPLATE = (
-	"us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html"
-)
+# PAYROLL_TAX_SUMMARY_TEMPLATE = (
+# 	"us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html"
+# )
 
 
 def execute(filters=None):
@@ -175,7 +175,7 @@ def generate_pdf(data: dict[str, Any]):
 	# Template path is hardcoded and bundled with the app, not user-controlled.
 	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 	html = frappe.render_template(
-		PAYROLL_TAX_SUMMARY_TEMPLATE,
+		"us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html",
 		{
 			"data": data,
 			"current_datetime": formatted_datetime,

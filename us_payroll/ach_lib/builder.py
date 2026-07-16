@@ -1,7 +1,14 @@
 import math
 from datetime import datetime, timedelta
 
-from .data_types import AddendaRecord, BatchControl, BatchHeader, EntryDetail, FileControl, Header
+from .data_types import (
+	AddendaRecord,
+	BatchControl,
+	BatchHeader,
+	EntryDetail,
+	FileControl,
+	Header,
+)
 
 
 class AchFile:

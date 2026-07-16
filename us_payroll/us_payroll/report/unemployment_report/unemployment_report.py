@@ -11,17 +11,17 @@ import frappe
 from frappe import _
 from frappe.utils.file_manager import save_file
 from frappe.utils.pdf import get_pdf
+from frappe.utils.xlsxutils import make_xlsx
 
 UNEMPLOYMENT_REPORT_TEMPLATE = "us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
-from frappe.utils.xlsxutils import make_xlsx
 
 
 def execute(filters=None):
-	if not filters.get("quarter"):
-		frappe.throw(_("Please select the Quarter."))
-
 	if not filters:
 		return [], []
+
+	if not filters.get("quarter"):
+		frappe.throw(_("Please select the Quarter."))
 
 	columns = get_columns()
 
@@ -133,11 +133,6 @@ def execute(filters=None):
 			}
 		)
 
-	for entry in print_data:
-		print(
-			f"Month: {entry['month']}, Year: {entry['year']}, Male: {entry['male']}, Female: {entry['female']}, Total: {entry['total']}"
-		)
-
 	for record in all_data:
 		record["print_data"] = print_data
 
@@ -246,7 +241,7 @@ def get_data(filters):
 		employee = row["employee"]
 		if employee not in grouped:
 			grouped[employee] = {
-				"salary_slip": slip,
+				"salary_slip": row["salary_slip"],
 				"quarter": row["quarter"],
 				"employee_id": row["employee_id"],
 				"employee": row["employee"],

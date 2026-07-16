@@ -11,7 +11,9 @@ import frappe
 from frappe import _
 from frappe.utils.pdf import get_pdf
 
-PAYROLL_DETAIL_TEMPLATE = "us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
+from us_payroll.utils.safe_render import safe_render
+
+# PAYROLL_DETAIL_TEMPLATE = "us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
 
 
 def execute(filters=None):
@@ -130,8 +132,24 @@ def generate_pdf(data: dict[str, Any]):
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
 	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-	html = frappe.render_template(
-		PAYROLL_DETAIL_TEMPLATE,
+	# html = frappe.render_template(
+	# 	PAYROLL_DETAIL_TEMPLATE,
+	# 	{
+	# 		"data": data,
+	# 		"department_data": department_data,
+	# 		"grand_totals": department_grand_totals,
+	# 		"filter": filters,
+	# 		"formatted_date_range": formatted_date_range,
+	# 		"current_datetime": formatted_datetime,
+	# 		"company_name": company_name,
+	# 		"from_date": from_date,
+	# 		"to_date": to_date,
+	# 		"letterhead_image": letterhead_image,
+	# 	},
+	# )
+
+	html = safe_render(
+		"payroll_detail_report_by_posted_date",
 		{
 			"data": data,
 			"department_data": department_data,

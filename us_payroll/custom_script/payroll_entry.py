@@ -56,7 +56,11 @@ def get_account_options():
 	company = frappe.defaults.get_global_default("company")
 	all_accounts = frappe.db.get_all(
 		"Account",
-		filters={"is_group": False, "account_type": ["in", ["Bank", "Cash"]], "company": company},
+		filters={
+			"is_group": False,
+			"account_type": ["in", ["Bank", "Cash"]],
+			"company": company,
+		},
 		fields=["name"],
 	)
 	options = []
@@ -186,9 +190,8 @@ def get_submitted_check_stubs(doc_id: str):
 		try:
 			frappe.get_doc("Salary Slip", slip.get("name"))
 			submitted_entries.append(slip.get("name"))
-
-		except Exception as e:
-			print(e, "e get_submitted_check_stubs")
+		except Exception:
+			continue
 
 	return {"submitted_entries": submitted_entries}
 
@@ -431,5 +434,5 @@ def get_department_working_hours(employee: str):
 	except frappe.DoesNotExistError:
 		return 0
 
-	except Exception as e:
-		return {"error": f"Unexpected error: {e!s}"}
+	except Exception as exc:
+		return {"error": f"Unexpected error: {exc!s}"}
