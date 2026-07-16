@@ -174,8 +174,8 @@ def calculate_leaves_taken(doc):
 
 @frappe.whitelist()
 def tax_calulations_for_fit(doc: Document):
-	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
-	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
+	settings_doc = frappe.get_doc("Client Setup", "Client Setup")
+	total_weeks_of_the_year = settings_doc.total_weeks_of_the_year
 	sal_structure = doc.salary_structure
 	sal_doc = frappe.get_doc("Salary Structure", sal_structure)
 
@@ -257,8 +257,8 @@ def tax_calulations_for_fit(doc: Document):
 			doc.custom_fit_added_in_total_deduction = True
 	else:
 		site_url = get_url()
-		fund_settings_url = f"{site_url}/desk/client-setup"
+		client_settings_url = f"{site_url}/desk/client-setup"
 		frappe.throw(
-			f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>"
+			f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{client_settings_url}' >Client Setup</a>"
 		)
 	doc.save()

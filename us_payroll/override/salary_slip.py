@@ -139,8 +139,8 @@ class OverrideSalarySlip(SalarySlip):
 
 	def salary_calculations_for_fit(self):
 		doc = self
-		fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
-		total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
+		settings_doc = frappe.get_doc("Client Setup", "Client Setup")
+		total_weeks_of_the_year = settings_doc.total_weeks_of_the_year
 
 		# --- 1. Non-taxable earnings (from Earnings table) ---
 		total_non_taxable_earnings = 0
@@ -183,9 +183,9 @@ class OverrideSalarySlip(SalarySlip):
 			annualized_wages = taxable_wages * total_weeks_of_the_year
 		else:
 			site_url = get_url()
-			fund_settings_url = f"{site_url}/desk/client-setup"
+			client_settings_url = f"{site_url}/desk/client-setup"
 			frappe.throw(
-				f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>"
+				f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{client_settings_url}' >Client Setup</a>"
 			)
 
 		doc.custom_annualized_wages = annualized_wages
