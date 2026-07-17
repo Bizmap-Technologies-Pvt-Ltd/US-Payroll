@@ -10,9 +10,10 @@ from typing import Any
 import frappe
 from frappe import _
 from frappe.utils import flt, getdate
-from frappe.utils.pdf import get_pdf
 
-from us_payroll.utils.safe_render import safe_render
+# from us_payroll.utils.safe_render import safe_render
+from frappe.utils.jinja import get_jenv
+from frappe.utils.pdf import get_pdf
 
 # EMPLOYEE_GROSS_EARNING_TEMPLATE = (
 # 	"us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html"
@@ -138,15 +139,29 @@ def generate_pdf(data: dict[str, Any]):
 	# 	},
 	# )
 
-	html = safe_render(
-		"employee_gross_earning",
+	# html = safe_render(
+	# 	"employee_gross_earning",
+	# 	{
+	# 		"data": data,
+	# 		"company_name": company_name,
+	# 		"formatted_start_end_date": formatted_start_end_date,
+	# 		"formatted_datetime": formatted_datetime,
+	# 		"letterhead_image": letterhead_image,
+	# 	},
+	# )
+
+	template = frappe.get_template(
+		"us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html"
+	)
+
+	html = template.render(
 		{
 			"data": data,
 			"company_name": company_name,
 			"formatted_start_end_date": formatted_start_end_date,
 			"formatted_datetime": formatted_datetime,
 			"letterhead_image": letterhead_image,
-		},
+		}
 	)
 
 	options = {

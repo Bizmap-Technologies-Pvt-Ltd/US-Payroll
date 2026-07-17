@@ -13,7 +13,7 @@
     .w2-canvas {
         position: relative;
         width: 7in;
-        height: 5.5in;
+        height: 10in;
         margin: 0 auto;
         background: url("") no-repeat;
         background-size: 7in 10.9in;
@@ -47,14 +47,31 @@
 
 <div class="w2-canvas">
 
-    {% set comp_name = frappe.db.get_value("Company", doc.company, "company_name") %}
-    {% set addr = frappe.db.get_value("Address", {"address_title": comp_name}, [
-    "address_line1","address_line2","city","state","pincode"
-    ], as_dict=True) %}
-    {% set emp = frappe.db.get_value("Employee", doc.employee, [
-    "employee_name", "custom_address_line_1", "custom_address_line_2",
-    "custom_city", "custom_stateprovince", "custom_zip_postal_code"
-    ], as_dict=True) %}
+    {# --- Global Company Fetch --- #}
+    {% set comp_doc = frappe.get_all("Company", fields=["name","company_name"], limit=1)[0] %}
+    {% set comp_name = comp_doc.company_name or "" %}
+    {% set comp_id = comp_doc.name or "" %}
+
+    {# --- Company Address (checkbox checked) --- #}
+    {% set comp_addr = frappe.db.sql("""
+    SELECT address_line1, address_line2, city, state, pincode, country
+    FROM `tabAddress`
+    WHERE is_your_company_address = 1
+    LIMIT 1
+    """, as_dict=True) %}
+    {% set comp_addr = comp_addr[0] if comp_addr else {} %}
+
+    {# --- Employee Details --- #}
+    {% if doc.employee %}
+    {% set emp = frappe.db.get_value("Employee", {"name": doc.employee}, [
+    "employee_name",
+    "custom_address_line_1","custom_address_line_2",
+    "custom_city","custom_stateprovince","custom_zip_postal_code","custom_country"
+    ], as_dict=True) or {} %}
+    {% else %}
+    {% set emp = {} %}
+    {% endif %}
+
 
     <!-- Box a – SSN -->
     <div class="w2-val w2-center" style="top:0.22in; left:1.1in; width:2.8in;">
@@ -78,10 +95,15 @@
 
     <!-- Box c – Employer address -->
     <div class="w2-val w2-left" style="top:0.86in; left:0.25in; width:3.2in; line-height:1.1;">
-        {{ comp_name }}<br>
-        {{ addr.address_line1 }}<br>
-        {{ addr.city }}, {{ addr.state }} {{ addr.pincode }}
+        {{ comp_name }}
+        {% if comp_id and comp_id != comp_name %} ({{ comp_id }}){% endif %}<br>
 
+        {% if comp_addr.address_line1 %}{{ comp_addr.address_line1 }}<br>{% endif %}
+        {% if comp_addr.address_line2 %}{{ comp_addr.address_line2 }}<br>{% endif %}
+        {% if comp_addr.city or comp_addr.state or comp_addr.pincode %}
+        {{ comp_addr.city or "" }} {{ comp_addr.state or "" }} {{ comp_addr.pincode or "" }}<br>
+        {% endif %}
+        {% if comp_addr.country %}{{ comp_addr.country }}{% endif %}
     </div>
 
     <!-- Box 3 -->
@@ -129,8 +151,11 @@
 
     <!-- Box f – Employee address -->
     <div class="w2-val w2-left" style="top:2.55in; left:0.25in; width:3.2in; line-height:1.1;">
-        {{ emp.custom_address_line_1 }}<br>
-        {{ emp.custom_city }}, {{ emp.custom_stateprovince }} {{ emp.custom_zip_postal_code }}
+        {% if emp.custom_address_line_1 %}{{ emp.custom_address_line_1 }}<br>{% endif %}
+        {% if emp.custom_address_line_2 %}{{ emp.custom_address_line_2 }}<br>{% endif %}
+        {% if emp.custom_city or emp.custom_stateprovince or emp.custom_zip_postal_code %}
+        {{ emp.custom_city or "" }} {{ emp.custom_stateprovince or "" }} {{ emp.custom_zip_postal_code or "" }}<br>{{ emp.custom_country or "" }}
+        {% endif %}
     </div>
 
     <!-- Box 9 -->
@@ -188,7 +213,6 @@
     </div>
     <div class="w2-val w2-left" style="top:5.22in; left:4.95in; width:2.5in;">
     </div>
-    <br><br>
 </div>
 
 

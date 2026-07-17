@@ -9,9 +9,10 @@ from typing import Any
 
 import frappe
 from frappe import _
-from frappe.utils.pdf import get_pdf
 
-from us_payroll.utils.safe_render import safe_render
+# from us_payroll.utils.safe_render import safe_render
+from frappe.utils.jinja import get_jenv
+from frappe.utils.pdf import get_pdf
 
 # PAYROLL_DETAIL_TEMPLATE = "us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
 
@@ -148,8 +149,27 @@ def generate_pdf(data: dict[str, Any]):
 	# 	},
 	# )
 
-	html = safe_render(
-		"payroll_detail_report_by_posted_date",
+	# html = safe_render(
+	# 	"payroll_detail_report_by_posted_date",
+	# 	{
+	# "data": data,
+	# "department_data": department_data,
+	# "grand_totals": department_grand_totals,
+	# "filter": filters,
+	# "formatted_date_range": formatted_date_range,
+	# "current_datetime": formatted_datetime,
+	# "company_name": company_name,
+	# "from_date": from_date,
+	# "to_date": to_date,
+	# "letterhead_image": letterhead_image,
+	# 	},
+	# )
+
+	template = frappe.get_template(
+		"us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
+	)
+
+	html = template.render(
 		{
 			"data": data,
 			"department_data": department_data,
@@ -161,7 +181,7 @@ def generate_pdf(data: dict[str, Any]):
 			"from_date": from_date,
 			"to_date": to_date,
 			"letterhead_image": letterhead_image,
-		},
+		}
 	)
 
 	options = {

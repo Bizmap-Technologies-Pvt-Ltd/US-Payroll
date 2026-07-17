@@ -10,6 +10,8 @@ from frappe.utils.pdf import get_pdf
 
 W2_BULK_PRINT_TEMPLATE = "us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html"
 
+from frappe.utils.jinja import get_jenv
+
 
 class W2FormDetails(Document):
 	pass
@@ -129,6 +131,14 @@ def bulk_w2_print(names: str):
 	# Template path is hardcoded and bundled with the app, not user-controlled.
 	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
 	html = render_template(W2_BULK_PRINT_TEMPLATE, {"docs": docs})
+
+	# template = frappe.get_template(
+	# 	"us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html"
+	# )
+
+	# html = template.render({
+	# 		"docs": docs
+	# })
 
 	pdf = get_pdf(html)
 	frappe.local.response.filename = "W2-Bulk.pdf"

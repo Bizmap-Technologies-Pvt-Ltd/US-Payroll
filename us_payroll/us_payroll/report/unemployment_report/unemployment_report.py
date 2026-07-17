@@ -10,10 +10,11 @@ from typing import Any
 import frappe
 from frappe import _
 from frappe.utils.file_manager import save_file
+
+# UNEMPLOYMENT_REPORT_TEMPLATE = "us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
+from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 from frappe.utils.xlsxutils import make_xlsx
-
-UNEMPLOYMENT_REPORT_TEMPLATE = "us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
 
 
 def execute(filters=None):
@@ -405,8 +406,30 @@ def generate_pdf(data: dict[str, Any]):
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
 	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-	html = frappe.render_template(
-		UNEMPLOYMENT_REPORT_TEMPLATE,
+	# html = frappe.render_template(
+	# 	UNEMPLOYMENT_REPORT_TEMPLATE,
+	# 	{
+	# 		"data": data,
+	# 		"department_data": department_data,
+	# 		"grand_totals": department_grand_totals,
+	# 		"filter": filters,
+	# 		"current_datetime": formatted_datetime,
+	# 		"letterhead_image": letterhead_image,
+	# 		"company_name": company_name,
+	# 		"start_date": start_date,
+	# 		"end_date": end_date,
+	# 		"month_year": month_year,
+	# 		"quarter_period_range": quarter_period_range,
+	# 		"print_data": print_data,
+	# 		"employee_counts": employee_counts,
+	# 	},
+	# )
+
+	template = frappe.get_template(
+		"us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
+	)
+
+	html = template.render(
 		{
 			"data": data,
 			"department_data": department_data,
@@ -421,7 +444,7 @@ def generate_pdf(data: dict[str, Any]):
 			"quarter_period_range": quarter_period_range,
 			"print_data": print_data,
 			"employee_counts": employee_counts,
-		},
+		}
 	)
 
 	options = {
