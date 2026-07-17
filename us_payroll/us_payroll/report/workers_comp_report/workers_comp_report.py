@@ -9,8 +9,6 @@ from typing import Any
 import frappe
 from frappe import _
 from frappe.utils import getdate
-
-# WORKERS_COMP_REPORT_TEMPLATE = "us_payroll/us_payroll/report/workers_comp_report/workers_comp_report.html"
 from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 
@@ -170,22 +168,6 @@ def generate_pdf(data: dict[str, Any]):
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
 	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-	# html = frappe.render_template(
-	# 	WORKERS_COMP_REPORT_TEMPLATE,
-	# 	{
-	# 		"data": data,
-	# 		"department_data": department_data,
-	# 		"comp_code_summary": comp_code_summary,
-	# 		"department_summary": department_summary,
-	# 		"grand_totals": grand_totals,
-	# 		"filter": filters,
-	# 		"formatted_date_range": formatted_date_range,
-	# 		"current_datetime": formatted_datetime,
-	# 		"company_name": company_name,
-	# 		"letterhead_image": letterhead_image,
-	# 	},
-	# )
-
 	template = frappe.get_template(
 		"us_payroll/us_payroll/report/workers_comp_report/workers_comp_report.html"
 	)

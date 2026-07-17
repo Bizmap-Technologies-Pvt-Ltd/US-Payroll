@@ -10,14 +10,8 @@ from typing import Any
 import frappe
 from frappe import _
 from frappe.utils import flt, getdate
-
-# from us_payroll.utils.safe_render import safe_render
 from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
-
-# EMPLOYEE_GROSS_EARNING_TEMPLATE = (
-# 	"us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html"
-# )
 
 
 def execute(filters=None):
@@ -125,30 +119,6 @@ def generate_pdf(data: dict[str, Any]):
 
 	company_name = frappe.defaults.get_global_default("company").replace("City of ", "")
 	company_name = f"City of {company_name}"
-
-	# Template path is hardcoded and bundled with the app, not user-controlled.
-	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-	# html = frappe.render_template(
-	# 	EMPLOYEE_GROSS_EARNING_TEMPLATE,
-	# 	{
-	# 		"data": data,
-	# 		"company_name": company_name,
-	# 		"formatted_start_end_date": formatted_start_end_date,
-	# 		"formatted_datetime": formatted_datetime,
-	# 		"letterhead_image": letterhead_image,
-	# 	},
-	# )
-
-	# html = safe_render(
-	# 	"employee_gross_earning",
-	# 	{
-	# 		"data": data,
-	# 		"company_name": company_name,
-	# 		"formatted_start_end_date": formatted_start_end_date,
-	# 		"formatted_datetime": formatted_datetime,
-	# 		"letterhead_image": letterhead_image,
-	# 	},
-	# )
 
 	template = frappe.get_template(
 		"us_payroll/us_payroll/report/employee_gross_earning/employee_gross_earning.html"

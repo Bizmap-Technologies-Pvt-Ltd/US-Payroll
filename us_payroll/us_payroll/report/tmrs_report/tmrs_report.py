@@ -9,8 +9,6 @@ from typing import Any
 
 import frappe
 from frappe import _
-
-# TMRS_REPORT_TEMPLATE = "us_payroll/us_payroll/report/tmrs_report/tmrs_report.html"
 from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 
@@ -277,23 +275,6 @@ def generate_pdf(data: dict[str, Any]):
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
 	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
-	# html = frappe.render_template(
-	# 	TMRS_REPORT_TEMPLATE,
-	# 	{
-	# 		"data": data,
-	# 		"department_data": department_data,
-	# 		"department_grand_totals": department_grand_totals,
-	# 		"filter": filters,
-	# 		"current_datetime": formatted_datetime,
-	# 		"letterhead_image": letterhead_image,
-	# 		"company_name": company_name,
-	# 		"start_date": start_date,
-	# 		"end_date": end_date,
-	# 		"formatted_start_end_date": formatted_start_end_date,
-	# 		"month_year": month_year,
-	# 	},
-	# )
-
 	template = frappe.get_template("us_payroll/us_payroll/report/tmrs_report/tmrs_report.html")
 
 	html = template.render(
