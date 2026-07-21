@@ -9,6 +9,7 @@ from typing import Any
 
 import frappe
 from frappe import _
+from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 
 
@@ -119,8 +120,6 @@ def generate_pdf(data: dict[str, Any]):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = "us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
-
 	data = data.get("data")["data"]
 
 	department_data, department_grand_totals = get_department_summary(data)
@@ -131,8 +130,12 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = f"City of {company_name}"
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
-	html = frappe.render_template(  # nosemgrep: frappe-ssti
-		template_path,
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	template = frappe.get_template(
+		"us_payroll/us_payroll/report/payroll_detail_report_by_posted_date/payroll_detail_report_by_posted_date.html"
+	)
+
+	html = template.render(
 		{
 			"data": data,
 			"department_data": department_data,
@@ -144,7 +147,7 @@ def generate_pdf(data: dict[str, Any]):
 			"from_date": from_date,
 			"to_date": to_date,
 			"letterhead_image": letterhead_image,
-		},
+		}
 	)
 
 	options = {

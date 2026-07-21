@@ -10,6 +10,7 @@ from typing import Any
 import frappe
 from frappe import _
 from frappe.utils.file_manager import save_file
+from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 from frappe.utils.xlsxutils import make_xlsx
 
@@ -165,13 +166,11 @@ def get_data(filters):
 			emp.first_name,
 			emp.middle_name,
 			emp.last_name,
-			-- ct.department,
 			cst.posting_date,
 			cst.gross_pay AS gross_pay,
 			cst.name AS salary_slip,
 			sd.salary_component,
 			sd.amount AS salary_component_amount,
-			-- ct.cost_center_name as custom_department_name,
 			CEIL(MONTH(pe.posting_date)/3) AS quarter
 
 		FROM
@@ -222,7 +221,6 @@ def get_data(filters):
 				"custom_nomasked_social_security_number": formatted_ssn,
 				"gender": row["gender"],
 				"reportable_wages": row["gross_pay"],  # Set once per slip
-				# 'custom_department_number': row['custom_department_number'],
 				"posting_date": row["posting_date"],
 			}
 
@@ -250,7 +248,6 @@ def get_data(filters):
 				"last_name": row["last_name"],
 				"payroll_entry": row["payroll_entry"],
 				"department": row["department"],
-				# 'custom_department_number': row['custom_department_number'],
 				"custom_nomasked_social_security_number": emp_formatted_ssn,
 				"gender": row["gender"],
 				"reportable_wages": 0.0,  # Set once per slip
@@ -354,7 +351,6 @@ def generate_pdf(data: dict[str, Any]):
 
 	month_year = f"{selected_quarter} {selected_year}"
 
-	template_path = "us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
 	letterhead_image = frappe.db.get_value("Letter Head", {"is_default": True}, "image")
 	site_url = frappe.utils.get_url()
 	if letterhead_image and not letterhead_image.startswith("http"):
@@ -406,8 +402,12 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = f"City of {company_name}"
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
-	html = frappe.render_template(  # nosemgrep: frappe-ssti
-		template_path,
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	template = frappe.get_template(
+		"us_payroll/us_payroll/report/unemployment_report/unemployment_report.html"
+	)
+
+	html = template.render(
 		{
 			"data": data,
 			"department_data": department_data,
@@ -422,7 +422,7 @@ def generate_pdf(data: dict[str, Any]):
 			"quarter_period_range": quarter_period_range,
 			"print_data": print_data,
 			"employee_counts": employee_counts,
-		},
+		}
 	)
 
 	options = {

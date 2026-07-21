@@ -9,6 +9,7 @@ from typing import Any
 
 import frappe
 from frappe import _
+from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 
 
@@ -169,22 +170,24 @@ def generate_pdf(data: dict[str, Any]):
 	if letterhead_image and not letterhead_image.startswith("http"):
 		letterhead_image = site_url + letterhead_image
 
-	template_path = "us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html"
-
 	data = data.get("data")["data"]
 
 	current_datetime = datetime.now()
 	formatted_datetime = current_datetime.strftime("%-m/%-d/%Y %-I:%M%p").lower()
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
-	html = frappe.render_template(  # nosemgrep: frappe-ssti
-		template_path,
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	template = frappe.get_template(
+		"us_payroll/us_payroll/report/payroll_tax_summary_report/payroll_tax_summary_report.html"
+	)
+
+	html = template.render(
 		{
 			"data": data,
 			"current_datetime": formatted_datetime,
 			"formatted_date_range": formatted_date_range,
 			"letterhead_image": letterhead_image,
-		},
+		}
 	)
 
 	options = {

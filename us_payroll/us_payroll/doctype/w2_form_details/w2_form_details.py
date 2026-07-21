@@ -6,6 +6,7 @@ import json
 import frappe
 from frappe import _, render_template
 from frappe.model.document import Document
+from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 
 
@@ -16,8 +17,6 @@ class W2FormDetails(Document):
 @frappe.whitelist()
 def calculate_totals(doc: str):
 	doc = json.loads(doc)
-	# if not (doc.get("year_start_date") and doc.get("year_end_date")):
-	# 	frappe.throw("Please make sure Year Start Date, and Year End Date are set.")
 
 	employee = doc.get("employee")
 	year_start_date = doc.get("year_start_date")
@@ -74,7 +73,6 @@ def calculate_totals(doc: str):
 			)
 			if ss_emp:
 				social_security_wages += ss_emp / 0.062
-				# social_security_tax_withheld += ss_emp
 
 		# --- Medicare Wages & Tips ---
 		if slip.custom_mc_taxable_wages and slip.custom_mc_taxable_wages > 0:
@@ -85,7 +83,6 @@ def calculate_totals(doc: str):
 			)
 			if mc_emp:
 				medicare_wages_and_tips += mc_emp / 0.0145
-				# medicare_tax_withheld += mc_emp
 
 		# --- Other deductions ---
 		for deduction in salary_slip_doc.deductions:
@@ -129,15 +126,10 @@ def bulk_w2_print(names: str):
 	docs = [frappe.get_doc("W2 Form Details", name) for name in names]
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
-	html = render_template(  # nosemgrep: frappe-ssti
-		"us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html", {"docs": docs}
-	)
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	template = frappe.get_template("us_payroll/us_payroll/doctype/w2_form_details/w2_bulk_print.html")
 
-	# options = {
-	# 	'margin-top': '14mm',
-	# 	'margin-bottom': '0mm',
-	# }
-	# pdf = get_pdf(html, options=options)
+	html = template.render({"docs": docs})
 
 	pdf = get_pdf(html)
 	frappe.local.response.filename = "W2-Bulk.pdf"

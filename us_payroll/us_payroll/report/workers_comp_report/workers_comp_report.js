@@ -1,7 +1,7 @@
-// Copyright (c) 2026, us_payroll and contributors
+// Copyright (c) 2026, Bizmap and contributors
 // For license information, please see license.txt
 
-frappe.query_reports["Workers' Comp Report"] = {
+frappe.query_reports["Workers Comp Report"] = {
 	filters: [
 		{
 			fieldname: "from_date",
@@ -22,7 +22,7 @@ frappe.query_reports["Workers' Comp Report"] = {
 	onload: function (report) {
 		report.page.add_inner_button(__("Print"), function () {
 			frappe.call({
-				method: "us_payroll.us_payroll.report.workers'_comp_report.workers'_comp_report.get_print",
+				method: "us_payroll.us_payroll.report.workers_comp_report.workers_comp_report.get_print",
 				args: {
 					report_data: { filter: report.get_values(), data: report.data },
 				},

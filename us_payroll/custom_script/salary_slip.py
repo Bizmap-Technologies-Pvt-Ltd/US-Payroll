@@ -161,8 +161,8 @@ def calculate_leaves_taken(doc):
 
 
 def salary_calculations_for_fit(doc):
-	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
-	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
+	client_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
+	total_weeks_of_the_year = client_settings_doc.total_weeks_of_the_year
 
 	# --- 1. Non-taxable earnings (from Earnings table) ---
 	total_non_taxable_earnings = 0
@@ -200,9 +200,9 @@ def salary_calculations_for_fit(doc):
 		annualized_wages = taxable_wages * total_weeks_of_the_year
 	else:
 		site_url = get_url()
-		fund_settings_url = f"{site_url}/desk/client-setup"
+		settings_url = f"{site_url}/desk/client-setup"
 		frappe.throw(
-			f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{fund_settings_url}' >Client Setup</a>"
+			f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{settings_url}' >Client Setup</a>"
 		)
 
 	doc.custom_annualized_wages = annualized_wages
@@ -217,8 +217,8 @@ def salary_calculations_for_fit(doc):
 
 @frappe.whitelist(methods=["POST"])
 def tax_calulations_for_fit(doc: Document):
-	fund_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
-	total_weeks_of_the_year = fund_settings_doc.total_weeks_of_the_year
+	client_settings_doc = frappe.get_doc("Client Setup", "Client Setup")
+	total_weeks_of_the_year = client_settings_doc.total_weeks_of_the_year
 	sal_structure = doc.salary_structure
 	sal_doc = frappe.get_doc("Salary Structure", sal_structure)
 
@@ -304,11 +304,11 @@ def tax_calulations_for_fit(doc: Document):
 			doc.custom_fit_added_in_total_deduction = True
 	else:
 		site_url = get_url()
-		fund_settings_url = f"{site_url}/desk/client-setup"
+		settings_url = f"{site_url}/desk/client-setup"
 		frappe.throw(
 			_(
 				"Please add <b>Total weeks of the year</b> in Client Setup. <a href='{url}'>Client Setup</a>"
-			).format(url=fund_settings_url)
+			).format(url=settings_url)
 		)
 	doc.save()
 

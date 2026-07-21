@@ -9,6 +9,7 @@ from typing import Any
 
 import frappe
 from frappe import _
+from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 
 
@@ -43,19 +44,6 @@ def get_data(filters):
 
 	if not selected_month:
 		frappe.throw(_("Please select a valid month."))
-
-	# # Calculate previous month and year
-	# if selected_month == 1:
-	# 	prev_month = 12
-	# 	prev_year = selected_year - 1
-	# else:
-	# 	prev_month = selected_month - 1
-	# 	prev_year = selected_year
-
-	# # Get first and last day of previous month
-	# start_date = datetime(selected_year, selected_month, 1)
-	# last_day = calendar.monthrange(selected_year, selected_month)[1]
-	# end_date = datetime(selected_year, selected_month, last_day)
 
 	data = frappe.db.sql(
 		"""
@@ -273,8 +261,6 @@ def generate_pdf(data: dict[str, Any]):
 
 	formatted_start_end_date = f"{formatted_start_date} - {formatted_end_date}"
 
-	template_path = "us_payroll/us_payroll/report/tmrs_report/tmrs_report.html"
-
 	letterhead_image = frappe.db.get_value("Letter Head", {"is_default": True}, "image")
 
 	data = data.get("data")["data"]
@@ -288,8 +274,10 @@ def generate_pdf(data: dict[str, Any]):
 	company_name = f"City of {company_name}"
 
 	# Template path is hardcoded and bundled with the app, not user-controlled.
-	html = frappe.render_template(  # nosemgrep: frappe-ssti
-		template_path,
+	# nosemgrep: frappe-semgrep-rules.rules.security.frappe-ssti
+	template = frappe.get_template("us_payroll/us_payroll/report/tmrs_report/tmrs_report.html")
+
+	html = template.render(
 		{
 			"data": data,
 			"department_data": department_data,
@@ -302,7 +290,7 @@ def generate_pdf(data: dict[str, Any]):
 			"end_date": end_date,
 			"formatted_start_end_date": formatted_start_end_date,
 			"month_year": month_year,
-		},
+		}
 	)
 
 	options = {
