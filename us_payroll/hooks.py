@@ -280,6 +280,7 @@ doc_events = {
 fixtures = [
 	{"dt": "Custom Field", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Property Setter", "filters": [["module", "=", "US-Payroll"]]},
+	{"dt": "Property Setter", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "US-Payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", ""]]},
