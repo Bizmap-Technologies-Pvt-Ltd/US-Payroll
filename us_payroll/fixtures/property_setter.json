@@ -1,1 +1,18 @@
-[]
+[
+ {
+  "default_value": null,
+  "doc_type": "Payroll Entry",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "currency",
+  "is_system_generated": 0,
+  "modified": "2026-09-19 02:25:32.391580",
+  "module": "us_payroll",
+  "name": "Payroll Entry-currency-permlevel",
+  "property": "permlevel",
+  "property_type": "Int",
+  "row_name": null,
+  "value": "0"
+ }
+]
