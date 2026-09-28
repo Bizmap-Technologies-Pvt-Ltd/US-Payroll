@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 
 import frappe
+from frappe.utils import getdate
+from erpnext.accounts.utils import get_fiscal_year
 
 
 def setup_wizard_complete(args=None):  # nosemgrep: overusing-args - framework hook signature
@@ -53,3 +55,67 @@ def setup_wizard_complete(args=None):  # nosemgrep: overusing-args - framework h
 			}
 		)
 		structure_doc.insert(ignore_permissions=True, ignore_mandatory=True)
+
+		##create income tax slabs
+		create_income_tax_slabs()
+
+
+
+def create_income_tax_slabs():
+	"""Create Income Tax Slabs during setup with custom checkboxes, currency, and effective_from."""
+
+	# Get current fiscal year start date
+	today = getdate()
+	fiscal_year, fiscal_year_start, fiscal_year_end = get_fiscal_year(today)
+	effective_from = fiscal_year_start
+
+	tax_slabs = [
+		{
+			"doctype": "Income Tax Slab",
+			"name": "Single or Married Filing Separately",
+			"currency": "USD",
+			"effective_from": effective_from,
+		},
+		{
+			"doctype": "Income Tax Slab",
+			"name": "Married Filing Jointly",
+			"currency": "USD",
+			"effective_from": effective_from,
+			"custom_married_filing_jointly": 1,
+		},
+		{
+			"doctype": "Income Tax Slab",
+			"name": "Head of Household",
+			"currency": "USD",
+			"effective_from": effective_from,
+		},
+		{
+			"doctype": "Income Tax Slab",
+			"name": "Single or Married filing separately with Form W-4",
+			"currency": "USD",
+			"effective_from": effective_from,
+			"custom_more_than_one_job": 1,
+		},
+		{
+			"doctype": "Income Tax Slab",
+			"name": "Married filing jointly with Form W-4",
+			"currency": "USD",
+			"effective_from": effective_from,
+			"custom_married_filing_jointly": 1,
+			"custom_more_than_one_job": 1,
+		},
+		{
+			"doctype": "Income Tax Slab",
+			"name": "Head of Household with Form W4",
+			"currency": "USD",
+			"effective_from": effective_from,
+			"custom_more_than_one_job": 1,
+		},
+	]
+
+	for slab in tax_slabs:
+		if not frappe.db.exists("Income Tax Slab", {"name": slab["name"]}):
+			doc = frappe.get_doc(slab)
+			doc.insert(ignore_permissions=True, ignore_mandatory=True)
+
+	frappe.db.commit()
