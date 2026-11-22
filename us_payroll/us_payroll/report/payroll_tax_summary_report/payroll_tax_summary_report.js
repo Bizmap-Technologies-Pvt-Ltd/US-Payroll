@@ -61,9 +61,8 @@ function get_date() {
 	let today = new Date();
 	let currentYear = today.getFullYear();
 
-	let fromDateStr = `01/01/${currentYear}`;
-	let fromDate = new Date(fromDateStr);
-	let toDate = new Date();
+	let fromDate = frappe.datetime.obj_to_str(new Date(currentYear, 0, 1));
+	let toDate = frappe.datetime.obj_to_str(today);
 
 	return { fromDate, toDate };
 }

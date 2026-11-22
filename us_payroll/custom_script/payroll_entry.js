@@ -103,28 +103,6 @@ frappe.ui.form.on("Payroll Entry", {
 		}
 	},
 
-	make_check_entry: function (frm) {
-		frappe.call({
-			method: "us_payroll.custom_script.payroll_entry.get_bank_entry_against_payroll",
-			args: {
-				doc_id: frm.doc.name,
-			},
-			callback: function (r) {
-				if (r.message) {
-					var bank_entry_jv = r.message.bank_entry_jv;
-					var check_entry_jv = r.message.check_entry_jv;
-					if (bank_entry_jv && bank_entry_jv.length > 0 && check_entry_jv.length == 0) {
-						frm.add_custom_button(__("Make Check Entry"), function () {
-							check_entry(frm);
-						}).addClass("btn-primary");
-					} else {
-						frm.remove_custom_button("Make Check Entry");
-					}
-				}
-			},
-		});
-	},
-
 	change_button_label: function (frm) {
 		$(".page-head-content")
 			.find('[data-label="Submit%20Salary%20Slip"]')
@@ -539,30 +517,6 @@ function calculate_holiday_hours(frm) {
 		frm.refresh_field("employees");
 	}
 }
-
-let check_entry = function (frm) {
-	var doc = frm.doc;
-	if (doc.payment_account) {
-		return frappe.call({
-			method: "run_doc_method",
-			args: {
-				method: "make_check_entry",
-				dt: "Payroll Entry",
-				dn: frm.doc.name,
-			},
-			callback: function () {
-				frappe.set_route("List", "Journal Entry", {
-					"Journal Entry Account.reference_name": frm.doc.name,
-				});
-			},
-			freeze: true,
-			freeze_message: __("Creating Payment Entries......"),
-		});
-	} else {
-		frappe.msgprint(__("Payment Account is mandatory"));
-		frm.scroll_to_field("payment_account");
-	}
-};
 
 const submit_salary_slip_no_freeze = function (frm) {
 	frappe.confirm(

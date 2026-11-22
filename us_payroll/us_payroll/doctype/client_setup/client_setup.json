@@ -1,15 +1,17 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_rename": 1,
  "creation": "2026-05-07 10:00:27.485480",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "use_project_code",
   "default_working_hours",
-  "use_three_bank_accounts",
+  "use_project_code",
   "deduct_flat_amount_from_net_pay",
-  "total_weeks_of_the_year"
+  "column_break_kssp",
+  "total_weeks_of_the_year",
+  "use_three_bank_accounts"
  ],
  "fields": [
   {
@@ -17,9 +19,11 @@
    "description": "This is use in Account naming.",
    "fieldname": "use_project_code",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Use Project Code"
   },
   {
+   "default": "0",
    "fieldname": "default_working_hours",
    "fieldtype": "Float",
    "label": "Default Working Hours"
@@ -43,13 +47,17 @@
    "fieldname": "total_weeks_of_the_year",
    "fieldtype": "Float",
    "label": "Total weeks of the year"
+  },
+  {
+   "fieldname": "column_break_kssp",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-05-07 15:47:00.553689",
+ "modified": "2026-11-21 23:16:26.968279",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Client Setup",

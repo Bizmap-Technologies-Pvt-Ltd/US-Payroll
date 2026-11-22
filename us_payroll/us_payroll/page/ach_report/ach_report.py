@@ -5,12 +5,57 @@ from datetime import datetime
 import frappe
 from frappe import _
 from frappe.utils import get_url
+from frappe.utils import now_datetime
 
 from us_payroll.ach_lib.builder import AchFile
 
 
 @frappe.whitelist()
 def generate_ach_file(payroll_entry: str):
+
+	# Fetch allowed roles from ACH Report Page
+	page_roles = frappe.get_all(
+		"Has Role",
+		filters={
+			"parent": "ach-report",
+			"parenttype": "Page",
+			"parentfield": "roles",
+		},
+		pluck="role",
+	)
+
+	if not page_roles:
+		frappe.throw(
+			_("No roles are configured for the ACH Report Page."),
+			frappe.PermissionError,
+		)
+
+	# Fetch roles explicitly assigned to logged-in user
+	user_roles = frappe.get_all(
+		"Has Role",
+		filters={
+			"parent": frappe.session.user,
+			"parenttype": "User",
+			"role": ["in", page_roles],
+		},
+		pluck="role",
+	)
+
+	# Strict permission check
+	if not user_roles:
+		frappe.throw(
+			_("You do not have permission to generate an ACH file."),
+			frappe.PermissionError,
+		)
+
+	# Check Payroll Entry permission
+	if not frappe.has_permission("Payroll Entry", "read", payroll_entry):
+		frappe.throw(
+			_("You do not have permission to generate an ACH file for this Payroll Entry."),
+			frappe.PermissionError,
+		)
+
+	# Existing ACH generation logic continues here
 	ach_data = frappe.get_single("ACH Report Details")
 
 	if ach_data and any(
@@ -20,7 +65,7 @@ def generate_ach_file(payroll_entry: str):
 			"immediate_dest": ach_data.bank_routing_no,
 			"immediate_org": ach_data.bank_account_no,
 			"immediate_dest_name": ach_data.bank_name,
-			"immediate_org_name": ach_data.bank_name,
+			"immediate_org_name": ach_data.company_name,
 			"company_id": ach_data.company_id,
 		}
 	else:
@@ -113,7 +158,16 @@ def generate_ach_file(payroll_entry: str):
 	ach_data = ach_file.render_to_string()
 
 	# Save file in Frappe
-	file = frappe.get_doc({"doctype": "File", "file_name": "ach_file.txt", "content": ach_data})
+	file = frappe.get_doc(
+		{
+			"doctype": "File",
+			"file_name": f"ach_file_{frappe.generate_hash(length=12)}.txt",
+			"content": ach_data,
+			"is_private": 1,
+			"attached_to_doctype": "Payroll Entry",
+			"attached_to_name": payroll_entry,
+		}
+	)
 	file.insert()
 
 	frappe.msgprint(_("ACH File Generated Successfully"))

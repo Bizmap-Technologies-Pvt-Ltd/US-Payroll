@@ -24,6 +24,7 @@ def after_insert(doc, method):
 				doc.custom_custom_total_overtime_hours = employee.custom_total_overtime_hours
 				doc.custom_custom_overtime_hourly_rate = employee.custom_overtime_hourly_rate
 				doc.custom_custom_total_working_hours = employee.custom_total_working_hours
+				doc.custom_base_amount = employee.custom_base_amount
 	doc.save()
 	set_fit_add_flag(doc)
 	tax_calulations_for_fit(doc)

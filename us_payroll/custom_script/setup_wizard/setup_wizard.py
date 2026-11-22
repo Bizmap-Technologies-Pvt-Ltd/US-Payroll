@@ -179,5 +179,6 @@ def create_income_tax_slabs():
 				doc.append("slabs", row)
 
 			doc.insert(ignore_permissions=True, ignore_mandatory=True)
+			doc.submit()
 
 	frappe.db.commit()

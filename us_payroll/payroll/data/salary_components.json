@@ -5,6 +5,7 @@
     "salary_component": "Hourly",
     "type": "Earning",
     "salary_component_abbr": "Hrly",
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "custom_total_amount",
     "is_tax_applicable": 1
@@ -15,6 +16,7 @@
     "salary_component": "Overtime",
     "type": "Earning",
     "salary_component_abbr": "OT",
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "custom_total_overtime_amount",
     "is_tax_applicable": 1
@@ -25,6 +27,7 @@
     "salary_component": "Salary",
     "type": "Earning",
     "salary_component_abbr": "Salary",
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "custom_base_amount",
     "is_tax_applicable": 1
@@ -35,8 +38,9 @@
     "salary_component": "Dental",
     "type": "Deduction",
     "salary_component_abbr": "Dental",
-    "amount_based_on_formula": 1,
-    "formula": "custom_formula"
+    "custom_calculation": 1,
+    "amount_based_on_formula": 0,
+    "formula": ""
   },
   {
     "doctype": "Salary Component",
@@ -44,6 +48,7 @@
     "salary_component": "FIT",
     "type": "Deduction",
     "salary_component_abbr": "FIT",
+    "custom_calculation": 0,
     "amount_based_on_formula": 0,
     "formula": "",
     "custom_is_this_fit_component": 1,
@@ -55,6 +60,7 @@
     "salary_component": "Social Security Tax - Employee",
     "type": "Deduction",
     "salary_component_abbr": "SST-EE",
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.062"
   },
@@ -65,6 +71,7 @@
     "type": "Deduction",
     "salary_component_abbr": "SST-ER",
     "do_not_include_in_total": 1,
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.062"
   },
@@ -74,6 +81,7 @@
     "salary_component": "Medicare Tax EE",
     "type": "Deduction",
     "salary_component_abbr": "MC-EE",
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.0145"
   },
@@ -84,6 +92,7 @@
     "type": "Deduction",
     "salary_component_abbr": "MC-ER",
     "do_not_include_in_total": 1,
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "(custom_taxable_wages+(gross_pay*0.06))*0.0145"
   },
@@ -93,6 +102,7 @@
     "salary_component": "TMRS (Employee)",
     "type": "Deduction",
     "salary_component_abbr": "TMRS (EE)",
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "gross_pay*0.06"
   },
@@ -103,6 +113,7 @@
     "type": "Deduction",
     "salary_component_abbr": "TMRS (ER)",
     "do_not_include_in_total": 1,
+    "custom_calculation": 0,
     "amount_based_on_formula": 1,
     "formula": "gross_pay*0.0446"
   }

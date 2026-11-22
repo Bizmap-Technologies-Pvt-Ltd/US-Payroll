@@ -27,7 +27,7 @@ class SalarySlipMixin(Document):
 	def eval_condition_and_formula(self, struct_row, data):
 		formula = sanitize_expression(struct_row.formula)
 
-		if struct_row.amount_based_on_formula and formula and formula.startswith("custom_formula"):
+		if struct_row.get("custom_calculation")::
 			condition = sanitize_expression(struct_row.condition)
 
 			if condition and not _safe_eval(

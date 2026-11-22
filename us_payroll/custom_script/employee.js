@@ -117,7 +117,7 @@ frappe.ui.form.on("Employee", {
 	custom_number_of_qualifying__children: function (frm) {
 		frm.set_value(
 			"custom_children_credit",
-			(frm.doc.custom_number_of_qualifying__children || 0) * 2000
+			(frm.doc.custom_number_of_qualifying__children || 0) * 2200
 		);
 		frm.trigger("calculate_total_dependents");
 	},
