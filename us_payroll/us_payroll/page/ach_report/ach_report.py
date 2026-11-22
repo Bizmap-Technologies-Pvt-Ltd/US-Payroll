@@ -4,15 +4,13 @@ from datetime import datetime
 
 import frappe
 from frappe import _
-from frappe.utils import get_url
-from frappe.utils import now_datetime
+from frappe.utils import get_url, now_datetime
 
 from us_payroll.ach_lib.builder import AchFile
 
 
 @frappe.whitelist()
 def generate_ach_file(payroll_entry: str):
-
 	# Fetch allowed roles from ACH Report Page
 	page_roles = frappe.get_all(
 		"Has Role",

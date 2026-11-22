@@ -4,6 +4,7 @@ from frappe.model.document import Document
 from frappe.utils import flt, get_url
 from hrms.payroll.doctype.salary_slip.salary_slip import _safe_eval
 from hrms.payroll.utils import sanitize_expression
+
 from us_payroll.custom_script.salary_slip import set_fica_limits
 
 
@@ -26,8 +27,6 @@ class SalarySlipMixin(Document):
 			check_doc.save()
 
 	def eval_condition_and_formula(self, struct_row, data):
-		formula = sanitize_expression(struct_row.formula)
-
 		if struct_row.get("custom_calculation"):
 			condition = sanitize_expression(struct_row.condition)
 
@@ -209,12 +208,21 @@ class SalarySlipMixin(Document):
 		# doc.custom_mc_taxable_wages = doc.custom_taxable_wages + doc.custom_total_fica_deductions
 
 		# Calculate FICA wages before applying the Social Security limit
-		ss_wages = flt(doc.custom_taxable_wages + doc.custom_total_fica_deductions,2,)
-		mc_wages = flt(doc.custom_taxable_wages + doc.custom_total_fica_deductions,2,)
+		ss_wages = flt(
+			doc.custom_taxable_wages + doc.custom_total_fica_deductions,
+			2,
+		)
+		mc_wages = flt(
+			doc.custom_taxable_wages + doc.custom_total_fica_deductions,
+			2,
+		)
 
 		# Apply Social Security wage cap and Additional Medicare threshold
-		set_fica_limits(doc, ss_wages=ss_wages, mc_wages=mc_wages,)
-
+		set_fica_limits(
+			doc,
+			ss_wages=ss_wages,
+			mc_wages=mc_wages,
+		)
 
 	def get_insurance_flags_from_assignment(self, employee, salary_component):
 		sal_assignment_name = frappe.get_value(

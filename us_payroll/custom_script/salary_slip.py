@@ -2,8 +2,7 @@ import frappe
 from erpnext.accounts.utils import get_fiscal_year
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, get_url
-from frappe.utils import flt, getdate
+from frappe.utils import flt, get_url, getdate
 
 
 def after_insert(doc, method):
@@ -216,21 +215,15 @@ def set_fica_limits(doc, ss_wages=None, mc_wages=None):
 	mc_threshold = flt(setup_doc.additional_medicare_tax_threshold)
 
 	if ss_cap <= 0:
-		frappe.throw(
-			"Please configure Social Security Wage Base in Client Setup."
-		)
+		frappe.throw("Please configure Social Security Wage Base in Client Setup.")
 
 	if mc_threshold <= 0:
-		frappe.throw(
-			"Please configure Additional Medicare Tax Threshold in Client Setup."
-		)
+		frappe.throw("Please configure Additional Medicare Tax Threshold in Client Setup.")
 
 	year = getdate(doc.posting_date).year
 
 	if ss_wages is None or mc_wages is None:
-	frappe.throw(
-		"Social Security and Medicare wages must be calculated before applying FICA limits."
-	)
+		frappe.throw("Social Security and Medicare wages must be calculated before applying FICA limits.")
 
 	# Original FICA wages BEFORE applying the Social Security cap.
 	# Pass these values explicitly when calling this function.
@@ -241,9 +234,15 @@ def set_fica_limits(doc, ss_wages=None, mc_wages=None):
 	ss_ytd, mc_ytd = get_ytd(doc, year)
 
 	# Social Security taxable wages
-	remaining_wage_base = max(0, flt(ss_cap - ss_ytd, 2),)
+	remaining_wage_base = max(
+		0,
+		flt(ss_cap - ss_ytd, 2),
+	)
 
-	ss_taxable = flt(max(0, min(ss_wages, remaining_wage_base)),2,)
+	ss_taxable = flt(
+		max(0, min(ss_wages, remaining_wage_base)),
+		2,
+	)
 
 	doc.custom_ss_taxable_wages_ytd = ss_ytd
 	doc.custom_ss_taxable_wages = ss_taxable
@@ -253,8 +252,18 @@ def set_fica_limits(doc, ss_wages=None, mc_wages=None):
 	doc.custom_medicare_taxable_wages_ytd = mc_ytd
 
 	# Additional Medicare taxable wages
-	additional_medicare_wages = flt(max(0, min(mc_wages, mc_ytd + mc_wages - mc_threshold,),),2,)
+	additional_medicare_wages = flt(
+		max(
+			0,
+			min(
+				mc_wages,
+				mc_ytd + mc_wages - mc_threshold,
+			),
+		),
+		2,
+	)
 	doc.custom_additional_medicare_wages = additional_medicare_wages
+
 
 @frappe.whitelist()
 def tax_calulations_for_fit(doc: Document):
@@ -346,4 +355,3 @@ def tax_calulations_for_fit(doc: Document):
 			f"Please add <b>Total weeks of the year</b> in Client Setup. <a href= '{client_settings_url}' >Client Setup</a>"
 		)
 	doc.save()
-

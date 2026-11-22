@@ -2,10 +2,12 @@
 # For license information, please see license.txt
 
 import json
+from collections import defaultdict
 
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import flt
 from frappe.utils.jinja import get_jenv
 from frappe.utils.pdf import get_pdf
 
@@ -43,9 +45,8 @@ def calculate_totals(doc: str):
 	total_federal_income_tax_withheld = 0.0
 	social_security_tax_withheld = 0.0
 	medicare_tax_withheld = 0.0
-	tmrs = 0.0
-	medical_insurance = 0.0
 	retirement_plan = False
+	box_12_amounts = defaultdict(float)
 
 	# Wage bases
 	social_security_wages = 0.0
@@ -91,18 +92,27 @@ def calculate_totals(doc: str):
 			if salary_component.custom_federal_income_tax_and_additional_withholdings:
 				total_federal_income_tax_withheld += deduction.amount
 
-			if salary_component.name == "TMRS (Employee)":
-				tmrs += deduction.amount
-				retirement_plan = True
-
-			if salary_component.name in ["TML-Medical (Pre-Tax)", "TML-Medical ER (Pre-Tax)"]:
-				medical_insurance += deduction.amount
-
 			if salary_component.name == "Social Security Tax - Employee":
 				social_security_tax_withheld += deduction.amount
 
 			if salary_component.name == "Medicare Tax EE":
 				medicare_tax_withheld += deduction.amount
+
+		# W-2 Box 12
+		for row in list(salary_slip_doc.earnings) + list(salary_slip_doc.deductions):
+			salary_component = frappe.get_cached_doc(
+				"Salary Component",
+				row.salary_component,
+			)
+
+			box_12_code = salary_component.get("custom_w2_box_12_code")
+
+			if box_12_code:
+				box_12_amounts[box_12_code] += flt(row.amount)
+
+			# W-2 Box 13 - Retirement Plan
+			if salary_component.get("custom_include_in_retirement_plan"):
+				retirement_plan = True
 
 	return {
 		"total_gross_pay": wages_tips_other_compensation,
@@ -111,9 +121,8 @@ def calculate_totals(doc: str):
 		"medicare_tax_withheld": medicare_tax_withheld,
 		"social_security_wages": social_security_wages,
 		"medicare_wages_and_tips": medicare_wages_and_tips,
-		"tmrs": tmrs,
-		"medical_insurance": medical_insurance,
 		"retirement_plan": retirement_plan,
+		"box_12_amounts": dict(box_12_amounts),
 	}
 
 

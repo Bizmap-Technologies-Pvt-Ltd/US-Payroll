@@ -7,7 +7,7 @@ from datetime import datetime
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import getdate, flt
+from frappe.utils import flt, getdate
 
 
 class Form941Details(Document):
@@ -149,9 +149,9 @@ def calculate_totals(doc: str):
 		# )
 		# medicare_wages_and_tips += (row.get("medicare_emp") or 0) + (row.get("medicare_er") or 0)
 
-		social_security_wages_amt += (row.get("ss_taxable_wages") or 0)
-		
-		medicare_wages_and_tips += (row.get("mc_taxable_wages") or 0)
+		social_security_wages_amt += row.get("ss_taxable_wages") or 0
+
+		medicare_wages_and_tips += row.get("mc_taxable_wages") or 0
 
 	ss_taxable_amount = social_security_wages_amt / 0.124
 	med_taxable_amount = medicare_wages_and_tips / 0.029

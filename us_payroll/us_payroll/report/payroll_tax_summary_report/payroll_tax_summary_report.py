@@ -111,8 +111,8 @@ def get_data(filters):
 			`tabEmployee` emp ON emp.name = ped.employee
 
 		LEFT JOIN (
-			SELECT 
-				employee, 
+			SELECT
+				employee,
 				SUM(gross_pay) AS gross_pay,
 				SUM(custom_ss_taxable_wages) AS social_security_wages,
 				SUM(custom_mc_taxable_wages) AS medicare_wages

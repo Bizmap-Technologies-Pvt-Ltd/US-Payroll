@@ -127,9 +127,7 @@ class PayrollEntryMixin(Document):
 		salary_components = self.get_salary_components(component_type)
 		if salary_components:
 			component_dict = {}
-			advance_deductions = self.get_advance_deductions_for_components(
-				component_type, salary_components
-			)
+			advance_deductions = self.get_advance_deductions_for_components(component_type, salary_components)
 
 			for item in salary_components:
 				employee_cost_centers = self.get_payroll_cost_centers_for_employee(

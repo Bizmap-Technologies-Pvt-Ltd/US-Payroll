@@ -11,7 +11,11 @@ frappe.ui.form.on("Company", {
 			} else {
 				frm.set_value("tax_id", "");
 				// frappe.msgprint(__("EIN No. should be 9 digits."));
-				frappe.msgprint(__("EIN No. should be in XX-XXXXXXX this format(two digits, a hyphen, followed by seven digits)."));
+				frappe.msgprint(
+					__(
+						"EIN No. should be in XX-XXXXXXX this format(two digits, a hyphen, followed by seven digits)."
+					)
+				);
 			}
 		}
 	},
