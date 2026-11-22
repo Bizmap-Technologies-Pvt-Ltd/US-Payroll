@@ -127,12 +127,13 @@ class PayrollEntryMixin(Document):
 		salary_components = self.get_salary_components(component_type)
 		if salary_components:
 			component_dict = {}
+			advance_deductions = self.get_advance_deductions_for_components(component_type, salary_components)
 
 			for item in salary_components:
 				employee_cost_centers = self.get_payroll_cost_centers_for_employee(
 					item.employee, item.salary_structure
 				)
-				employee_advance = self.get_advance_deduction(component_type, item)
+				employee_advance = advance_deductions.get(item.additional_salary)
 
 				for cost_center, percentage in employee_cost_centers.items():
 					amount_against_cost_center = flt(item.amount) * percentage / 100
@@ -154,6 +155,29 @@ class PayrollEntryMixin(Document):
 			account_details = self.get_account(component_dict=component_dict)
 
 			return account_details
+
+	def get_advance_deductions_for_components(self, component_type, salary_components):
+		if hasattr(self, "get_advance_deductions"):
+			return self.get_advance_deductions(component_type, salary_components)
+
+		# Support HRMS v16 revisions that still expose the pre-refactor advance helpers.
+		if component_type != "deductions":
+			return {}
+
+		advance_deductions = {}
+		for item in salary_components:
+			if not item.additional_salary:
+				continue
+
+			ref_doctype, ref_docname = frappe.db.get_value(
+				"Additional Salary",
+				item.additional_salary,
+				["ref_doctype", "ref_docname"],
+			)
+			if ref_doctype == "Employee Advance":
+				advance_deductions[item.additional_salary] = ref_docname
+
+		return advance_deductions
 
 	def get_account(self, component_dict=None, employee=None):
 		component_dict = component_dict or {}

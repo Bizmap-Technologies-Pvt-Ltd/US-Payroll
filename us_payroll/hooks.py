@@ -284,10 +284,10 @@ doc_events = {
 # }
 
 fixtures = [
-	{"dt": "Custom Field", "filters": [["module", "=", "US-Payroll"]]},
+	{"dt": "Custom Field", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Property Setter", "filters": [["module", "=", "us_payroll"]]},
-	{"dt": "Workspace", "filters": [["module", "=", "US-Payroll"]]},
+	{"dt": "Print Format", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
+	{"dt": "Workspace Sidebar", "filters": [["name", "=", "USA Payroll"]]},
 	"Translation",
-	"Workspace Sidebar",
 ]

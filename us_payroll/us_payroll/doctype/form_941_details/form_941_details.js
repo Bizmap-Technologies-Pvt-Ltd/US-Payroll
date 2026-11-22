@@ -652,16 +652,16 @@ frappe.ui.form.on("Form 941 Details", {
 
 	employer_identification_number_ein: function (frm) {
 		let ein = frm.doc.employer_identification_number_ein;
-		if (ein && ein.length === 9 && frm.doc.__islocal == 1) {
+		if (ein && ein.length === 10 && frm.doc.__islocal == 1) {
 			frm.set_value("digit1", ein[0]);
 			frm.set_value("digit2", ein[1]);
-			frm.set_value("digit3", ein[2]);
-			frm.set_value("digit4", ein[3]);
-			frm.set_value("digit5", ein[4]);
-			frm.set_value("digit6", ein[5]);
-			frm.set_value("digit7", ein[6]);
-			frm.set_value("digit8", ein[7]);
-			frm.set_value("digit9", ein[8]);
+			frm.set_value("digit3", ein[3]);
+			frm.set_value("digit4", ein[4]);
+			frm.set_value("digit5", ein[5]);
+			frm.set_value("digit6", ein[6]);
+			frm.set_value("digit7", ein[7]);
+			frm.set_value("digit8", ein[8]);
+			frm.set_value("digit9", ein[9]);
 		} else {
 			frappe.msgprint(__("Please enter a valid 9-digit EIN number."));
 			frm.set_value("digit1", "");

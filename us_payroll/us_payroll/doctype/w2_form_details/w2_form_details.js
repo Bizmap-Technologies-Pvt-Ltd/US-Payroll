@@ -56,58 +56,7 @@ frappe.ui.form.on("W2 Form Details", {
 			);
 		}
 
-		frappe.call({
-			method: "us_payroll.us_payroll.doctype.w2_form_details.w2_form_details.calculate_totals",
-			args: {
-				doc: frm.doc,
-			},
-			callback: function (r) {
-				let total_gross_pay = r.message.total_gross_pay;
-				let total_federal_income_tax_withheld =
-					r.message.total_federal_income_tax_withheld;
-				let social_security_tax_withheld = r.message.social_security_tax_withheld;
-				let medicare_tax_withheld = r.message.medicare_tax_withheld;
-				let tmrs = r.message.tmrs;
-				let medical_insurance = r.message.medical_insurance;
-				let retirement_plan = r.message.retirement_plan;
-				let social_security_wages = r.message.social_security_wages;
-				let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
-
-				if (r.message) {
-					frm.set_value("wages_tips_other_compensation", total_gross_pay);
-					frm.set_value(
-						"federal_income_tax_withheld",
-						total_federal_income_tax_withheld
-					);
-					frm.set_value("social_security_tax_withheld", social_security_tax_withheld);
-					frm.set_value("medicare_tax_withheld", medicare_tax_withheld);
-					frm.set_value("medical_insurance", medical_insurance);
-					frm.set_value("tmrs", tmrs);
-					frm.set_value("retirement_plan", retirement_plan);
-					frm.set_value("social_security_wages", social_security_wages);
-					frm.set_value("medicare_wages_and_tips", medicare_wages_and_tips);
-				} else {
-					frm.set_value("wages_tips_other_compensation", "");
-					frm.set_value("federal_income_tax_withheld", "");
-					frm.set_value("social_security_tax_withheld", "");
-					frm.set_value("medicare_tax_withheld", "");
-					frm.set_value("medical_insurance", "");
-					frm.set_value("tmrs", "");
-					frm.set_value("retirement_plan", false);
-					frm.set_value("social_security_wages", "");
-					frm.set_value("medicare_wages_and_tips", "");
-				}
-				frm.refresh_field("wages_tips_other_compensation");
-				frm.refresh_field("federal_income_tax_withheld");
-				frm.refresh_field("social_security_tax_withheld");
-				frm.refresh_field("medicare_tax_withheld");
-				frm.refresh_field("medical_insurance");
-				frm.refresh_field("tmrs");
-				frm.refresh_field("retirement_plan");
-				frm.refresh_field("social_security_wages");
-				frm.refresh_field("medicare_wages_and_tips");
-			},
-		});
+		frm.trigger("calculate_w2_totals");
 	},
 
 	set_ein: function (frm) {
@@ -156,16 +105,10 @@ frappe.ui.form.on("W2 Form Details", {
 		}
 	},
 
-	year: function (frm) {
-		let today = new Date();
-		let currentYear = today.getFullYear();
-		let selectedYear = frm.doc.year;
-		let fromDateStr = `${selectedYear}/01/01`;
-		let fromDate = new Date(fromDateStr);
-		let toDateStr = `${selectedYear}/12/31`;
-		let toDate = new Date(toDateStr);
-		frm.set_value("year_start_date", fromDateStr);
-		frm.set_value("year_end_date", toDateStr);
+	calculate_w2_totals: function (frm) {
+		if (!frm.doc.employee || !frm.doc.year_start_date || !frm.doc.year_end_date) {
+			return;
+		}
 
 		frappe.call({
 			method: "us_payroll.us_payroll.doctype.w2_form_details.w2_form_details.calculate_totals",
@@ -173,51 +116,47 @@ frappe.ui.form.on("W2 Form Details", {
 				doc: frm.doc,
 			},
 			callback: function (r) {
-				let total_gross_pay = r.message.total_gross_pay;
-				let total_federal_income_tax_withheld =
-					r.message.total_federal_income_tax_withheld;
-				let social_security_tax_withheld = r.message.social_security_tax_withheld;
-				let medicare_tax_withheld = r.message.medicare_tax_withheld;
-				let tmrs = r.message.tmrs;
-				let medical_insurance = r.message.medical_insurance;
-				let retirement_plan = r.message.retirement_plan;
-				let social_security_wages = r.message.social_security_wages;
-				let medicare_wages_and_tips = r.message.medicare_wages_and_tips;
+				if (!r.message) return;
 
-				if (r.message) {
-					frm.set_value("wages_tips_other_compensation", total_gross_pay);
-					frm.set_value(
-						"federal_income_tax_withheld",
-						total_federal_income_tax_withheld
-					);
-					frm.set_value("social_security_tax_withheld", social_security_tax_withheld);
-					frm.set_value("medicare_tax_withheld", medicare_tax_withheld);
-					frm.set_value("medical_insurance", medical_insurance);
-					frm.set_value("tmrs", tmrs);
-					frm.set_value("retirement_plan", retirement_plan);
-					frm.set_value("social_security_wages", social_security_wages);
-					frm.set_value("medicare_wages_and_tips", medicare_wages_and_tips);
-				} else {
-					frm.set_value("wages_tips_other_compensation", "");
-					frm.set_value("federal_income_tax_withheld", "");
-					frm.set_value("social_security_tax_withheld", "");
-					frm.set_value("medicare_tax_withheld", "");
-					frm.set_value("medical_insurance", "");
-					frm.set_value("tmrs", "");
-					frm.set_value("retirement_plan", false);
-					frm.set_value("social_security_wages", "");
-					frm.set_value("medicare_wages_and_tips", "");
-				}
-				frm.refresh_field("wages_tips_other_compensation");
-				frm.refresh_field("federal_income_tax_withheld");
-				frm.refresh_field("social_security_tax_withheld");
-				frm.refresh_field("medicare_tax_withheld");
-				frm.refresh_field("medical_insurance");
-				frm.refresh_field("tmrs");
-				frm.refresh_field("retirement_plan");
-				frm.refresh_field("social_security_wages");
-				frm.refresh_field("medicare_wages_and_tips");
+				const data = r.message;
+
+				frm.set_value({
+					wages_tips_other_compensation: data.total_gross_pay,
+					federal_income_tax_withheld: data.total_federal_income_tax_withheld,
+					social_security_tax_withheld: data.social_security_tax_withheld,
+					medicare_tax_withheld: data.medicare_tax_withheld,
+					social_security_wages: data.social_security_wages,
+					medicare_wages_and_tips: data.medicare_wages_and_tips,
+					retirement_plan: data.retirement_plan,
+				});
+
+				// Populate W-2 Box 12 child table
+				frm.clear_table("box_12_details");
+
+				const box_12_amounts = data.box_12_amounts || {};
+
+				Object.entries(box_12_amounts).forEach(([code, amount]) => {
+					frm.add_child("box_12_details", {
+						box_12_code: code,
+						amount: amount,
+					});
+				});
+
+				frm.refresh_field("box_12_details");
 			},
+		});
+	},
+
+	year: function (frm) {
+		if (!frm.doc.year) return;
+
+		const selectedYear = frm.doc.year;
+
+		frm.set_value({
+			year_start_date: `${selectedYear}-01-01`,
+			year_end_date: `${selectedYear}-12-31`,
+		}).then(() => {
+			frm.trigger("calculate_w2_totals");
 		});
 	},
 });

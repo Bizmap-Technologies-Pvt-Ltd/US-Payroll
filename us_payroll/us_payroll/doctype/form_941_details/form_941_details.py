@@ -7,6 +7,7 @@ from datetime import datetime
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import flt, getdate
 
 
 class Form941Details(Document):
@@ -52,7 +53,9 @@ def calculate_totals(doc: str):
 				SUM(agg.ss_employee_total) AS social_security_emp,
 				SUM(agg.ss_employer_total) AS social_security_er,
 				SUM(agg.medicare_employee_total) AS medicare_emp,
-				SUM(agg.medicare_employer_total) AS medicare_er
+				SUM(agg.medicare_employer_total) AS medicare_er,
+				SUM(agg.custom_ss_taxable_wages) AS ss_taxable_wages,
+				SUM(agg.custom_mc_taxable_wages) AS mc_taxable_wages
 			FROM (
 				SELECT
 					cs.name AS salary_slip_id,
@@ -63,6 +66,8 @@ def calculate_totals(doc: str):
 					cs.custom_total_pretax,
 					cs.custom_total_non_taxable_earnings,
 					cs.custom_taxable_wages,
+					cs.custom_ss_taxable_wages,
+					cs.custom_mc_taxable_wages,
 
 					COALESCE((
 						SELECT SUM(ded.amount)
@@ -139,10 +144,14 @@ def calculate_totals(doc: str):
 		total_taxable_wages += row.get("taxable_wages") or 0
 		total_non_taxable_earnings += row.get("non_taxable_earnings") or 0
 		total_federal_income_tax_withheld += row.get("federal_withholding") or 0
-		social_security_wages_amt += (row.get("social_security_emp") or 0) + (
-			row.get("social_security_er") or 0
-		)
-		medicare_wages_and_tips += (row.get("medicare_emp") or 0) + (row.get("medicare_er") or 0)
+		# social_security_wages_amt += (row.get("social_security_emp") or 0) + (
+		# 	row.get("social_security_er") or 0
+		# )
+		# medicare_wages_and_tips += (row.get("medicare_emp") or 0) + (row.get("medicare_er") or 0)
+
+		social_security_wages_amt += row.get("ss_taxable_wages") or 0
+
+		medicare_wages_and_tips += row.get("mc_taxable_wages") or 0
 
 	ss_taxable_amount = social_security_wages_amt / 0.124
 	med_taxable_amount = medicare_wages_and_tips / 0.029
@@ -283,7 +292,8 @@ def get_quarterly_data_for_liability(doc: str):
 
 	for slip in salary_slips:
 		slip_doc = frappe.get_doc("Salary Slip", slip["name"])
-		slip_month = slip_doc.start_date.month
+		# slip_month = slip_doc.start_date.month
+		slip_month = slip_doc.posting_date.month
 		month_key = month_mapping.get(slip_month)
 
 		for row in slip_doc.deductions:

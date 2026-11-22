@@ -56,13 +56,13 @@ def get_columns():
 		},
 		{
 			"label": _("Unemployment insurance"),
-			"fieldname": "workers_comp",
+			"fieldname": "unemployment_insurance",
 			"fieldtype": "Currency",
 			"width": 150,
 		},
 		{
 			"label": _("Workers comp"),
-			"fieldname": "unemployment_insurance",
+			"fieldname": "workers_comp",
 			"fieldtype": "Currency",
 			"width": 150,
 		},
@@ -86,20 +86,22 @@ def get_data(filters):
 			emp.middle_name,
 			emp.last_name,
 			gp.gross_pay,
+			gp.social_security_wages,
+			gp.medicare_wages,
 
 			COALESCE(SUM(
 				CASE
 					WHEN sd.salary_component IN ('FIT Withholdings', 'FIT') THEN sd.amount
 					ELSE 0
 				END
-			), 0) AS fit_withholdings,
+			), 0) AS fit_withholdings
 
-			COALESCE(SUM(CASE
-				WHEN sd.salary_component = 'Social Security Tax - Employee' THEN sd.amount
-				ELSE 0 END), 0) AS social_security_wages,
-			COALESCE(SUM(CASE
-				WHEN sd.salary_component = 'Medicare Tax EE' THEN sd.amount
-				ELSE 0 END), 0) AS medicare_wages
+			-- COALESCE(SUM(CASE
+			-- 	WHEN sd.salary_component = 'Social Security Tax - Employee' THEN sd.amount
+			-- 	ELSE 0 END), 0) AS social_security_wages,
+			-- COALESCE(SUM(CASE
+			-- 	WHEN sd.salary_component = 'Medicare Tax EE' THEN sd.amount
+			-- 	ELSE 0 END), 0) AS medicare_wages
 
 		FROM
 			`tabPayroll Entry` pe
@@ -109,10 +111,15 @@ def get_data(filters):
 			`tabEmployee` emp ON emp.name = ped.employee
 
 		LEFT JOIN (
-			SELECT employee, SUM(gross_pay) AS gross_pay
+			SELECT
+				employee,
+				SUM(gross_pay) AS gross_pay,
+				SUM(custom_ss_taxable_wages) AS social_security_wages,
+				SUM(custom_mc_taxable_wages) AS medicare_wages
+
 			FROM `tabSalary Slip`
 			WHERE posting_date BETWEEN %(from_date)s AND %(to_date)s
-			  AND docstatus != 2
+			  AND docstatus = 1
 			GROUP BY employee
 		) gp ON gp.employee = ped.employee
 
@@ -123,7 +130,7 @@ def get_data(filters):
 
 		WHERE
 			cst.posting_date BETWEEN %(from_date)s AND %(to_date)s
-			AND cst.docstatus != 2
+			AND cst.docstatus = 1
 			AND sd.salary_component IN ('FIT Withholdings', 'Social Security Tax - Employee', 'Medicare Tax EE', 'FIT')
 
 		GROUP BY
@@ -135,8 +142,8 @@ def get_data(filters):
 	)
 
 	for row in data:
-		row["workers_comp"] = (row.get("gross_pay") or 0) * 0.007
-		row["unemployment_insurance"] = 0
+		row["unemployment_insurance"] = (row.get("gross_pay") or 0) * 0.007
+		row["workers_comp"] = 0
 
 	return data
 
