@@ -123,6 +123,21 @@ def reflect_do_not_include(doc):
 			):
 				deduction_row.do_not_include_in_total = assign_row.do_not_include_in_total
 				deduction_row.do_not_include_in_accounts = assign_row.do_not_include_in_accounts
+				deduction_row.custom_calculation = assign_row.custom_calculation
+
+
+def set_flag(doc):
+	sal_assignment_name = frappe.get_value(
+		"Salary Structure Assignment", {"employee": doc.employee, "docstatus": 1}, "name"
+	)
+	if not sal_assignment_name:
+		return
+
+	sal_assignment_doc = frappe.get_doc("Salary Structure Assignment", sal_assignment_name)
+	for earning_row in doc.earnings:
+		for assign_row in sal_assignment_doc.custom_employee_earnings:
+			if earning_row.salary_component == assign_row.earning_component:
+				earning_row.custom_calculation = assign_row.custom_calculation
 
 
 def set_do_not_include_in_accounts(doc):

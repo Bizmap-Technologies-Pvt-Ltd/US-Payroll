@@ -188,6 +188,7 @@ frappe.ui.form.on("Employee Insurance Deduction", {
 				"custom_is_this_pretax_component",
 				"custom_is_this_fit_component",
 				"custom_federal_income_tax_and_additional_withholdings",
+				"custom_calculation",
 			])
 			.then((r) => {
 				if (!r || !r.message) return;
@@ -207,6 +208,7 @@ frappe.ui.form.on("Employee Insurance Deduction", {
 					custom_is_this_fit_component: "is_this_income_tax_slab_component",
 					custom_federal_income_tax_and_additional_withholdings:
 						"federal_income_tax_and_additional_withholdings",
+					custom_calculation: "custom_calculation",
 				};
 
 				Object.keys(field_map).forEach((sc_field) => {
@@ -223,5 +225,30 @@ frappe.ui.form.on("Employee Insurance Deduction", {
 			row.is_this_pre_tax_component = 0; // uncheck
 		}
 		frm.refresh_field("custom_employee_insurance_deduction");
+	},
+});
+
+frappe.ui.form.on("Employee Earnings", {
+	// child doctype
+	earning_component(frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		if (!row.earning_component) return;
+
+		frappe.db
+			.get_value("Salary Component", row.earning_component, ["custom_calculation"])
+			.then((r) => {
+				if (!r || !r.message) return;
+
+				const data = r.message;
+
+				// Explicit mapping: Salary Component → Child Table
+				const field_map = {
+					custom_calculation: "custom_calculation",
+				};
+
+				Object.keys(field_map).forEach((sc_field) => {
+					frappe.model.set_value(cdt, cdn, field_map[sc_field], data[sc_field]);
+				});
+			});
 	},
 });

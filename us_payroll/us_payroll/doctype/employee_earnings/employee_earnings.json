@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_rename": 1,
  "creation": "2026-02-04 19:16:08.332276",
  "doctype": "DocType",
@@ -7,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "earning_component",
-  "amount"
+  "amount",
+  "custom_calculation"
  ],
  "fields": [
   {
@@ -24,13 +26,20 @@
    "in_list_view": 1,
    "label": "Salary Component",
    "options": "Salary Component"
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_calculation",
+   "fieldtype": "Check",
+   "label": "Custom Calculation",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-23 02:22:32.231214",
+ "modified": "2026-11-22 04:14:07.104498",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Employee Earnings",
