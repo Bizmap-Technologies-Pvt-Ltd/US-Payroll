@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_rename": 1,
  "creation": "2025-12-26 01:50:28.887816",
  "doctype": "DocType",
@@ -19,7 +20,8 @@
   "insurance_component",
   "is_this_pre_tax_component",
   "is_this_income_tax_slab_component",
-  "federal_income_tax_and_additional_withholdings"
+  "federal_income_tax_and_additional_withholdings",
+  "custom_calculation"
  ],
  "fields": [
   {
@@ -71,11 +73,11 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "default": "0",
    "fieldname": "do_not_include_in_total",
    "fieldtype": "Check",
-   "label": "Do Not Include in Total",
-   "read_only": 1
+   "label": "Do Not Include in Total"
   },
   {
    "default": "0",
@@ -125,13 +127,20 @@
    "fieldtype": "Check",
    "label": " Do Not Include in Accounting Entries",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_calculation",
+   "fieldtype": "Check",
+   "label": "Custom Calculation",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-05-29 12:24:48.223854",
+ "modified": "2026-11-22 04:13:30.149778",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "Employee Insurance Deduction",
