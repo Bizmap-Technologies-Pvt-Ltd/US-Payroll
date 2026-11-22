@@ -289,5 +289,6 @@ fixtures = [
 	{"dt": "Print Format", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Workspace Sidebar", "filters": [["name", "=", "USA Payroll"]]},
+	{"dt": "Workspace Sidebar", "filters": [["app", "=", "us_payroll"]]},
 	"Translation",
 ]
