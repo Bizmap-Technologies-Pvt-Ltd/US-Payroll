@@ -43,6 +43,7 @@ class SalarySlipMixin(Document):
 					"employee": self.employee,
 					"salary_structure": self.salary_structure,
 					"docstatus": 1,
+					"from_date": ["<=", self.start_date],
 				},
 				"name",
 			)

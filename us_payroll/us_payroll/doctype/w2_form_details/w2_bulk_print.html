@@ -16,7 +16,7 @@
 /* ===================================== */
 
 .page {
-    height: 287mm;                 /* A4 height minus margins */
+    height: 130mm;                 /* A4 height minus margins */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -116,6 +116,7 @@ td {
 
 {# Close the last page only if docs length is odd #}
 {% if docs|length % 2 == 1 %}
+
     </div>
 {% endif %}
 
