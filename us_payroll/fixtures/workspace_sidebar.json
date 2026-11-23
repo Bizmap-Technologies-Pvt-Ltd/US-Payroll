@@ -359,22 +359,6 @@
     "url": null
    },
    {
-    "child": 1,
-    "collapsible": 1,
-    "filters": null,
-    "icon": null,
-    "indent": 0,
-    "keep_closed": 0,
-    "label": "Worker's Comp Report",
-    "link_to": "Workers Comp Report",
-    "link_type": "Report",
-    "navigate_to_tab": null,
-    "route_options": null,
-    "show_arrow": 0,
-    "type": "Link",
-    "url": null
-   },
-   {
     "child": 0,
     "collapsible": 1,
     "filters": null,
@@ -519,7 +503,7 @@
     "url": null
    }
   ],
-  "modified": "2026-11-18 06:41:50.205408",
+  "modified": "2026-11-22 20:38:19.728155",
   "module": "us_payroll",
   "module_onboarding": null,
   "name": "USA Payroll",
