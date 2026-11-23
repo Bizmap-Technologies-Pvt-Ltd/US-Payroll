@@ -290,5 +290,6 @@ fixtures = [
 	{"dt": "Workspace", "filters": [["module", "=", "us_payroll"]]},
 	{"dt": "Workspace Sidebar", "filters": [["name", "=", "USA Payroll"]]},
 	{"dt": "Workspace Sidebar", "filters": [["app", "=", "us_payroll"]]},
+	{"dt": "Role", "filters": [["name", "=", "Payroll Manager"]]},
 	"Translation",
 ]

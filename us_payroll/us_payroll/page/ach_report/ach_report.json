@@ -4,13 +4,17 @@
  "docstatus": 0,
  "doctype": "Page",
  "idx": 0,
- "modified": "2026-05-05 11:31:56.493790",
+ "modified": "2026-11-22 23:21:51.143675",
  "modified_by": "Administrator",
  "module": "us_payroll",
  "name": "ach-report",
  "owner": "Administrator",
  "page_name": "ach-report",
- "roles": [],
+ "roles": [
+  {
+   "role": "Payroll Manager"
+  }
+ ],
  "script": null,
  "standard": "Yes",
  "style": null,
