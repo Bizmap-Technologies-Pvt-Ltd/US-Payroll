@@ -1,3 +1,80 @@
+{# ===== DYNAMIC DATA: CHANGE doc.employee / doc.year to your real field names ===== #}
+{% set w2_emp = doc.employee %}
+{# Year: first 4 digits of year / tax_year / fiscal_year. If none is found it is 0 and ALL submitted stubs of the employee are used #}
+{% set w2_year = ((doc.year or doc.tax_year or doc.fiscal_year or '') | string)[:4] | int %}
+
+{# Check which Salary Component fields exist, so the print never errors if a field is missing #}
+{% set sc_cols = frappe.db.sql("""
+    SELECT COLUMN_NAME AS col
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'tabSalary Component'
+      AND COLUMN_NAME IN ('custom_include_in_retirement_plan', 'custom_w2_box_12_code')
+""", as_dict=True) | map(attribute='col') | list %}
+
+{# Box 13: components ticked "Include in Retirement Plan" with an amount this year #}
+{% if 'custom_include_in_retirement_plan' in sc_cols %}
+{% set retirement_rows = frappe.db.sql("""
+    SELECT sd.salary_component, SUM(sd.amount) AS total
+    FROM `tabSalary Detail` sd
+    INNER JOIN `tabSalary Slip` ss ON ss.name = sd.parent
+    INNER JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+    WHERE ss.employee = %(emp)s
+      AND ss.docstatus = 1
+      AND (%(year)s = 0 OR YEAR(ss.posting_date) = %(year)s)
+      AND sd.parentfield = 'deductions'
+      AND sc.custom_include_in_retirement_plan = 1
+    GROUP BY sd.salary_component
+    HAVING SUM(sd.amount) > 0
+""", {"emp": w2_emp, "year": w2_year}, as_dict=True) %}
+{% else %}
+{% set retirement_rows = [] %}
+{% endif %}
+
+{# Box 14: same checkbox (Include in Retirement Plan), name and yearly total #}
+{% if 'custom_include_in_retirement_plan' in sc_cols %}
+{% set box14_rows = frappe.db.sql("""
+    SELECT sd.salary_component, SUM(sd.amount) AS total
+    FROM `tabSalary Detail` sd
+    INNER JOIN `tabSalary Slip` ss ON ss.name = sd.parent
+    INNER JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+    WHERE ss.employee = %(emp)s
+      AND ss.docstatus = 1
+      AND (%(year)s = 0 OR YEAR(ss.posting_date) = %(year)s)
+      AND sd.parentfield = 'deductions'
+      AND sc.custom_include_in_retirement_plan = 1
+    GROUP BY sd.salary_component
+    HAVING SUM(sd.amount) > 0
+    ORDER BY sd.salary_component
+""", {"emp": w2_emp, "year": w2_year}, as_dict=True) %}
+{% else %}
+{% set box14_rows = [] %}
+{% endif %}
+
+{# Box 12: one row per "W-2 Box 12 Code" (DD, D, E, G ...), amounts added together #}
+{% if 'custom_w2_box_12_code' in sc_cols %}
+{% set box12_rows = frappe.db.sql("""
+    SELECT sc.custom_w2_box_12_code AS code, SUM(sd.amount) AS total
+    FROM `tabSalary Detail` sd
+    INNER JOIN `tabSalary Slip` ss ON ss.name = sd.parent
+    INNER JOIN `tabSalary Component` sc ON sc.name = sd.salary_component
+    WHERE ss.employee = %(emp)s
+      AND ss.docstatus = 1
+      AND (%(year)s = 0 OR YEAR(ss.posting_date) = %(year)s)
+      AND IFNULL(sc.custom_w2_box_12_code, '') != ''
+    GROUP BY sc.custom_w2_box_12_code
+    HAVING SUM(sd.amount) > 0
+    ORDER BY sc.custom_w2_box_12_code
+""", {"emp": w2_emp, "year": w2_year}, as_dict=True) %}
+{% else %}
+{% set box12_rows = [] %}
+{% endif %}
+
+{% set b12a = box12_rows[0] if box12_rows|length > 0 else None %}
+{% set b12b = box12_rows[1] if box12_rows|length > 1 else None %}
+{% set b12c = box12_rows[2] if box12_rows|length > 2 else None %}
+{% set b12d = box12_rows[3] if box12_rows|length > 3 else None %}
+
 <style>
     @page {
         size: A4;
@@ -8,12 +85,6 @@
         margin: 0;
         padding: 0;
         font-family: "Courier New", Courier, monospace;
-    }
-
-    .page {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
     }
 
     .w2-canvas {
@@ -177,33 +248,35 @@
     <div class="w2-val w2-right" style="top:3.35in; left:3.55in; width:1.6in;">
     </div>
 
-    <!-- Box 12a -->
+    <!-- Box 12a: code and amount come from "W-2 Box 12 Code" on Salary Component -->
     <div class="w2-val w2-left" style="top:2.16in; left:5.8in; width:1.7in;">
-        &nbsp;&nbsp; DD &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ "{:,.2f}".format(doc.medical_insurance | float) }}
+        {% if b12a %}&nbsp;&nbsp; {{ b12a.code }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ "{:,.2f}".format(b12a.total | float) }}{% endif %}
     </div>
 
     <!-- Box 12b -->
     <div class="w2-val w2-left" style="top:3.15in; left:5.2in; width:1.7in;">
+        {% if b12b %}&nbsp;&nbsp; {{ b12b.code }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ "{:,.2f}".format(b12b.total | float) }}{% endif %}
     </div>
 
     <!-- Box 12c -->
     <div class="w2-val w2-left" style="top:3.45in; left:5.2in; width:1.7in;">
+        {% if b12c %}&nbsp;&nbsp; {{ b12c.code }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ "{:,.2f}".format(b12c.total | float) }}{% endif %}
     </div>
 
     <!-- Box 12d -->
     <div class="w2-val w2-left" style="top:3.75in; left:5.2in; width:1.7in;">
+        {% if b12d %}&nbsp;&nbsp; {{ b12d.code }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ "{:,.2f}".format(b12d.total | float) }}{% endif %}
     </div>
 
     <!-- Box 13 checkboxes -->
     <div class="w2-val checkbox" style="top:2.79in; left:4.04in;">{% if doc.statutory_employee %}x{% endif %}</div>
-    {% if doc.tmrs %}
-    <div class="w2-val checkbox" style="top:2.55in; left:4.82in">{% if doc.retirement_plan %}x{% endif %}</div>
-    {% endif %}
+    {# Retirement plan: "x" when a component ticked "Include in Retirement Plan" has an amount #}
+    <div class="w2-val checkbox" style="top:2.55in; left:4.82in">{% if retirement_rows %}x{% endif %}</div>
     <div class="w2-val checkbox" style="top:3.62in; left:5.58in;">{% if doc.third_party_sick_pay %}x{% endif %}</div>
 
-    <!-- Box 14 -->
-    {% if doc.tmrs %} <div class="w2-val w2-left" style="top:2.85in; left:4.12in; width:3.2in;">
-        TMRS &nbsp;{{ doc.tmrs }}
+    <!-- Box 14: name and amount of each component ticked "Include in Retirement Plan" -->
+    {% if box14_rows %} <div class="w2-val w2-left" style="top:2.85in; left:4.12in; width:3.2in;">
+        {% for r in box14_rows %}{{ r.salary_component }} &nbsp;{{ "{:,.2f}".format(r.total | float) }}{% if not loop.last %}<br>{% endif %}{% endfor %}
     </div> {% endif %}
 
     <!-- Boxes 15–20 -->
@@ -220,5 +293,3 @@
     <div class="w2-val w2-left" style="top:5.22in; left:4.95in; width:2.5in;">
     </div>
 </div>
-
-
