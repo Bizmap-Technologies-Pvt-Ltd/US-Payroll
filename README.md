@@ -94,6 +94,8 @@ Pick the branch that matches your Frappe and ERPNext version.
 
 A Frappe site with **ERPNext** and **Frappe HR (hrms)** installed.
 
+**Note:**  After running `bench get-app hrms`, run `bench build` from the bench directory to ensure all required frontend assets are generated correctly. Without this step, the Desk may render blank.
+
 ### Install on an existing bench
 
 Open the **USA Payroll** workspace in the desk to start setting up employees, salary structures and
